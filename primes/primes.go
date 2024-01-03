@@ -27,6 +27,8 @@ import (
 	"fmt"
 	"math"
 	"os"
+
+	"github.com/erikbryant/util-golang/system"
 )
 
 const (
@@ -44,7 +46,8 @@ var (
 )
 
 func init() {
-	Load("primes.gob")
+	fileName := system.MyPath("primes.gob")
+	Load(fileName)
 }
 
 // Pi is the prime counting function, returning the number of primes below n

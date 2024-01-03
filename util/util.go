@@ -1,47 +1,12 @@
 package util
 
 import (
-	"fmt"
 	"math"
 	"math/big"
-	"os"
-	"os/signal"
-	"path"
-	"runtime"
 	"strings"
-	"syscall"
 
 	"github.com/erikbryant/util-golang/primes"
 )
-
-func init() {
-	filepath := path.Join(MyPath(), "../primes/primes.gob")
-	primes.Load(filepath)
-}
-
-// MyPath returns the absolute path of the source file calling this
-func MyPath() string {
-	_, filename, _, ok := runtime.Caller(1)
-	if !ok {
-		panic("Cannot get caller information")
-	}
-	return path.Dir(filename)
-}
-
-// CtrlT prints a debugging message when SIGUSR1 is sent to this process.
-func CtrlT(str string, val *int, digits []int) {
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, syscall.SIGUSR1)
-
-	fmt.Println("$ kill -SIGUSR1", os.Getpid())
-
-	go func() {
-		for {
-			<-c
-			fmt.Println("^T] ", str, *val, digits)
-		}
-	}()
-}
 
 type convergentSeries func(int) int64
 
