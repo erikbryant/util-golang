@@ -43,6 +43,10 @@ var (
 	PackedPrimesEnd int
 )
 
+func init() {
+	Load("primes.gob")
+}
+
 // Pi is the prime counting function, returning the number of primes below n
 // https://en.wikipedia.org/wiki/Prime-counting_function
 func Pi(n int) int {
