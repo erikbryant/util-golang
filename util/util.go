@@ -11,11 +11,11 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/erikbryant/project-euler/golang/primes"
+	"github.com/erikbryant/util-golang/primes"
 )
 
 func init() {
-	filepath := path.Join(MyPath(), "../primes.gob")
+	filepath := path.Join(MyPath(), "../primes/primes.gob")
 	primes.Load(filepath)
 }
 
