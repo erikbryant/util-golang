@@ -2,3 +2,6 @@
 *.prof
 gmon.out
 *.gcov
+
+// Output from the graphs package
+*.png
