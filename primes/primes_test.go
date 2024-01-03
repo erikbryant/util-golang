@@ -5,7 +5,7 @@ import (
 )
 
 func init() {
-	Load("../primes.gob")
+	Load("primes.gob")
 }
 
 func TestPi(t *testing.T) {
