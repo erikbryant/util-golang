@@ -69,6 +69,14 @@ func (v *Vertex) Neighbors() []*Vertex {
 	return v.neighbors
 }
 
+// Neighbors returns the first neighbor
+func (v *Vertex) FirstNeighbor() *Vertex {
+	if len(v.neighbors) == 0 {
+		return nil
+	}
+	return v.neighbors[0]
+}
+
 // AddNeighbor adds a neighbor vertex unless it is already a neighbor
 func (v *Vertex) AddNeighbor(node *Vertex) {
 	if v.HasNeighbor(*node) {
@@ -76,6 +84,22 @@ func (v *Vertex) AddNeighbor(node *Vertex) {
 	}
 	v.neighbors = append(v.neighbors, node)
 	v.neighborIDs[node.ID()] = true
+}
+
+// RemoveNeighbor adds a neighbor vertex unless it is already a neighbor
+func (v *Vertex) RemoveNeighbor(node Vertex) {
+	if !v.HasNeighbor(node) {
+		return
+	}
+	for i := range v.neighbors {
+		if v.neighbors[i].ID() == node.ID() {
+			// Move end node to this location, truncate slice by 1
+			v.neighbors[i] = v.neighbors[len(v.neighbors)-1]
+			v.neighbors = v.neighbors[:len(v.neighbors)-1]
+			break
+		}
+	}
+	delete(v.neighborIDs, node.ID())
 }
 
 // ID returns the id of the vertex

@@ -34,6 +34,34 @@ func (a *AdjacencyList) AddNode(node *Vertex) {
 	a.nodeIDs[node.ID()] = true
 }
 
+// RemoveNode removes a node from the adjacency list
+func (a *AdjacencyList) RemoveNode(node *Vertex) {
+	for i, n := range a.nodes {
+		if n.ID() == node.ID() {
+			// Remove it from its neighbors
+			for _, neighbor := range node.Neighbors() {
+				neighbor.RemoveNeighbor(*node)
+			}
+			// Move end node to this location, truncate slice by 1
+			a.nodes[i] = a.nodes[len(a.nodes)-1]
+			a.nodes = a.nodes[:len(a.nodes)-1]
+			delete(a.nodeIDs, n.ID())
+			return
+		}
+	}
+}
+
+// Copy returns a copy of the AdjacencyList
+func (a *AdjacencyList) Copy() AdjacencyList {
+	newA := NewAL()
+
+	for _, node := range a.nodes {
+		newA.AddNode(node)
+	}
+
+	return newA
+}
+
 // Nodes returns the slice of nodes in the adjacency list
 func (a *AdjacencyList) Nodes() []*Vertex {
 	return a.nodes
@@ -93,6 +121,82 @@ func (a *AdjacencyList) ValueLowest() *Vertex {
 	}
 
 	return min
+}
+
+// Whiskers returns a list of vertexes that have only one edge
+func (a *AdjacencyList) Whiskers() []*Vertex {
+
+	// Degenerate case: just one edge V-V'
+	if len(a.Nodes()) == 2 {
+		// We assume nodes without edges are already removed
+		return []*Vertex{a.nodes[0]}
+	}
+
+	whiskers := []*Vertex{}
+
+	for _, node := range a.Nodes() {
+		if node.EdgeCount() == 1 {
+			whiskers = append(whiskers, node)
+		}
+	}
+
+	return whiskers
+}
+
+// NodeWithMostEdges returns the node with the highest edge count
+func (a *AdjacencyList) NodeWithMostEdges() *Vertex {
+	var maxEdgeNode *Vertex
+
+	maxEdges := -1
+	maxEdgeNode = nil
+
+	for _, node := range a.Nodes() {
+		if node.EdgeCount() > maxEdges {
+			maxEdges = node.EdgeCount()
+			maxEdgeNode = node
+		}
+	}
+
+	return maxEdgeNode
+}
+
+func (a *AdjacencyList) RemoveOrphans() {
+	for _, node := range a.Nodes() {
+		if node.EdgeCount() == 0 {
+			a.RemoveNode(node)
+		}
+	}
+}
+
+// MinimalVertexCover returns vertices that make a minimal (not guaranteed to be minimum) vertex cover
+func (a *AdjacencyList) MinimalVertexCover() []*Vertex {
+	aCopy := a.Copy()
+
+	// Nodes without edges don't count towards the MVC
+	aCopy.RemoveOrphans()
+
+	mvc := []*Vertex{}
+
+	for len(aCopy.Nodes()) > 0 {
+		tmp := aCopy.Whiskers()
+		for _, node := range tmp {
+			aCopy.RemoveNode(node)
+			neighbor := node.FirstNeighbor()
+			mvc = append(mvc, neighbor)
+			aCopy.RemoveNode(neighbor)
+		}
+
+		aCopy.RemoveOrphans()
+		if len(aCopy.Nodes()) == 0 {
+			break
+		}
+
+		node := aCopy.NodeWithMostEdges()
+		aCopy.RemoveNode(node)
+		mvc = append(mvc, node)
+	}
+
+	return mvc
 }
 
 // label returns a label for the given node
