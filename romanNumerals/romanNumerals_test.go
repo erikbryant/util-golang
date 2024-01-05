@@ -23,6 +23,7 @@ func TestRomanArabic(t *testing.T) {
 		{29, "XXIX"},
 		{39, "XXXIX"},
 		{43, "XLIII"},
+		{49, "XLIX"},
 		{50, "L"},
 		{77, "LXXVII"},
 		{87, "LXXXVII"},
