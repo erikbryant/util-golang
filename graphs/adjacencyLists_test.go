@@ -162,3 +162,39 @@ func TestMinimalVertexCover(t *testing.T) {
 		}
 	}
 }
+
+func TestMinimalVertexCoverOctahedral(t *testing.T) {
+	// Test against the octahedral graph
+	// https://reference.wolfram.com/language/ref/FindVertexCover.html
+	// https://www.researchgate.net/figure/Octahedral-graph_fig3_365219344
+
+	a := NewAL()
+	nA := NewVertex("A", 4)
+	nB := NewVertex("B", 4)
+	nC := NewVertex("C", 4)
+	nD := NewVertex("D", 4)
+	nE := NewVertex("E", 4)
+	nF := NewVertex("F", 4)
+
+	a.AddEdge(&nA, &nB)
+	a.AddEdge(&nB, &nC)
+	a.AddEdge(&nC, &nA)
+
+	a.AddEdge(&nD, &nE)
+	a.AddEdge(&nE, &nF)
+	a.AddEdge(&nF, &nD)
+
+	a.AddEdge(&nD, &nA)
+	a.AddEdge(&nD, &nB)
+
+	a.AddEdge(&nE, &nA)
+	a.AddEdge(&nE, &nC)
+
+	a.AddEdge(&nF, &nB)
+	a.AddEdge(&nF, &nC)
+
+	mvc := a.MinimalVertexCover()
+	if len(mvc) != 4 {
+		t.Errorf("ERROR: For 'two nodes' expected len=4, got len=%d", len(mvc))
+	}
+}
