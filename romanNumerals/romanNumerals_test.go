@@ -2,7 +2,7 @@ package romanNumerals
 
 import "testing"
 
-func TestE(t *testing.T) {
+func TestRomanArabic(t *testing.T) {
 	testCases := []struct {
 		n        int
 		expected string
@@ -40,6 +40,10 @@ func TestE(t *testing.T) {
 		answer := Roman(testCase.n)
 		if answer != testCase.expected {
 			t.Errorf("ERROR: For %d expected %s, got %s", testCase.n, testCase.expected, answer)
+		}
+		answer2 := Arabic(answer)
+		if answer2 != testCase.n {
+			t.Errorf("ERROR: For %s expected %d, got %d", answer, testCase.n, answer2)
 		}
 	}
 }
