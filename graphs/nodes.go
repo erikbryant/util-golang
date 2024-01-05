@@ -8,20 +8,18 @@ import (
 
 // Vertex implements a graph Vertex
 type Vertex struct {
-	name        string
-	value       int
-	neighbors   []*Vertex
-	neighborIDs map[string]bool
-	id          string
+	name      string
+	value     int
+	neighbors map[string]*Vertex
+	id        string
 }
 
 // NewVertex returns a new Vertex
 func NewVertex(name string, value int) Vertex {
 	return Vertex{
-		name:        name,
-		value:       value,
-		neighbors:   []*Vertex{},
-		neighborIDs: map[string]bool{},
+		name:      name,
+		value:     value,
+		neighbors: map[string]*Vertex{},
 		// Generate an ID guaranteed to be unique
 		id: fmt.Sprintf("%v:%v", time.Now().UnixMicro(), rand.Float64()),
 	}
@@ -59,52 +57,37 @@ func (v *Vertex) SetValue(value int) {
 	v.value = value
 }
 
-// HasNeighbor returns true if the given vertex is already a neighbor
-func (v *Vertex) HasNeighbor(node Vertex) bool {
-	return v.neighborIDs[node.ID()]
-}
-
-// Neighbors returns a slice of all neighbors
-func (v *Vertex) Neighbors() []*Vertex {
-	return v.neighbors
-}
-
-// Neighbors returns the first neighbor
-func (v *Vertex) FirstNeighbor() *Vertex {
-	if len(v.neighbors) == 0 {
-		return nil
-	}
-	return v.neighbors[0]
-}
-
-// AddNeighbor adds a neighbor vertex unless it is already a neighbor
-func (v *Vertex) AddNeighbor(node *Vertex) {
-	if v.HasNeighbor(*node) {
-		return
-	}
-	v.neighbors = append(v.neighbors, node)
-	v.neighborIDs[node.ID()] = true
-}
-
-// RemoveNeighbor adds a neighbor vertex unless it is already a neighbor
-func (v *Vertex) RemoveNeighbor(node Vertex) {
-	if !v.HasNeighbor(node) {
-		return
-	}
-	for i := range v.neighbors {
-		if v.neighbors[i].ID() == node.ID() {
-			// Move end node to this location, truncate slice by 1
-			v.neighbors[i] = v.neighbors[len(v.neighbors)-1]
-			v.neighbors = v.neighbors[:len(v.neighbors)-1]
-			break
-		}
-	}
-	delete(v.neighborIDs, node.ID())
-}
-
 // ID returns the id of the vertex
 func (v *Vertex) ID() string {
 	return v.id
+}
+
+// HasNeighbor returns true if the given vertex is already a neighbor
+func (v *Vertex) HasNeighbor(node Vertex) bool {
+	return v.neighbors[node.ID()] != nil
+}
+
+// Neighbors returns a map of all neighbors
+func (v *Vertex) Neighbors() map[string]*Vertex {
+	return v.neighbors
+}
+
+// FirstNeighbor returns the first neighbor
+func (v *Vertex) FirstNeighbor() *Vertex {
+	for _, node := range v.neighbors {
+		return node
+	}
+	return nil
+}
+
+// AddNeighbor adds a neighbor vertex
+func (v *Vertex) AddNeighbor(node *Vertex) {
+	v.neighbors[node.ID()] = node
+}
+
+// RemoveNeighbor removes a neighbor vertex
+func (v *Vertex) RemoveNeighbor(node Vertex) {
+	delete(v.neighbors, node.ID())
 }
 
 // EdgeCount returns the number of edges (neighbors)

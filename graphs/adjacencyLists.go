@@ -8,44 +8,43 @@ import (
 
 // AdjacencyList implements an undirected graph
 type AdjacencyList struct {
-	nodes   []*Vertex
-	nodeIDs map[string]bool
+	nodes map[string]*Vertex
 }
 
 // NewAL returns a new, empty adjacdency list
 func NewAL() AdjacencyList {
 	return AdjacencyList{
-		nodes:   []*Vertex{},
-		nodeIDs: map[string]bool{},
+		nodes: map[string]*Vertex{},
 	}
 }
 
 // HasNode returns true if the node is already in the adjacency list
 func (a *AdjacencyList) HasNode(node Vertex) bool {
-	return a.nodeIDs[node.ID()]
+	return a.nodes[node.ID()] != nil
+}
+
+// FirstNode returns a node from the map
+func (a *AdjacencyList) FirstNode() *Vertex {
+	for _, node := range a.Nodes() {
+		return node
+	}
+	return nil
 }
 
 // AddNode adds a node to the adjacency list if not already present
 func (a *AdjacencyList) AddNode(node *Vertex) {
-	if a.HasNode(*node) {
-		return
-	}
-	a.nodes = append(a.nodes, node)
-	a.nodeIDs[node.ID()] = true
+	a.nodes[node.ID()] = node
 }
 
 // RemoveNode removes a node from the adjacency list
 func (a *AdjacencyList) RemoveNode(node *Vertex) {
-	for i, n := range a.nodes {
+	for _, n := range a.Nodes() {
 		if n.ID() == node.ID() {
 			// Remove it from its neighbors
 			for _, neighbor := range node.Neighbors() {
 				neighbor.RemoveNeighbor(*node)
 			}
-			// Move end node to this location, truncate slice by 1
-			a.nodes[i] = a.nodes[len(a.nodes)-1]
-			a.nodes = a.nodes[:len(a.nodes)-1]
-			delete(a.nodeIDs, n.ID())
+			delete(a.nodes, n.ID())
 			return
 		}
 	}
@@ -62,8 +61,8 @@ func (a *AdjacencyList) Copy() AdjacencyList {
 	return newA
 }
 
-// Nodes returns the slice of nodes in the adjacency list
-func (a *AdjacencyList) Nodes() []*Vertex {
+// Nodes returns the map of nodes in the adjacency list
+func (a *AdjacencyList) Nodes() map[string]*Vertex {
 	return a.nodes
 }
 
@@ -108,11 +107,7 @@ func (a *AdjacencyList) ValueSum() int {
 
 // ValueLowest returns the node with the lowest value
 func (a *AdjacencyList) ValueLowest() *Vertex {
-	if len(a.nodes) == 0 {
-		return nil
-	}
-
-	min := a.nodes[0]
+	min := a.FirstNode()
 
 	for _, node := range a.Nodes() {
 		if node.Value() < min.Value() {
@@ -123,20 +118,19 @@ func (a *AdjacencyList) ValueLowest() *Vertex {
 	return min
 }
 
-// Whiskers returns a list of vertexes that have only one edge
-func (a *AdjacencyList) Whiskers() []*Vertex {
-
-	// Degenerate case: just one edge V-V'
-	if len(a.Nodes()) == 2 {
-		// We assume nodes without edges are already removed
-		return []*Vertex{a.nodes[0]}
-	}
-
-	whiskers := []*Vertex{}
+// Whiskers returns a map of vertexes that have only one edge
+func (a *AdjacencyList) Whiskers() map[string]*Vertex {
+	whiskers := map[string]*Vertex{}
 
 	for _, node := range a.Nodes() {
 		if node.EdgeCount() == 1 {
-			whiskers = append(whiskers, node)
+			// If we have already recorded the node at the other end of
+			// this edge, do not also add this node. We count only one
+			// node per edge.
+			if whiskers[node.FirstNeighbor().ID()] != nil {
+				continue
+			}
+			whiskers[node.ID()] = node
 		}
 	}
 
