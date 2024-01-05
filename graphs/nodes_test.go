@@ -41,27 +41,3 @@ func TestRemoveNeighbor(t *testing.T) {
 		t.Errorf("ERROR: For 'remove neighbor' expected len 0, got len %d", len(v1.Neighbors()))
 	}
 }
-
-// func TestE(t *testing.T) {
-// 	testCases := []struct {
-// 		n        int
-// 		expected int64
-// 	}{
-// 		{1, 2},
-// 		{2, 1},
-// 		{3, 2},
-// 		{4, 1},
-// 		{5, 1},
-// 		{6, 4},
-// 		{7, 1},
-// 		{8, 1},
-// 		{9, 6},
-// 	}
-
-// 	for _, testCase := range testCases {
-// 		answer := E(testCase.n)
-// 		if answer != testCase.expected {
-// 			t.Errorf("ERROR: For %d expected %d, got %d", testCase.n, testCase.expected, answer)
-// 		}
-// 	}
-// }

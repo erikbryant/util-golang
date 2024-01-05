@@ -163,31 +163,34 @@ func (a *AdjacencyList) RemoveOrphans() {
 }
 
 // MinimalVertexCover returns vertices that make a minimal (not guaranteed to be minimum) vertex cover
-func (a *AdjacencyList) MinimalVertexCover() []*Vertex {
+func (a *AdjacencyList) MinimalVertexCover() map[string]*Vertex {
 	aCopy := a.Copy()
-
-	// Nodes without edges don't count towards the MVC
-	aCopy.RemoveOrphans()
-
-	mvc := []*Vertex{}
+	mvc := map[string]*Vertex{}
 
 	for len(aCopy.Nodes()) > 0 {
-		tmp := aCopy.Whiskers()
-		for _, node := range tmp {
-			aCopy.RemoveNode(node)
+		// Axiom: Nodes with whiskers must be in the MVC
+		for _, node := range aCopy.Whiskers() {
 			neighbor := node.FirstNeighbor()
-			mvc = append(mvc, neighbor)
-			aCopy.RemoveNode(neighbor)
+			if neighbor != nil {
+				// We might have already removed this neighbor B if, for instance,
+				// A<->B<->C and we are at node C and have already processed node A.
+				mvc[neighbor.ID()] = neighbor
+				aCopy.RemoveNode(neighbor)
+			}
+			aCopy.RemoveNode(node)
 		}
 
+		// Axiom: Nodes without edges are not in the MVC
 		aCopy.RemoveOrphans()
+
 		if len(aCopy.Nodes()) == 0 {
 			break
 		}
 
+		// Heuristic: Assume the most connected node is in the MVC
 		node := aCopy.NodeWithMostEdges()
 		aCopy.RemoveNode(node)
-		mvc = append(mvc, node)
+		mvc[node.ID()] = node
 	}
 
 	return mvc
