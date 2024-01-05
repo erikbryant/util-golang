@@ -5,11 +5,74 @@ import (
 	"testing"
 )
 
+func TestAddEdge(t *testing.T) {
+	a := NewAL()
+
+	// Empty adjacency list
+
+	answer := a.NodeCount()
+	if answer != 0 {
+		t.Errorf("ERROR: Expected len=0, got len=%d", answer)
+	}
+
+	answer = a.EdgeCount()
+	if answer != 0 {
+		t.Errorf("ERROR: Expected len=0, got len=%d", answer)
+	}
+
+	// Implied addition of nodes
+
+	n1 := NewVertex("A", 4)
+	n2 := NewVertex("B", 4)
+	a.AddEdge(&n1, &n2)
+
+	answer = a.NodeCount()
+	if answer != 2 {
+		t.Errorf("ERROR: Expected len=2, got len=%d", answer)
+	}
+
+	answer = a.EdgeCount()
+	if answer != 1 {
+		t.Errorf("ERROR: Expected len=1, got len=%d", answer)
+	}
+
+	// Explicit addition of nodes
+
+	n3 := NewVertex("C", 4)
+
+	a.AddNode(&n3)
+	a.AddEdge(&n1, &n3)
+
+	answer = a.NodeCount()
+	if answer != 3 {
+		t.Errorf("ERROR: Expected len=3, got len=%d", answer)
+	}
+
+	answer = a.EdgeCount()
+	if answer != 2 {
+		t.Errorf("ERROR: Expected len=2, got len=%d", answer)
+	}
+
+	// New edge, no new nodes
+
+	a.AddEdge(&n2, &n3)
+
+	answer = a.NodeCount()
+	if answer != 3 {
+		t.Errorf("ERROR: Expected len=3, got len=%d", answer)
+	}
+
+	answer = a.EdgeCount()
+	if answer != 3 {
+		t.Errorf("ERROR: Expected len=3, got len=%d", answer)
+	}
+}
+
 func TestWhiskers(t *testing.T) {
 	a := NewAL()
 	whiskers := a.Whiskers()
 	if len(whiskers) != 0 {
-		t.Errorf("ERROR: For 'empty' expected 0 len, got %d len", len(whiskers))
+		t.Errorf("ERROR: For 'empty' expected len=0, got len=%d", len(whiskers))
 	}
 
 	a = NewAL()
@@ -55,7 +118,7 @@ func TestMinimalVertexCover(t *testing.T) {
 	a := NewAL()
 	mvc := a.MinimalVertexCover()
 	if len(mvc) != 0 {
-		t.Errorf("ERROR: For 'empty' expected 0 len, got %d len", len(mvc))
+		t.Errorf("ERROR: For 'empty' expected len=0, got len=%d", len(mvc))
 	}
 
 	a = NewAL()

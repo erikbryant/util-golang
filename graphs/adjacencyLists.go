@@ -52,13 +52,13 @@ func (a *AdjacencyList) RemoveNode(node *Vertex) {
 
 // Copy returns a copy of the AdjacencyList
 func (a *AdjacencyList) Copy() AdjacencyList {
-	newA := NewAL()
+	newAL := NewAL()
 
 	for _, node := range a.nodes {
-		newA.AddNode(node)
+		newAL.AddNode(node)
 	}
 
-	return newA
+	return newAL
 }
 
 // Nodes returns the map of nodes in the adjacency list
@@ -71,7 +71,7 @@ func (a *AdjacencyList) NodeCount() int {
 	return len(a.Nodes())
 }
 
-// AddEdge adds the two nodes as an edge, adding the nodes if they are not already present
+// AddEdge adds an edge, adding the nodes if they are not already present
 func (a *AdjacencyList) AddEdge(n1, n2 *Vertex) {
 	a.AddNode(n1)
 	a.AddNode(n2)
@@ -118,7 +118,7 @@ func (a *AdjacencyList) ValueLowest() *Vertex {
 	return min
 }
 
-// Whiskers returns a map of vertexes that have only one edge
+// Whiskers returns a map of vertices that have only one edge
 func (a *AdjacencyList) Whiskers() map[string]*Vertex {
 	whiskers := map[string]*Vertex{}
 
@@ -154,6 +154,7 @@ func (a *AdjacencyList) NodeWithMostEdges() *Vertex {
 	return maxEdgeNode
 }
 
+// RemoveOrphans removes all vertices that have no edges
 func (a *AdjacencyList) RemoveOrphans() {
 	for _, node := range a.Nodes() {
 		if node.EdgeCount() == 0 {
