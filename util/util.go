@@ -195,10 +195,21 @@ func MulFraction(n1, d1, n2, d2 int) (int, int) {
 	return a, b
 }
 
-// IsSquare returns true if f is a square
+// IsInt returns true if n is an integer
+func IsInt(n float64) bool {
+	return n == float64(int(n))
+}
+
+// IsSquare returns true if n is a square number
 func IsSquare(n int) bool {
 	root := math.Sqrt(float64(n))
-	return root == math.Trunc(root)
+	return IsInt(root)
+}
+
+// IsCube returns true if n is a cube number
+func IsCube(n int) bool {
+	root := math.Cbrt(float64(n))
+	return IsInt(root)
 }
 
 // heapPermutation generates a permutation using Heap Algorithm

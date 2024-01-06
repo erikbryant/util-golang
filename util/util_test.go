@@ -271,6 +271,72 @@ func TestMulFraction(t *testing.T) {
 	}
 }
 
+func TestIsInt(t *testing.T) {
+	testCases := []struct {
+		c        float64
+		expected bool
+	}{
+		{-3.000, true},
+		{-1.0, true},
+		{0.0, true},
+		{0.01, false},
+		{1.0, true},
+		{3.1415, false},
+		{9999.0, true},
+	}
+
+	for _, testCase := range testCases {
+		answer := IsInt(testCase.c)
+		if answer != testCase.expected {
+			t.Errorf("ERROR: For %f expected %t, got %t", testCase.c, testCase.expected, answer)
+		}
+	}
+}
+
+func TestIsSquare(t *testing.T) {
+	testCases := []struct {
+		c        int
+		expected bool
+	}{
+		{-4, false},
+		{0, true},
+		{1, true},
+		{2, false},
+		{4, true},
+		{1000000, true},
+	}
+
+	for _, testCase := range testCases {
+		answer := IsSquare(testCase.c)
+		if answer != testCase.expected {
+			t.Errorf("ERROR: For %d expected %t, got %t", testCase.c, testCase.expected, answer)
+		}
+	}
+}
+
+func TestIsCube(t *testing.T) {
+	testCases := []struct {
+		c        int
+		expected bool
+	}{
+		{-3, false},
+		{-1, true},
+		{0, true},
+		{1, true},
+		{2, false},
+		{8, true},
+		{125, true},
+		{27000, true},
+	}
+
+	for _, testCase := range testCases {
+		answer := IsCube(testCase.c)
+		if answer != testCase.expected {
+			t.Errorf("ERROR: For %d expected %t, got %t", testCase.c, testCase.expected, answer)
+		}
+	}
+}
+
 func TestIsPalindromeString(t *testing.T) {
 	testCases := []struct {
 		c        string
