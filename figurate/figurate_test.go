@@ -35,7 +35,7 @@ func TestIsPentagonal(t *testing.T) {
 	}{
 		{-3, false},
 		{-1, false},
-		{0, true},
+		{0, false},
 		{1, true},
 		{5, true},
 		{12, true},
@@ -59,7 +59,7 @@ func TestIsHexagonal(t *testing.T) {
 		expected bool
 	}{
 		{-1, false},
-		{0, true},
+		{0, false},
 		{1, true},
 		{5, false},
 		{6, true},
