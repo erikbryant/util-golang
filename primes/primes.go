@@ -37,11 +37,11 @@ const (
 )
 
 var (
-	// Primes indicates whether the index is prime or not
-	Primes []bool
+	// isPrime indicates whether the index is prime or not
+	isPrime []bool
 	// PackedPrimes is a list of the first n prime numbers
 	PackedPrimes []int
-	// PackedPrimesEnd is the index of the final value ini the PackedPrimes slice
+	// PackedPrimesEnd is the index of the final value in the PackedPrimes slice
 	PackedPrimesEnd int
 )
 
@@ -94,8 +94,8 @@ func Prime(number int) bool {
 
 // packPrimes fills PackedPrimes with prime numbers
 func packPrimes() {
-	for i := 0; i < len(Primes); i++ {
-		if Primes[i] {
+	for i := 0; i < len(isPrime); i++ {
+		if isPrime[i] {
 			PackedPrimes = append(PackedPrimes, i)
 		}
 	}
@@ -147,7 +147,7 @@ func seive() {
 	upper := MaxPrime
 	fmt.Println("upper: ", upper)
 	for i := 0; i <= upper; i++ {
-		Primes = append(Primes, true)
+		isPrime = append(isPrime, true)
 	}
 	c := make(chan int)
 	go excludes(upper, c)
@@ -157,7 +157,7 @@ func seive() {
 			// Channel is empty
 			break
 		}
-		Primes[exclude] = false
+		isPrime[exclude] = false
 	}
 }
 
