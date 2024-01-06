@@ -233,7 +233,7 @@ func TestSumFraction(t *testing.T) {
 	}{
 		// Equal denominators
 		{1, 2, 3, 2, 4, 2},
-		{1, 2, 3, 2, 4, 2},
+		{2, 7, 5, 7, 7, 7},
 		// Differing denominators
 		{1, 2, 1, 3, 5, 6},
 		{1, 2, 3, 10, 8, 10},
@@ -244,6 +244,29 @@ func TestSumFraction(t *testing.T) {
 		answer, answer2 := SumFraction(testCase.a, testCase.b, testCase.c, testCase.d)
 		if answer != testCase.expectedN || answer2 != testCase.expectedD {
 			t.Errorf("ERROR: For %d/%d + %d/%d expected %d/%d, got %d/%d", testCase.a, testCase.b, testCase.c, testCase.d, testCase.expectedN, testCase.expectedD, answer, answer2)
+		}
+	}
+}
+
+func TestMulFraction(t *testing.T) {
+	testCases := []struct {
+		a, b      int
+		c, d      int
+		expectedN int
+		expectedD int
+	}{
+		{2, 2, 3, 3, 1, 1},
+		{1, 2, 3, 2, 3, 4},
+		{5, 7, 2, 8, 5, 28},
+		{6, 9, 1, 3, 2, 9},
+		{3, 4, 3, 12, 3, 16},
+		{2, 30, 2, 72, 1, 540},
+	}
+
+	for _, testCase := range testCases {
+		answer, answer2 := MulFraction(testCase.a, testCase.b, testCase.c, testCase.d)
+		if answer != testCase.expectedN || answer2 != testCase.expectedD {
+			t.Errorf("ERROR: For %d/%d * %d/%d expected %d/%d, got %d/%d", testCase.a, testCase.b, testCase.c, testCase.d, testCase.expectedN, testCase.expectedD, answer, answer2)
 		}
 	}
 }

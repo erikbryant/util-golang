@@ -174,16 +174,25 @@ func LCM(a, b int) int {
 	return (a / GCD(a, b)) * b
 }
 
+func ReduceFraction(n, d int) (int, int) {
+	gcd := GCD(n, d)
+	return n / gcd, d / gcd
+}
+
 // SumFraction returns the sum of the two fractions, still in fraction form
 func SumFraction(n1, d1, n2, d2 int) (int, int) {
-	if d1 == d2 {
-		return n1 + n2, d1
-	}
-
 	lcm := LCM(d1, d2)
 	n1Scalar := lcm / d1
 	n2Scalar := lcm / d2
 	return (n1 * n1Scalar) + (n2 * n2Scalar), lcm
+}
+
+// MulFraction returns the product of the two fractions, still in fraction form
+func MulFraction(n1, d1, n2, d2 int) (int, int) {
+	n1, d1 = ReduceFraction(n1, d1)
+	n2, d2 = ReduceFraction(n2, d2)
+	a, b := ReduceFraction(n1*n2, d1*d2)
+	return a, b
 }
 
 // IsSquare returns true if f is a square
