@@ -490,28 +490,6 @@ func TestHarshad(t *testing.T) {
 	}
 }
 
-func TestTriangular(t *testing.T) {
-	testCases := []struct {
-		c        int
-		expected bool
-	}{
-		{0, true},
-		{1, true},
-		{9, false},
-		{10, true},
-		{1000, false},
-		{17526, false},
-		{1000 * 1000, false},
-	}
-
-	for _, testCase := range testCases {
-		answer := Triangular(testCase.c)
-		if answer != testCase.expected {
-			t.Errorf("ERROR: For %d expected %t, got %t", testCase.c, testCase.expected, answer)
-		}
-	}
-}
-
 func TestTotient(t *testing.T) {
 	testCases := []struct {
 		n        int
@@ -676,6 +654,36 @@ func TestPascalTriangle(t *testing.T) {
 		answer := triangle[testCase.row][testCase.col]
 		if answer != testCase.expected {
 			t.Errorf("ERROR: For %d %d expected %d, got %d", testCase.row, testCase.col, testCase.expected, answer)
+		}
+	}
+}
+
+func TestIsDigitPermutation(t *testing.T) {
+	testCases := []struct {
+		c, d     int
+		expected bool
+	}{
+		{-12, -21, true},
+		{0, 0, true},
+		{1, 1, true},
+		{2, 1, false},
+		{2, 2, true},
+		{9, 99, false},
+		{10, 42, false},
+		{123, 231, true},
+		{212, 122, true},
+		{212, 122222, false},
+		{1000, 3293, false},
+		{2000, 200, false},
+		{17526, 23, false},
+		{21222, 122, false},
+		{87109, 79180, true},
+	}
+
+	for _, testCase := range testCases {
+		answer := IsDigitPermutation(testCase.c, testCase.d)
+		if answer != testCase.expected {
+			t.Errorf("ERROR: For %d, %d expected %t, got %t", testCase.c, testCase.d, testCase.expected, answer)
 		}
 	}
 }

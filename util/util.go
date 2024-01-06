@@ -10,9 +10,9 @@ import (
 
 type convergentSeries func(int) int64
 
-// E returns the nth number (1-based) in the convergent series
-// of the number e [2; 1,2,1, 1,4,1, 1,6,1, ... ,1,2k,1, ...]
+// E returns the nth number (1-based) in the convergent series of e
 func E(n int) int64 {
+	// e.g., [2; 1,2,1, 1,4,1, 1,6,1, ... ,1,2k,1, ...]
 	if n == 1 {
 		return int64(2)
 	}
@@ -22,16 +22,17 @@ func E(n int) int64 {
 	return int64(1)
 }
 
-// Sqrt2 returns the nth number (1-based) in the convergent series
-// of the square root of 2: [2;(2)]
+// Sqrt2 returns the nth number (1-based) in the convergent series of root 2
 func Sqrt2(n int) int64 {
+	// e.g., [2;(2)]
+
 	if n == 1 {
 		return int64(1)
 	}
 	return int64(2)
 }
 
-// Convergent returns the nth convegence of whichever series you pass in a function for.
+// Convergent returns the nth convegence of whichever series you pass in a function for
 func Convergent(n int, fn convergentSeries) (*big.Int, *big.Int) {
 	numerator := big.NewInt(fn(n))
 	denominator := big.NewInt(1)
@@ -97,7 +98,7 @@ func Divisors(n int) []int {
 	return d
 }
 
-// Factors returns a sorted list of the unique prime factors of n (excluding n).
+// Factors returns a sorted list of the unique prime factors of n (excluding n)
 func Factors(n int) []int {
 	if primes.Prime(n) {
 		return []int{}
@@ -115,8 +116,7 @@ func Factors(n int) []int {
 	return f
 }
 
-// FactorsCounted returns a map of prime factors of n with counts
-// of how many times each factor divides into n.
+// FactorsCounted returns counts of how many times each factor divides into n
 func FactorsCounted(n int) map[int]int {
 	factors := make(map[int]int)
 
@@ -213,8 +213,9 @@ func IsCube(n int) bool {
 }
 
 // heapPermutation generates a permutation using Heap Algorithm
-// https://www.geeksforgeeks.org/heaps-algorithm-for-generating-permutations/
 func heapPermutation(digits []int, size int, c chan []int) {
+	// https://www.geeksforgeeks.org/heaps-algorithm-for-generating-permutations/
+
 	if size == 1 {
 		var temp []int
 		for i := 0; i < len(digits); i++ {
@@ -237,12 +238,13 @@ func heapPermutation(digits []int, size int, c chan []int) {
 	}
 }
 
-// MakeDigits generates all permutations of the first n digits.
-// For example:
-//
-//	n=2 [1 2] [2 1]
-//	n=3 [1 2 3] [1 3 2] [2 1 3] [2 3 1] [3 1 2] [3 2 1]
+// MakeDigits generates all permutations of the first n digits
 func MakeDigits(n int, c chan []int) {
+	// For example:
+	//
+	//	n=2 [1 2] [2 1]
+	//	n=3 [1 2 3] [1 3 2] [2 1 3] [2 3 1] [3 1 2] [3 2 1]
+
 	defer close(c)
 
 	var digits []int
@@ -320,7 +322,7 @@ func DigitsToInt(digits []int) int {
 	return number
 }
 
-// DigitSum returns the sum of the digits in the number.
+// DigitSum returns the sum of the digits in the number
 func DigitSum(n int) (sum int) {
 	for n > 0 {
 		sum += n % 10
@@ -330,37 +332,32 @@ func DigitSum(n int) (sum int) {
 	return
 }
 
-// Harshad returns true if n is divisible by the sum of its digits.
+// Harshad returns true if n is divisible by the sum of its digits
 func Harshad(n, sum int) bool {
 	return n%sum == 0
 }
 
-// Triangular returns true if n is a trianglar number
-func Triangular(n int) bool {
-	// n is triangular if 8*n+1 is a square
-	root := math.Sqrt(float64(n<<3 + 1))
-	return root == math.Trunc(root)
-}
-
-// Totient returns how many numbers k are relatively prime to n where
-// 1 <= k < n. Relatively prime means that they have no common divisors (other
-// than 1). 1 is considered relatively prime to all other numbers.
-//
-// From https://www.doc.ic.ac.uk/~mrh/330tutor/ch05s02.html
-//
-// The general formula to compute φ(n) is the following:
-//
-// If the prime factorisation of n is given by n =p1e1*...*pnen, then
-// φ(n) = n *(1 - 1/p1)* ... (1 - 1/pn).
-//
-// For example:
-//
-// 9 = 32, φ(9) = 9* (1-1/3) = 6
-//
-// 4 =22, φ(4) = 4* (1-1/2) = 2
-//
-// 15 = 3*5, φ(15) = 15* (1-1/3)*(1-1/5) = 15*(2/3)*(4/5) =8
+// Totient returns how many numbers k are relatively prime to n
 func Totient(n int) int {
+	// ... where  1 <= k < n. Relatively prime means that they have
+	// no common divisors (other than 1). 1 is considered relatively
+	// prime to all other numbers.
+	//
+	// From https://www.doc.ic.ac.uk/~mrh/330tutor/ch05s02.html
+	//
+	// The general formula to compute φ(n) is the following:
+	//
+	// If the prime factorisation of n is given by n =p1e1*...*pnen, then
+	// φ(n) = n *(1 - 1/p1)* ... (1 - 1/pn).
+	//
+	// For example:
+	//
+	// 9 = 32, φ(9) = 9* (1-1/3) = 6
+	//
+	// 4 =22, φ(4) = 4* (1-1/2) = 2
+	//
+	// 15 = 3*5, φ(15) = 15* (1-1/3)*(1-1/5) = 15*(2/3)*(4/5) =8
+
 	if primes.Prime(n) {
 		return n - 1
 	}
@@ -404,8 +401,7 @@ func IsAnagram(w1, w2 string) bool {
 	return w2 == ""
 }
 
-// Cryptoquip returns whether the two strings have the same relative
-// arrangement of letters. For instance, KEEP and LOOT.
+// Cryptoquip returns true if the letter arrangements are similar; e.g., KEEP and LOOT
 func Cryptoquip(w1, w2 string) (map[byte]byte, bool) {
 	if len(w1) != len(w2) {
 		return nil, false
@@ -449,15 +445,16 @@ func SquareFree(n int) bool {
 }
 
 // PascalTriangle returns a triangle of the max depth specified
-// We build the triangle left-justified. A cell is the sum of the cell above it
-// and the cell above and to the left.
-//
-//	1: 1
-//	2: 1 1
-//	3: 1 2 1
-//	4: 1 3 3 1
-//	5: 1 4 6 4 1
 func PascalTriangle(max int) [][]int {
+	// We build the triangle left-justified. A cell is the sum of the cell above it
+	// and the cell above and to the left.
+	//
+	//	1: 1
+	//	2: 1 1
+	//	3: 1 2 1
+	//	4: 1 3 3 1
+	//	5: 1 4 6 4 1
+
 	rows := [][]int{}
 	var row []int
 
@@ -478,4 +475,36 @@ func PascalTriangle(max int) [][]int {
 	}
 
 	return rows
+}
+
+// IsDigitPermutation returns whether the two numbers are digit permutations of each other
+func IsDigitPermutation(a, b int) bool {
+	// Take the absolute value
+	a = max(a, -1*a)
+	b = max(b, -1*b)
+
+	digits := map[int]int{}
+
+	for a > 0 && b > 0 {
+		r := a % 10
+		digits[r]++
+		a /= 10
+
+		r = b % 10
+		digits[r]--
+		b /= 10
+	}
+
+	if a != b {
+		// a and b were not the same length
+		return false
+	}
+
+	for _, val := range digits {
+		if val != 0 {
+			return false
+		}
+	}
+
+	return true
 }
