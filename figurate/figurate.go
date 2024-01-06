@@ -1,4 +1,4 @@
-package figuratenumbers
+package figurate
 
 // https://en.wikipedia.org/wiki/Figurate_number
 // https://mathworld.wolfram.com/FigurateNumber.html

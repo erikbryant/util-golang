@@ -1,4 +1,4 @@
-package figuratenumbers
+package figurate
 
 import "testing"
 
