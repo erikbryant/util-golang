@@ -148,6 +148,44 @@ func FactorsCounted(n int) map[int]int {
 	return factors
 }
 
+// GCD returns the greatest common divisor of a and b
+func GCD(a, b int) int {
+	// https://en.wikipedia.org/wiki/Greatest_common_divisor
+
+	if a == 0 && b == 0 {
+		return 0
+	}
+
+	for a > 0 && b > 0 {
+		a, b = min(a, b), max(a, b)%min(a, b)
+	}
+
+	return max(a, b)
+}
+
+// LCM returns the least common multiple of a and b
+func LCM(a, b int) int {
+	// https://en.wikipedia.org/wiki/Least_common_multiple
+
+	if a == 0 && b == 0 {
+		return 0
+	}
+
+	return (a / GCD(a, b)) * b
+}
+
+// SumFraction returns the sum of the two fractions, still in fraction form
+func SumFraction(n1, d1, n2, d2 int) (int, int) {
+	if d1 == d2 {
+		return n1 + n2, d1
+	}
+
+	lcm := LCM(d1, d2)
+	n1Scalar := lcm / d1
+	n2Scalar := lcm / d2
+	return (n1 * n1Scalar) + (n2 * n2Scalar), lcm
+}
+
 // IsSquare returns true if f is a square
 func IsSquare(n int) bool {
 	root := math.Sqrt(float64(n))

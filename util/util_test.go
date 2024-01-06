@@ -180,6 +180,74 @@ func TestFactorsCounted(t *testing.T) {
 	}
 }
 
+func TestGCD(t *testing.T) {
+	testCases := []struct {
+		a, b     int
+		expected int
+	}{
+		{0, 0, 0},
+		{1, 0, 1},
+		{0, 1, 1},
+		{1, 2, 1},
+		{3, 5, 1},
+		{2, 4, 2},
+		{9, 28, 1},
+		{200, 100, 100},
+	}
+
+	for _, testCase := range testCases {
+		answer := GCD(testCase.a, testCase.b)
+		if answer != testCase.expected {
+			t.Errorf("ERROR: For %d, %d expected %d, got %d", testCase.a, testCase.b, testCase.expected, answer)
+		}
+	}
+}
+
+func TestLCM(t *testing.T) {
+	testCases := []struct {
+		a, b     int
+		expected int
+	}{
+		{0, 0, 0},
+		{1, 0, 0},
+		{0, 1, 0},
+		{1, 2, 2},
+		{2, 2, 2},
+		{2, 4, 4},
+	}
+
+	for _, testCase := range testCases {
+		answer := LCM(testCase.a, testCase.b)
+		if answer != testCase.expected {
+			t.Errorf("ERROR: For %d, %d expected %d, got %d", testCase.a, testCase.b, testCase.expected, answer)
+		}
+	}
+}
+
+func TestSumFraction(t *testing.T) {
+	testCases := []struct {
+		a, b      int
+		c, d      int
+		expectedN int
+		expectedD int
+	}{
+		// Equal denominators
+		{1, 2, 3, 2, 4, 2},
+		{1, 2, 3, 2, 4, 2},
+		// Differing denominators
+		{1, 2, 1, 3, 5, 6},
+		{1, 2, 3, 10, 8, 10},
+		{2, 30, 2, 72, 34, 360},
+	}
+
+	for _, testCase := range testCases {
+		answer, answer2 := SumFraction(testCase.a, testCase.b, testCase.c, testCase.d)
+		if answer != testCase.expectedN || answer2 != testCase.expectedD {
+			t.Errorf("ERROR: For %d/%d + %d/%d expected %d/%d, got %d/%d", testCase.a, testCase.b, testCase.c, testCase.d, testCase.expectedN, testCase.expectedD, answer, answer2)
+		}
+	}
+}
+
 func TestIsPalindromeString(t *testing.T) {
 	testCases := []struct {
 		c        string
