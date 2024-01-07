@@ -67,3 +67,45 @@ func TestRemoveNeighbor(t *testing.T) {
 		t.Errorf("ERROR: For 'remove neighbor' expected len 0, got len %d", len(v1.Neighbors()))
 	}
 }
+
+func TestEdgeCountDegree(t *testing.T) {
+	v1 := NewVertex("A", 1)
+	answer := v1.NeighborCount()
+	if answer != 0 {
+		t.Errorf("ERROR: Expected 0, got %d", answer)
+	}
+	answer = v1.Degree()
+	if answer != 0 {
+		t.Errorf("ERROR: Expected 0, got %d", answer)
+	}
+
+	v2 := NewVertex("B", 2)
+	answer = v2.NeighborCount()
+	if answer != 0 {
+		t.Errorf("ERROR: Expected 0, got %d", answer)
+	}
+	answer = v2.Degree()
+	if answer != 0 {
+		t.Errorf("ERROR: Expected 0, got %d", answer)
+	}
+
+	v1.AddNeighbor(&v2)
+	answer = v1.NeighborCount()
+	if answer != 1 {
+		t.Errorf("ERROR: Expected 1, got %d", answer)
+	}
+	answer = v1.Degree()
+	if answer != 1 {
+		t.Errorf("ERROR: Expected 1, got %d", answer)
+	}
+
+	v1.AddNeighbor(&v1)
+	answer = v1.NeighborCount()
+	if answer != 2 {
+		t.Errorf("ERROR: Expected 2, got %d", answer)
+	}
+	answer = v1.Degree()
+	if answer != 3 {
+		t.Errorf("ERROR: Expected 3, got %d", answer)
+	}
+}

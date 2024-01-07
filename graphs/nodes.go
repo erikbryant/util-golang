@@ -90,7 +90,22 @@ func (v *Vertex) RemoveNeighbor(node Vertex) {
 	delete(v.neighbors, node.ID())
 }
 
-// EdgeCount returns the number of edges (neighbors)
-func (v *Vertex) EdgeCount() int {
+// NeighborCount returns the number of edges (neighbors)
+func (v *Vertex) NeighborCount() int {
 	return len(v.neighbors)
+}
+
+// Degree returns the degree of the incoming edges (loops count as 2)
+func (v *Vertex) Degree() int {
+	degree := 0
+
+	for _, node := range v.Neighbors() {
+		if v.ID() == node.ID() {
+			// We own *both* ends of this edge
+			degree++
+		}
+		degree++
+	}
+
+	return degree
 }

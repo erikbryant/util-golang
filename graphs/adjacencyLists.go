@@ -84,7 +84,7 @@ func (a *AdjacencyList) EdgeCount() int {
 	edges := 0
 
 	for _, node := range a.Nodes() {
-		edges += node.EdgeCount()
+		edges += node.NeighborCount()
 	}
 
 	// This is undirected, so each edge is listed twice
@@ -123,7 +123,7 @@ func (a *AdjacencyList) Whiskers() map[string]*Vertex {
 	whiskers := map[string]*Vertex{}
 
 	for _, node := range a.Nodes() {
-		if node.EdgeCount() == 1 {
+		if node.NeighborCount() == 1 {
 			// If we have already recorded the node at the other end of
 			// this edge, do not also add this node. We count only one
 			// node per edge.
@@ -145,8 +145,8 @@ func (a *AdjacencyList) NodeWithMostEdges() *Vertex {
 	maxEdgeNode = nil
 
 	for _, node := range a.Nodes() {
-		if node.EdgeCount() > maxEdges {
-			maxEdges = node.EdgeCount()
+		if node.NeighborCount() > maxEdges {
+			maxEdges = node.NeighborCount()
 			maxEdgeNode = node
 		}
 	}
@@ -157,7 +157,7 @@ func (a *AdjacencyList) NodeWithMostEdges() *Vertex {
 // RemoveOrphans removes all vertices that have no edges
 func (a *AdjacencyList) RemoveOrphans() {
 	for _, node := range a.Nodes() {
-		if node.EdgeCount() == 0 {
+		if node.NeighborCount() == 0 {
 			a.RemoveNode(node)
 		}
 	}
@@ -236,4 +236,135 @@ func (a *AdjacencyList) Serialize(title string) string {
 	}
 
 	return g.String()
+}
+
+// IsCycle returns true if the nodes form a cycle
+func IsCycle(path []*Vertex) bool {
+	if len(path) == 0 {
+		return false
+	}
+
+	first := path[0]
+	last := path[len(path)-1]
+
+	// A cycle is a path that returns to the start vertex
+	// or a neighbor of the start vertex
+	return first.ID() == last.ID() || first.HasNeighbor(*last)
+}
+
+// Connection returns a vertex ordering to traverse from n1 to n2
+// func (a *AdjacencyList) Connection(n1, n2 *Vertex) []*Vertex {
+// 	// https://en.wikipedia.org/wiki/Connectivity_(graph_theory)
+
+// 	return nil
+// }
+
+func VisitAll(node *Vertex, visited map[string]bool) {
+	if visited[node.ID()] {
+		return
+	}
+
+	// Visit this node
+	visited[node.ID()] = true
+
+	// Vist each neighbor
+	for _, neighbor := range node.Neighbors() {
+		VisitAll(neighbor, visited)
+	}
+}
+
+// Connected returns true if every vertex is reachable from every other vertex
+func (a *AdjacencyList) Connected() bool {
+	// https://en.wikipedia.org/wiki/Connectivity_(graph_theory)
+
+	visited := map[string]bool{}
+
+	VisitAll(a.FirstNode(), visited)
+
+	// If each vertices has been visited, the graph is connected
+	for _, node := range a.Nodes() {
+		if !visited[node.ID()] {
+			return false
+		}
+	}
+
+	return true
+}
+
+func (a *AdjacencyList) findHamiltonianPath(start, finish *Vertex) []*Vertex {
+	return []*Vertex{}
+}
+
+// HamiltonianPath returns a vertex slice, the traversal of which will touch each vertex once
+func (a *AdjacencyList) HamiltonianPath() []*Vertex {
+	// https://en.wikipedia.org/wiki/Hamiltonian_path
+
+	if a.NodeCount() < 3 {
+		return nil
+	}
+
+	// Depending on the number of 1-edge nodes (whiskers) we have
+	// different approaches...
+	whiskers := a.Whiskers()
+
+	if len(whiskers) > 2 {
+		// No possible path
+		return nil
+	}
+
+	// Convert the map to something we can index into.
+	// Pad so we are sure to have at least 2 elements.
+	terminals := []*Vertex{}
+	for _, node := range whiskers {
+		terminals = append(terminals, node)
+	}
+	terminals = append(terminals, nil)
+	terminals = append(terminals, nil)
+
+	start := terminals[0]
+	finish := terminals[1]
+
+	return a.findHamiltonianPath(start, finish)
+}
+
+// HamiltonianCycle returns a vertex slice, the traversal of which will touch each vertex once
+func (a *AdjacencyList) HamiltonianCycle() []*Vertex {
+	// https://en.wikipedia.org/wiki/Hamiltonian_path
+
+	path := a.HamiltonianPath()
+
+	// A cycle is a path that returns to the start vertex
+	if !IsCycle(path) {
+		return nil
+	}
+
+	return path
+}
+
+// EulerianPath returns a vertex slice, the traversal of which will touch each edge once
+func (a *AdjacencyList) EulerianPath() []*Vertex {
+	// https://en.wikipedia.org/wiki/Eulerian_path
+
+	// A path exists only if every vertex has an even degree
+	for _, node := range a.Nodes() {
+		if node.NeighborCount()%2 == 1 {
+			return nil
+		}
+	}
+
+	return nil
+}
+
+// EulerianCycle returns a vertex slice, the traversal of which will touch each edge once, returning to the start vertex
+func (a *AdjacencyList) EulerianCycle() []*Vertex {
+	// https://en.wikipedia.org/wiki/Eulerian_path
+
+	path := a.EulerianPath()
+
+	// A cycle is a path that returns to the start vertex
+	if !IsCycle(path) {
+		return nil
+	}
+
+	return path
 }
