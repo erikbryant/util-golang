@@ -289,8 +289,8 @@ func DigitSum(n int) int {
 }
 
 // Harshad returns true if n is divisible by the sum of its digits
-func Harshad(n, sum int) bool {
-	return n%sum == 0
+func Harshad(n int) bool {
+	return n%DigitSum(n) == 0
 }
 
 // Totient returns how many numbers k are relatively prime to n

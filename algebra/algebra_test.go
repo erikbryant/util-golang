@@ -466,7 +466,7 @@ func TestHarshad(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		answer := Harshad(testCase.c, DigitSum(testCase.c))
+		answer := Harshad(testCase.c)
 		if answer != testCase.expected {
 			t.Errorf("ERROR: For %d expected %t, got %t", testCase.c, testCase.expected, answer)
 		}
