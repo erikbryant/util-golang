@@ -49,7 +49,7 @@ func doit() {
 	adj := graphs.NewAL()
 
 	lower := 1
-	upper := 66
+	upper := 47
 
 	// Our numbers start at 1, put a placeholder in 0
 	nodes = append(nodes, nil)

@@ -2,7 +2,7 @@ package graphs
 
 import (
 	"math/rand"
-	"slices"
+	"sort"
 	"time"
 )
 
@@ -16,17 +16,20 @@ type Vertex struct {
 
 // makeID returns a unique ID
 func makeID() uint64 {
-	// Get the micro time. That would almost be unique on its own
+	// Use micro time as the ID. That would almost be unique on its own
 	// if it were not the case that we might have a flurry of vertex
-	// objects created all at once. For uniqueness we really only
-	// care about the lower half.
+	// objects created all at once, even in the same microsecond.
+	//
+	// For uniqueness we really only care about the lower half.
 	// Fill the upper half with random garbage to make the composite
 	// value unique.
+	//
 	// We could use a string to make this simpler to create, but
 	// uint64 is a much faster map index, making 'neighbors' about
-	// 2x faster to access.
-	lowHalf := 0x0000000000ffffff & uint64(time.Now().UnixMicro())
-	topHalf := 0xffffffffff000000 & (uint64(rand.Float64()*10000000) << 32)
+	// 1.3x faster to access.
+
+	lowHalf := 0x00000000ffffffff & uint64(time.Now().UnixMicro())
+	topHalf := rand.Uint64() << 32
 	return topHalf | lowHalf
 }
 
@@ -89,17 +92,16 @@ func (v Vertex) Neighbors() map[uint64]*Vertex {
 
 // NeighborsSorted returns a sorted slice of all neighbors
 func (v Vertex) NeighborsSorted() []*Vertex {
-	keys := []uint64{}
-	for key := range v.neighbors {
-		keys = append(keys, key)
+	neighbors := make([]*Vertex, len(v.neighbors))
+	i := 0
+	for _, node := range v.neighbors {
+		neighbors[i] = node
+		i++
 	}
 
-	slices.Sort(keys)
-
-	neighbors := []*Vertex{}
-	for _, key := range keys {
-		neighbors = append(neighbors, v.neighbors[key])
-	}
+	sort.Slice(neighbors, func(i, j int) bool {
+		return neighbors[i].NeighborCount() < neighbors[j].NeighborCount()
+	})
 
 	return neighbors
 }

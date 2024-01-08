@@ -1,68 +1,33 @@
 package graphs
 
-import "slices"
-
-func VisitAll(node Vertex, visited map[uint64]bool) {
-	if visited[node.ID()] {
-		return
-	}
-
-	// Visit this node
-	visited[node.ID()] = true
-
-	// Vist each neighbor
-	for _, neighbor := range node.Neighbors() {
-		VisitAll(*neighbor, visited)
-	}
-}
-
-// Connected returns true if every vertex is reachable from every other vertex
-func (a AdjacencyList) Connected() bool {
-	// https://en.wikipedia.org/wiki/Connectivity_(graph_theory)
-
-	if len(a.Nodes()) == 0 {
-		// An empty graph has no connections
-		return false
-	}
-
-	visited := map[uint64]bool{}
-
-	VisitAll(*a.FirstNode(), visited)
-
-	// If each vertices has been visited, the graph is connected
-	for _, node := range a.Nodes() {
-		if !visited[node.ID()] {
-			return false
-		}
-	}
-
-	return true
-}
+import (
+	"sort"
+)
 
 // traversePaths finds [all] paths that touch each vertex
 func (a AdjacencyList) traversePaths(ch chan []*Vertex, terminal1, terminal2 *Vertex, stopOnFirstPath bool) {
 	defer close(ch)
 
-	startNodes := a.Nodes()
+	var startNodes []*Vertex
 
 	// If we have terminal node overrides, use those instead
-	if terminal1 != nil {
-		startNodes = map[uint64]*Vertex{}
-		startNodes[terminal1.ID()] = terminal1
+	if terminal1 == nil {
+		for _, node := range a.Nodes() {
+			startNodes = append(startNodes, node)
+		}
+	} else {
+		startNodes = append(startNodes, terminal1)
 		if terminal2 != nil {
-			startNodes[terminal2.ID()] = terminal2
+			startNodes = append(startNodes, terminal2)
 		}
 	}
 
-	keys := []uint64{}
-	for key := range startNodes {
-		keys = append(keys, key)
-	}
-	slices.Sort(keys)
+	sort.Slice(startNodes, func(i, j int) bool {
+		return startNodes[i].NeighborCount() < startNodes[j].NeighborCount()
+	})
 
 	// Look for paths from each possible starting node
-	for _, key := range keys {
-		node := startNodes[key]
+	for _, node := range startNodes {
 
 		todo := NewPath(a.EdgeCount())
 		path := NewPath(a.NodeCount())

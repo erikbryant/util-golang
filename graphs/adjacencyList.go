@@ -163,6 +163,35 @@ func (a *AdjacencyList) RemoveOrphans() {
 	}
 }
 
+func visitAll(node Vertex, visited map[uint64]bool) {
+	if visited[node.ID()] {
+		return
+	}
+
+	// Visit this node
+	visited[node.ID()] = true
+
+	// Vist each neighbor
+	for _, neighbor := range node.Neighbors() {
+		visitAll(*neighbor, visited)
+	}
+}
+
+// Connected returns true if every vertex is reachable from every other vertex
+func (a AdjacencyList) Connected() bool {
+	// https://en.wikipedia.org/wiki/Connectivity_(graph_theory)
+
+	if len(a.Nodes()) == 0 {
+		// An empty graph has no connections
+		return false
+	}
+
+	// If each vertices has been visited, the graph is connected
+	visited := map[uint64]bool{}
+	visitAll(*a.FirstNode(), visited)
+	return len(visited) == len(a.Nodes())
+}
+
 // MinimalVertexCover returns vertices that make a minimal (not guaranteed to be minimum) vertex cover
 func (a AdjacencyList) MinimalVertexCover() map[uint64]*Vertex {
 	aCopy := a.Copy()
