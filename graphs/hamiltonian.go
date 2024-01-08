@@ -4,6 +4,50 @@ import (
 	"sort"
 )
 
+func (a AdjacencyList) startsWith() int {
+	l := len(a.nodes)
+
+	magic := [][2]int{
+		{114, -1}, // We don't know anything above here
+		{64, 50},
+		{49, 15},
+		{36, 13},
+		{30, 6},
+		// {25, 5},
+		// {20, 5},
+		// {16, 4},
+		// {9, 7},
+		// {4, 5},
+		// {1, 3},
+	}
+
+	if l > magic[0][0] {
+		return 0
+	}
+
+	for _, pair := range magic {
+		if l >= pair[0] {
+			return pair[1] - (l - pair[0])
+		}
+	}
+
+	return 0
+}
+
+func (a AdjacencyList) starter() *Vertex {
+	s := a.startsWith()
+	if s == 0 {
+		return nil
+	}
+	for _, node := range a.nodes {
+		if node.Value() == s {
+			return node
+		}
+	}
+
+	return nil
+}
+
 // traversePaths finds [all] paths that touch each vertex
 func (a AdjacencyList) traversePaths(ch chan []*Vertex, terminal1, terminal2 *Vertex, stopOnFirstPath bool) {
 	defer close(ch)
@@ -31,6 +75,13 @@ func (a AdjacencyList) traversePaths(ch chan []*Vertex, terminal1, terminal2 *Ve
 		return startNodes[i].NeighborCount() < startNodes[j].NeighborCount()
 	})
 
+	n := a.starter()
+	if n != nil {
+		startNodes = []*Vertex{n}
+	}
+
+	targetLen := a.NodeCount()
+
 	// Look for paths from each possible starting node
 	for _, node := range startNodes {
 
@@ -38,10 +89,10 @@ func (a AdjacencyList) traversePaths(ch chan []*Vertex, terminal1, terminal2 *Ve
 		path := NewPath(a.NodeCount())
 
 		// Initialize
-		todo.Push(node, path.Len())
+		todo.PushNoTrack(node, path.Len())
 
 		for todo.Len() > 0 {
-			next, depth := todo.Pop()
+			next, depth := todo.PopNoTrack()
 
 			// We have a new node to put in the path, but
 			// it may go in waaaay back near the start
@@ -56,7 +107,7 @@ func (a AdjacencyList) traversePaths(ch chan []*Vertex, terminal1, terminal2 *Ve
 
 			path.Push(next, -1)
 
-			if path.Len() == a.NodeCount() {
+			if path.Len() == targetLen {
 				// We have a path!!!
 				ch <- path.Get()
 				if stopOnFirstPath {
@@ -67,7 +118,7 @@ func (a AdjacencyList) traversePaths(ch chan []*Vertex, terminal1, terminal2 *Ve
 
 			for _, node := range next.Neighbors() {
 				if !path.Contains(*node) {
-					todo.Push(node, path.Len())
+					todo.PushNoTrack(node, path.Len())
 				}
 			}
 		}

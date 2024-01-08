@@ -23,6 +23,12 @@ func (p *Path) Push(node *Vertex, depth int) {
 	p.visited[node.ID()] = true
 }
 
+func (p *Path) PushNoTrack(node *Vertex, depth int) {
+	p.index++
+	p.path[p.index] = node
+	p.depth[p.index] = depth
+}
+
 func (p *Path) Pop() (*Vertex, int) {
 	if p.index < 0 {
 		// The path is empty
@@ -32,6 +38,19 @@ func (p *Path) Pop() (*Vertex, int) {
 	node := p.path[p.index]
 	depth := p.depth[p.index]
 	p.visited[node.ID()] = false
+	p.index--
+
+	return node, depth
+}
+
+func (p *Path) PopNoTrack() (*Vertex, int) {
+	if p.index < 0 {
+		// The path is empty
+		return nil, 0
+	}
+
+	node := p.path[p.index]
+	depth := p.depth[p.index]
 	p.index--
 
 	return node, depth
