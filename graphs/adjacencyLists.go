@@ -8,23 +8,23 @@ import (
 
 // AdjacencyList implements an undirected graph
 type AdjacencyList struct {
-	nodes map[string]*Vertex
+	nodes map[uint64]*Vertex
 }
 
 // NewAL returns a new, empty adjacdency list
 func NewAL() AdjacencyList {
 	return AdjacencyList{
-		nodes: map[string]*Vertex{},
+		nodes: map[uint64]*Vertex{},
 	}
 }
 
 // HasNode returns true if the node is already in the adjacency list
-func (a *AdjacencyList) HasNode(node Vertex) bool {
+func (a AdjacencyList) HasNode(node Vertex) bool {
 	return a.nodes[node.ID()] != nil
 }
 
 // FirstNode returns a node from the map
-func (a *AdjacencyList) FirstNode() *Vertex {
+func (a AdjacencyList) FirstNode() *Vertex {
 	for _, node := range a.Nodes() {
 		return node
 	}
@@ -37,12 +37,12 @@ func (a *AdjacencyList) AddNode(node *Vertex) {
 }
 
 // RemoveNode removes a node from the adjacency list
-func (a *AdjacencyList) RemoveNode(node *Vertex) {
+func (a *AdjacencyList) RemoveNode(node Vertex) {
 	for _, n := range a.Nodes() {
 		if n.ID() == node.ID() {
 			// Remove it from its neighbors
 			for _, neighbor := range node.Neighbors() {
-				neighbor.RemoveNeighbor(*node)
+				neighbor.RemoveNeighbor(node)
 			}
 			delete(a.nodes, n.ID())
 			return
@@ -51,7 +51,7 @@ func (a *AdjacencyList) RemoveNode(node *Vertex) {
 }
 
 // Copy returns a copy of the AdjacencyList
-func (a *AdjacencyList) Copy() AdjacencyList {
+func (a AdjacencyList) Copy() AdjacencyList {
 	newAL := NewAL()
 
 	for _, node := range a.nodes {
@@ -62,12 +62,12 @@ func (a *AdjacencyList) Copy() AdjacencyList {
 }
 
 // Nodes returns the map of nodes in the adjacency list
-func (a *AdjacencyList) Nodes() map[string]*Vertex {
+func (a AdjacencyList) Nodes() map[uint64]*Vertex {
 	return a.nodes
 }
 
 // NodeCount returns the number of nodes in the adjacency list
-func (a *AdjacencyList) NodeCount() int {
+func (a AdjacencyList) NodeCount() int {
 	return len(a.Nodes())
 }
 
@@ -80,7 +80,7 @@ func (a *AdjacencyList) AddEdge(n1, n2 *Vertex) {
 }
 
 // EdgeCount returns the number of distinct edges in the adjacency list
-func (a *AdjacencyList) EdgeCount() int {
+func (a AdjacencyList) EdgeCount() int {
 	edges := 0
 
 	for _, node := range a.Nodes() {
@@ -92,12 +92,12 @@ func (a *AdjacencyList) EdgeCount() int {
 }
 
 // Genus returns the genus number of the adjacency list
-func (a *AdjacencyList) Genus() int {
+func (a AdjacencyList) Genus() int {
 	return a.EdgeCount() - a.NodeCount() + 1
 }
 
 // ValueSum returns the sum of all node values
-func (a *AdjacencyList) ValueSum() int {
+func (a AdjacencyList) ValueSum() int {
 	sum := 0
 	for _, node := range a.Nodes() {
 		sum += node.Value()
@@ -106,21 +106,21 @@ func (a *AdjacencyList) ValueSum() int {
 }
 
 // ValueLowest returns the node with the lowest value
-func (a *AdjacencyList) ValueLowest() *Vertex {
-	min := a.FirstNode()
+func (a AdjacencyList) ValueLowest() *Vertex {
+	minVal := a.FirstNode()
 
 	for _, node := range a.Nodes() {
-		if node.Value() < min.Value() {
-			min = node
+		if node.Value() < minVal.Value() {
+			minVal = node
 		}
 	}
 
-	return min
+	return minVal
 }
 
 // Whiskers returns a map of vertices that have only one edge
-func (a *AdjacencyList) Whiskers() map[string]*Vertex {
-	whiskers := map[string]*Vertex{}
+func (a AdjacencyList) Whiskers() map[uint64]*Vertex {
+	whiskers := map[uint64]*Vertex{}
 
 	for _, node := range a.Nodes() {
 		if node.NeighborCount() == 1 {
@@ -138,7 +138,7 @@ func (a *AdjacencyList) Whiskers() map[string]*Vertex {
 }
 
 // NodeWithMostEdges returns the node with the highest edge count
-func (a *AdjacencyList) NodeWithMostEdges() *Vertex {
+func (a AdjacencyList) NodeWithMostEdges() *Vertex {
 	var maxEdgeNode *Vertex
 
 	maxEdges := -1
@@ -158,15 +158,15 @@ func (a *AdjacencyList) NodeWithMostEdges() *Vertex {
 func (a *AdjacencyList) RemoveOrphans() {
 	for _, node := range a.Nodes() {
 		if node.NeighborCount() == 0 {
-			a.RemoveNode(node)
+			a.RemoveNode(*node)
 		}
 	}
 }
 
 // MinimalVertexCover returns vertices that make a minimal (not guaranteed to be minimum) vertex cover
-func (a *AdjacencyList) MinimalVertexCover() map[string]*Vertex {
+func (a AdjacencyList) MinimalVertexCover() map[uint64]*Vertex {
 	aCopy := a.Copy()
-	mvc := map[string]*Vertex{}
+	mvc := map[uint64]*Vertex{}
 
 	for len(aCopy.Nodes()) > 0 {
 		// Axiom: Nodes with whiskers must be in the MVC
@@ -176,9 +176,9 @@ func (a *AdjacencyList) MinimalVertexCover() map[string]*Vertex {
 				// We might have already removed this neighbor B if, for instance,
 				// A<->B<->C and we are at node C and have already processed node A.
 				mvc[neighbor.ID()] = neighbor
-				aCopy.RemoveNode(neighbor)
+				aCopy.RemoveNode(*neighbor)
 			}
-			aCopy.RemoveNode(node)
+			aCopy.RemoveNode(*node)
 		}
 
 		// Axiom: Nodes without edges are not in the MVC
@@ -190,7 +190,7 @@ func (a *AdjacencyList) MinimalVertexCover() map[string]*Vertex {
 
 		// Heuristic: Assume the most connected node is in the MVC
 		node := aCopy.NodeWithMostEdges()
-		aCopy.RemoveNode(node)
+		aCopy.RemoveNode(*node)
 		mvc[node.ID()] = node
 	}
 
@@ -203,16 +203,16 @@ func label(node Vertex) string {
 }
 
 // Serialize returns the adjacency list in graphviz format
-func (a *AdjacencyList) Serialize(title string) string {
+func (a AdjacencyList) Serialize(title string) string {
 	g := dot.NewGraph(dot.Undirected)
 	g.Label(title)
 
 	// Create the nodes
-	nodes := map[string]dot.Node{}
+	nodes := map[uint64]dot.Node{}
 	for _, node := range a.Nodes() {
 		l := label(*node)
 		id := node.ID()
-		n := g.Node(id)
+		n := g.Node(fmt.Sprintf("%d", id))
 		n.Label(l)
 		nodes[id] = n
 	}
@@ -221,7 +221,9 @@ func (a *AdjacencyList) Serialize(title string) string {
 	added := map[string]bool{}
 	for _, node := range a.Nodes() {
 		for _, neighbor := range node.Neighbors() {
-			if added[node.ID()+neighbor.ID()] {
+			edgeAB := fmt.Sprintf("%d:%d", node.ID(), neighbor.ID())
+			edgeBA := fmt.Sprintf("%d:%d", neighbor.ID(), node.ID())
+			if added[edgeAB] {
 				// We have already added this edge
 				continue
 			}
@@ -230,141 +232,10 @@ func (a *AdjacencyList) Serialize(title string) string {
 			n2 := nodes[neighbor.ID()]
 			g.Edge(n1, n2)
 			// Record that we have already added this edge
-			added[node.ID()+neighbor.ID()] = true
-			added[neighbor.ID()+node.ID()] = true
+			added[edgeAB] = true
+			added[edgeBA] = true
 		}
 	}
 
 	return g.String()
-}
-
-// IsCycle returns true if the nodes form a cycle
-func IsCycle(path []*Vertex) bool {
-	if len(path) == 0 {
-		return false
-	}
-
-	first := path[0]
-	last := path[len(path)-1]
-
-	// A cycle is a path that returns to the start vertex
-	// or a neighbor of the start vertex
-	return first.ID() == last.ID() || first.HasNeighbor(*last)
-}
-
-// Connection returns a vertex ordering to traverse from n1 to n2
-// func (a *AdjacencyList) Connection(n1, n2 *Vertex) []*Vertex {
-// 	// https://en.wikipedia.org/wiki/Connectivity_(graph_theory)
-
-// 	return nil
-// }
-
-func VisitAll(node *Vertex, visited map[string]bool) {
-	if visited[node.ID()] {
-		return
-	}
-
-	// Visit this node
-	visited[node.ID()] = true
-
-	// Vist each neighbor
-	for _, neighbor := range node.Neighbors() {
-		VisitAll(neighbor, visited)
-	}
-}
-
-// Connected returns true if every vertex is reachable from every other vertex
-func (a *AdjacencyList) Connected() bool {
-	// https://en.wikipedia.org/wiki/Connectivity_(graph_theory)
-
-	visited := map[string]bool{}
-
-	VisitAll(a.FirstNode(), visited)
-
-	// If each vertices has been visited, the graph is connected
-	for _, node := range a.Nodes() {
-		if !visited[node.ID()] {
-			return false
-		}
-	}
-
-	return true
-}
-
-func (a *AdjacencyList) findHamiltonianPath(start, finish *Vertex) []*Vertex {
-	return []*Vertex{}
-}
-
-// HamiltonianPath returns a vertex slice, the traversal of which will touch each vertex once
-func (a *AdjacencyList) HamiltonianPath() []*Vertex {
-	// https://en.wikipedia.org/wiki/Hamiltonian_path
-
-	if a.NodeCount() < 3 {
-		return nil
-	}
-
-	// Depending on the number of 1-edge nodes (whiskers) we have
-	// different approaches...
-	whiskers := a.Whiskers()
-
-	if len(whiskers) > 2 {
-		// No possible path
-		return nil
-	}
-
-	// Convert the map to something we can index into.
-	// Pad so we are sure to have at least 2 elements.
-	terminals := []*Vertex{}
-	for _, node := range whiskers {
-		terminals = append(terminals, node)
-	}
-	terminals = append(terminals, nil)
-	terminals = append(terminals, nil)
-
-	start := terminals[0]
-	finish := terminals[1]
-
-	return a.findHamiltonianPath(start, finish)
-}
-
-// HamiltonianCycle returns a vertex slice, the traversal of which will touch each vertex once
-func (a *AdjacencyList) HamiltonianCycle() []*Vertex {
-	// https://en.wikipedia.org/wiki/Hamiltonian_path
-
-	path := a.HamiltonianPath()
-
-	// A cycle is a path that returns to the start vertex
-	if !IsCycle(path) {
-		return nil
-	}
-
-	return path
-}
-
-// EulerianPath returns a vertex slice, the traversal of which will touch each edge once
-func (a *AdjacencyList) EulerianPath() []*Vertex {
-	// https://en.wikipedia.org/wiki/Eulerian_path
-
-	// A path exists only if every vertex has an even degree
-	for _, node := range a.Nodes() {
-		if node.NeighborCount()%2 == 1 {
-			return nil
-		}
-	}
-
-	return nil
-}
-
-// EulerianCycle returns a vertex slice, the traversal of which will touch each edge once, returning to the start vertex
-func (a *AdjacencyList) EulerianCycle() []*Vertex {
-	// https://en.wikipedia.org/wiki/Eulerian_path
-
-	path := a.EulerianPath()
-
-	// A cycle is a path that returns to the start vertex
-	if !IsCycle(path) {
-		return nil
-	}
-
-	return path
 }

@@ -15,10 +15,10 @@ func populate() graphs.AdjacencyList {
 
 	a := graphs.NewAL()
 
-	a.AddEdge(&n1, &n2)
-	a.AddEdge(&n2, &n3)
-	a.AddEdge(&n3, &n4)
-	a.AddEdge(&n4, &n2)
+	a.AddEdge(n1, n2)
+	a.AddEdge(n2, n3)
+	a.AddEdge(n3, n4)
+	a.AddEdge(n4, n2)
 
 	return a
 }

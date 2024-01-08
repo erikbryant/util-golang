@@ -1,8 +1,8 @@
 package graphs
 
 import (
-	"fmt"
 	"math/rand"
+	"slices"
 	"time"
 )
 
@@ -10,23 +10,38 @@ import (
 type Vertex struct {
 	name      string
 	value     int
-	neighbors map[string]*Vertex
-	id        string
+	neighbors map[uint64]*Vertex
+	id        uint64
+}
+
+// makeID returns a unique ID
+func makeID() uint64 {
+	// Get the micro time. That would almost be unique on its own
+	// if it were not the case that we might have a flurry of vertex
+	// objects created all at once. For uniqueness we really only
+	// care about the lower half.
+	// Fill the upper half with random garbage to make the composite
+	// value unique.
+	// We could use a string to make this simpler to create, but
+	// uint64 is a much faster map index, making 'neighbors' about
+	// 2x faster to access.
+	lowHalf := 0x0000000000ffffff & uint64(time.Now().UnixMicro())
+	topHalf := 0xffffffffff000000 & (uint64(rand.Float64()*10000000) << 32)
+	return topHalf | lowHalf
 }
 
 // NewVertex returns a new Vertex
-func NewVertex(name string, value int) Vertex {
-	return Vertex{
+func NewVertex(name string, value int) *Vertex {
+	return &Vertex{
 		name:      name,
 		value:     value,
-		neighbors: map[string]*Vertex{},
-		// Generate an ID guaranteed to be unique
-		id: fmt.Sprintf("%v:%v", time.Now().UnixMicro(), rand.Float64()),
+		neighbors: map[uint64]*Vertex{},
+		id:        makeID(),
 	}
 }
 
 // Name returns the vertex name
-func (v *Vertex) Name() string {
+func (v Vertex) Name() string {
 	return v.name
 }
 
@@ -36,7 +51,7 @@ func (v *Vertex) SetName(name string) {
 }
 
 // Value returns the vertex value
-func (v *Vertex) Value() int {
+func (v Vertex) Value() int {
 	return v.value
 }
 
@@ -58,22 +73,39 @@ func (v *Vertex) SetValue(value int) {
 }
 
 // ID returns the id of the vertex
-func (v *Vertex) ID() string {
+func (v Vertex) ID() uint64 {
 	return v.id
 }
 
 // HasNeighbor returns true if the given vertex is already a neighbor
-func (v *Vertex) HasNeighbor(node Vertex) bool {
+func (v Vertex) HasNeighbor(node Vertex) bool {
 	return v.neighbors[node.ID()] != nil
 }
 
 // Neighbors returns a map of all neighbors
-func (v *Vertex) Neighbors() map[string]*Vertex {
+func (v Vertex) Neighbors() map[uint64]*Vertex {
 	return v.neighbors
 }
 
+// NeighborsSorted returns a sorted slice of all neighbors
+func (v Vertex) NeighborsSorted() []*Vertex {
+	keys := []uint64{}
+	for key := range v.neighbors {
+		keys = append(keys, key)
+	}
+
+	slices.Sort(keys)
+
+	neighbors := []*Vertex{}
+	for _, key := range keys {
+		neighbors = append(neighbors, v.neighbors[key])
+	}
+
+	return neighbors
+}
+
 // FirstNeighbor returns the first neighbor
-func (v *Vertex) FirstNeighbor() *Vertex {
+func (v Vertex) FirstNeighbor() *Vertex {
 	for _, node := range v.neighbors {
 		return node
 	}
@@ -91,7 +123,7 @@ func (v *Vertex) RemoveNeighbor(node Vertex) {
 }
 
 // NeighborCount returns the number of edges (neighbors)
-func (v *Vertex) NeighborCount() int {
+func (v Vertex) NeighborCount() int {
 	return len(v.neighbors)
 }
 
@@ -108,4 +140,9 @@ func (v *Vertex) Degree() int {
 	}
 
 	return degree
+}
+
+// Equal returns true if v and node are the same vertex
+func (v Vertex) Equal(node Vertex) bool {
+	return v.ID() == node.ID()
 }
