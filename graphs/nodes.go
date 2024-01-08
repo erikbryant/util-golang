@@ -8,10 +8,11 @@ import (
 
 // Vertex implements a graph Vertex
 type Vertex struct {
-	name      string
-	value     int
-	neighbors map[uint64]*Vertex
-	id        uint64
+	name        string
+	value       int
+	neighbor    []*Vertex
+	neighborIDs map[uint64]*Vertex
+	id          uint64
 }
 
 // makeID returns a unique ID
@@ -25,7 +26,7 @@ func makeID() uint64 {
 	// value unique.
 	//
 	// We could use a string to make this simpler to create, but
-	// uint64 is a much faster map index, making 'neighbors' about
+	// uint64 is a much faster map index, making 'neighborIDs' about
 	// 1.3x faster to access.
 
 	lowHalf := 0x00000000ffffffff & uint64(time.Now().UnixMicro())
@@ -36,10 +37,11 @@ func makeID() uint64 {
 // NewVertex returns a new Vertex
 func NewVertex(name string, value int) *Vertex {
 	return &Vertex{
-		name:      name,
-		value:     value,
-		neighbors: map[uint64]*Vertex{},
-		id:        makeID(),
+		name:        name,
+		value:       value,
+		neighbor:    []*Vertex{},
+		neighborIDs: map[uint64]*Vertex{},
+		id:          makeID(),
 	}
 }
 
@@ -60,13 +62,11 @@ func (v Vertex) Value() int {
 
 // Increment increments the vertex value by 1
 func (v *Vertex) Increment() {
-	// Should this call SetValue()?
 	v.value++
 }
 
 // Decrement decrements the vertex value by 1
 func (v *Vertex) Decrement() {
-	// Should this call SetValue()?
 	v.value--
 }
 
@@ -82,51 +82,52 @@ func (v Vertex) ID() uint64 {
 
 // HasNeighbor returns true if the given vertex is already a neighbor
 func (v Vertex) HasNeighbor(node Vertex) bool {
-	return v.neighbors[node.ID()] != nil
+	return v.neighborIDs[node.ID()] != nil
 }
 
-// Neighbors returns a map of all neighbors
-func (v Vertex) Neighbors() map[uint64]*Vertex {
-	return v.neighbors
+// Neighbors returns a slice of all neighbors
+func (v Vertex) Neighbors() []*Vertex {
+	return v.neighbor
 }
 
 // NeighborsSorted returns a sorted slice of all neighbors
-func (v Vertex) NeighborsSorted() []*Vertex {
-	neighbors := make([]*Vertex, len(v.neighbors))
-	i := 0
-	for _, node := range v.neighbors {
-		neighbors[i] = node
-		i++
-	}
-
-	sort.Slice(neighbors, func(i, j int) bool {
-		return neighbors[i].NeighborCount() < neighbors[j].NeighborCount()
+func (v Vertex) SortNeighbors() {
+	sort.Slice(v.neighbor, func(i, j int) bool {
+		return v.neighbor[i].NeighborCount() < v.neighbor[j].NeighborCount()
 	})
-
-	return neighbors
 }
 
 // FirstNeighbor returns the first neighbor
 func (v Vertex) FirstNeighbor() *Vertex {
-	for _, node := range v.neighbors {
-		return node
+	if len(v.neighbor) == 0 {
+		return nil
 	}
-	return nil
+	return v.neighbor[0]
 }
 
 // AddNeighbor adds a neighbor vertex
 func (v *Vertex) AddNeighbor(node *Vertex) {
-	v.neighbors[node.ID()] = node
+	v.neighbor = append(v.neighbor, node)
+	v.neighborIDs[node.ID()] = node
 }
 
 // RemoveNeighbor removes a neighbor vertex
 func (v *Vertex) RemoveNeighbor(node Vertex) {
-	delete(v.neighbors, node.ID())
+	delete(v.neighborIDs, node.ID())
+
+	for i := 0; i < len(v.neighbor); i++ {
+		if node.Equal(*v.neighbor[i]) {
+			// Copy terminal cell to here, shrink slice by one
+			v.neighbor[i] = v.neighbor[len(v.neighbor)-1]
+			v.neighbor = v.neighbor[:len(v.neighbor)-1]
+			break
+		}
+	}
 }
 
 // NeighborCount returns the number of edges (neighbors)
 func (v Vertex) NeighborCount() int {
-	return len(v.neighbors)
+	return len(v.neighbor)
 }
 
 // Degree returns the degree of the incoming edges (loops count as 2)

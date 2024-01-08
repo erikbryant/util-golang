@@ -8,6 +8,11 @@ import (
 func (a AdjacencyList) traversePaths(ch chan []*Vertex, terminal1, terminal2 *Vertex, stopOnFirstPath bool) {
 	defer close(ch)
 
+	// Try to improve the speed of the traversal
+	for _, node := range a.Nodes() {
+		node.SortNeighbors()
+	}
+
 	var startNodes []*Vertex
 
 	// If we have terminal node overrides, use those instead
@@ -60,7 +65,7 @@ func (a AdjacencyList) traversePaths(ch chan []*Vertex, terminal1, terminal2 *Ve
 				continue
 			}
 
-			for _, node := range next.NeighborsSorted() {
+			for _, node := range next.Neighbors() {
 				if !path.Contains(*node) {
 					todo.Push(node, path.Len())
 				}
