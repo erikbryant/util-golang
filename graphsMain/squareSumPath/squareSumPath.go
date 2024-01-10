@@ -3,12 +3,16 @@ package main
 // go fmt ./... && go vet ./... && go test
 // time go run squareSumPath.go -cpuprofile cpu.prof | gvpack -u | dot -Tpng > test.png && open test.png
 // go tool pprof cpu.prof
+//
+// The path count (ignorning reverses) should match this sequence
+// https://oeis.org/A071983
 
 import (
 	"flag"
 	"fmt"
 	"log"
 	"os"
+	"runtime"
 	"runtime/pprof"
 
 	"github.com/erikbryant/util-golang/algebra"
@@ -33,7 +37,7 @@ func squareAddends(n int) []int {
 }
 
 // connect connects the given int to all addends in the graph
-func connect(adj *graphs.AdjacencyList, n int, addends []int) {
+func connect(adj *graphs.AdjacencyList, n int, addends []int) int {
 	// Record this new node
 	node := graphs.NewVertex("", n)
 	nodes = append(nodes, node)
@@ -43,38 +47,45 @@ func connect(adj *graphs.AdjacencyList, n int, addends []int) {
 	for _, addend := range addends {
 		adj.AddEdge(nodes[n], nodes[addend])
 	}
+
+	return len(addends)
+}
+
+func listPaths(paths [][]*graphs.Vertex) {
+	for _, path := range paths {
+		fmt.Fprintf(os.Stderr, "  ")
+		for _, node := range path {
+			fmt.Fprintf(os.Stderr, "%d ", node.Value())
+		}
+		fmt.Fprintf(os.Stderr, "\n")
+	}
+}
+
+func plotGraph(lower, upper int, adj graphs.AdjacencyList, paths [][]*graphs.Vertex) {
+	title := fmt.Sprintf("%d..%d Connected: %t #Paths: %d", lower, upper, adj.Connected(), len(paths))
+	serial := adj.Serialize(title)
+	fmt.Println(serial)
 }
 
 func doit() {
 	adj := graphs.NewAL()
-
-	lower := 1
-	upper := 47
+	var paths [][]*graphs.Vertex
 
 	// Our numbers start at 1, put a placeholder in 0
 	nodes = append(nodes, nil)
 
+	lower := 1
+	upper := 1000
+
 	for i := lower; i <= upper; i++ {
 		addends := squareAddends(i)
-		connect(&adj, i, addends)
-		fmt.Fprintf(os.Stderr, "Added %6d: ", i)
-		paths := adj.HamiltonianPaths()
-		if paths == nil {
-			fmt.Fprintf(os.Stderr, "\n")
-		} else {
-			fmt.Fprintf(os.Stderr, "Found a path!!\n")
-		}
-		// for _, path := range paths {
-		// 	for _, node := range path {
-		// 		fmt.Fprintf(os.Stderr, " %s->", node.Name())
-		// 	}
-		// 	fmt.Fprintf(os.Stderr, "\n\n")
-		// }
+		connections := connect(&adj, i, addends)
+		paths = adj.HamiltonianPaths(2, true, false)
+		fmt.Fprintf(os.Stderr, "Added %6d: Connections: %3d Paths: %6d GoRoutines: %3d\n", i, connections, len(paths), runtime.NumGoroutine())
+		// listPaths(paths)
 	}
 
-	// title := fmt.Sprintf("%d..%d Connected: %t Hamiltonian Path: %t", lower, upper, adj.Connected(), adj.HamiltonianPaths() != nil)
-	// serial := adj.Serialize(title)
-	// fmt.Println(serial)
+	// plotGraph(lower, upper, adj, paths)
 }
 
 func main() {

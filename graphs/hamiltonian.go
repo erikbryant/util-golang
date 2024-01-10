@@ -1,155 +1,178 @@
 package graphs
 
 import (
-	"sort"
+	"runtime"
+	"sync"
+	"time"
 )
 
-func (a AdjacencyList) startsWith() int {
-	l := len(a.nodes)
+var (
+	RunningID int64
+	Lock      sync.Mutex
+)
 
-	magic := [][2]int{
-		{114, -1}, // We don't know anything above here
-		{64, 50},
-		{49, 15},
-		{36, 13},
-		{30, 6},
-		// {25, 5},
-		// {20, 5},
-		// {16, 4},
-		// {9, 7},
-		// {4, 5},
-		// {1, 3},
-	}
-
-	if l > magic[0][0] {
-		return 0
-	}
-
-	for _, pair := range magic {
-		if l >= pair[0] {
-			return pair[1] - (l - pair[0])
-		}
-	}
-
-	return 0
-}
-
-func (a AdjacencyList) starter() *Vertex {
-	s := a.startsWith()
-	if s == 0 {
-		return nil
-	}
-	for _, node := range a.nodes {
-		if node.Value() == s {
-			return node
-		}
-	}
-
-	return nil
-}
-
-// traversePaths finds [all] paths that touch each vertex
-func (a AdjacencyList) traversePaths(ch chan []*Vertex, terminal1, terminal2 *Vertex, stopOnFirstPath bool) {
-	defer close(ch)
-
-	// Try to improve the speed of the traversal
-	for _, node := range a.Nodes() {
-		node.SortNeighbors()
-	}
-
-	var startNodes []*Vertex
-
-	// If we have terminal node overrides, use those instead
-	if terminal1 == nil {
-		for _, node := range a.Nodes() {
-			startNodes = append(startNodes, node)
-		}
-	} else {
-		startNodes = append(startNodes, terminal1)
-		if terminal2 != nil {
-			startNodes = append(startNodes, terminal2)
-		}
-	}
-
-	sort.Slice(startNodes, func(i, j int) bool {
-		return startNodes[i].NeighborCount() < startNodes[j].NeighborCount()
-	})
-
-	n := a.starter()
-	if n != nil {
-		startNodes = []*Vertex{n}
-	}
+// traversePaths pushes to resultsCh [all] paths from startNode that touch each vertex
+func traversePaths(a AdjacencyList, resultsCh chan []*Vertex, startNode *Vertex, stopOnFirstPath bool, myID int64) {
+	// Be concurrency safe in here!
+	// * Pass in a COPY of the AdjacencyList. This routine may continue
+	//   to live and access it even after the caller has torn down.
+	// * Use locks around access to global values
 
 	targetLen := a.NodeCount()
 
-	// Look for paths from each possible starting node
-	for _, node := range startNodes {
+	todo := NewPath(a.EdgeCount())
+	path := NewPath(a.NodeCount())
 
-		todo := NewPath(a.EdgeCount())
-		path := NewPath(a.NodeCount())
+	// Initialize
+	todo.PushNoTrack(startNode, path.Len())
 
-		// Initialize
-		todo.PushNoTrack(node, path.Len())
+	for todo.Len() > 0 {
+		Lock.Lock()
+		quit := myID != RunningID
+		Lock.Unlock()
+		if quit {
+			break
+		}
 
-		for todo.Len() > 0 {
-			next, depth := todo.PopNoTrack()
+		next, depth := todo.PopNoTrack()
 
-			// We have a new node to put in the path, but
-			// it may go in waaaay back near the start
-			for path.Len() > depth {
-				path.Pop()
+		// We have a new node to put in the path, but
+		// it may go in waaaay back near the start
+		for path.Len() > depth {
+			path.Pop()
+		}
+
+		path.Push(next, -1)
+
+		if path.Len() == targetLen {
+			// We found have a path!!!
+			Lock.Lock()
+			quit := myID != RunningID
+			if !quit {
+				resultsCh <- path.Get()
 			}
-
-			// if path.Contains(*next) {
-			// 	// We have already visited this node
-			// 	continue
-			// }
-
-			path.Push(next, -1)
-
-			if path.Len() == targetLen {
-				// We have a path!!!
-				ch <- path.Get()
-				if stopOnFirstPath {
-					return
-				}
-				continue
+			Lock.Unlock()
+			if quit || stopOnFirstPath {
+				break
 			}
+			continue
+		}
 
-			for _, node := range next.Neighbors() {
-				if !path.Contains(*node) {
-					todo.PushNoTrack(node, path.Len())
-				}
+		for _, node := range next.Neighbors() {
+			if !path.Contains(*node) {
+				todo.PushNoTrack(node, path.Len())
 			}
 		}
 	}
 }
 
+// isEqualReverse returns true if path1 is the reverse of path2
+func isEqualReverse(path1, path2 []*Vertex) bool {
+	if len(path1) != len(path2) {
+		return false
+	}
+
+	for i := range path1 {
+		if path1[i].ID() != path2[len(path2)-1-i].ID() {
+			return false
+		}
+	}
+
+	return true
+}
+
+// foundForward returns true if there is a path that is the reverse of newPath
+func hasReverse(foundPaths [][]*Vertex, newPath []*Vertex) bool {
+	for _, path := range foundPaths {
+		if isEqualReverse(path, newPath) {
+			return true
+		}
+	}
+	return false
+}
+
 // allPotentialPaths returns all combinations of vertex orderings (valid paths or not)
-func (a AdjacencyList) allPotentialPaths(terminal1, terminal2 *Vertex) [][]*Vertex {
+func (a AdjacencyList) allPotentialPaths(terminals []*Vertex, stopOnFirstPath bool, includeReverse bool) [][]*Vertex {
 	allPaths := [][]*Vertex{}
 
-	ch := make(chan []*Vertex)
-	go a.traversePaths(ch, terminal1, terminal2, true)
+	resultsCh := make(chan []*Vertex, a.NodeCount()+1000) // How the go routines send us results
 
+	runID := time.Now().UnixMicro()
+	Lock.Lock()
+	RunningID = runID
+	Lock.Unlock()
+
+	// Sometimes some are already running
+	goRoutinesAlreadyStarted := runtime.NumGoroutine()
+
+	// Create one worker for each starting node
+	if len(terminals) > 0 {
+		for _, node := range terminals {
+			tmpA := a.Copy()
+			tmpNode := tmpA.nodes[node.id]
+			go traversePaths(tmpA, resultsCh, tmpNode, stopOnFirstPath, runID)
+		}
+	} else {
+		for _, node := range a.Nodes() {
+			tmpA := a.Copy()
+			tmpNode := tmpA.nodes[node.id]
+			go traversePaths(tmpA, resultsCh, tmpNode, stopOnFirstPath, runID)
+		}
+	}
+
+	// Collect results from the workers
 	for {
-		path, ok := <-ch
-		if !ok {
+		var path []*Vertex
+
+		path = nil
+		for path == nil {
+			select {
+			case path = <-resultsCh:
+			default:
+			}
+			if runtime.NumGoroutine() <= goRoutinesAlreadyStarted && path == nil {
+				break
+			}
+			if path == nil {
+				continue
+			}
+		}
+
+		if path == nil {
 			break
 		}
+
+		if !includeReverse && hasReverse(allPaths, path) {
+			// We have already collected this path
+			continue
+		}
+
 		allPaths = append(allPaths, path)
+
+		if stopOnFirstPath {
+			break
+		}
 	}
+
+	Lock.Lock()
+	RunningID = 0
+	Lock.Unlock()
 
 	return allPaths
 }
 
-// HamiltonianPaths returns slices, the traversal of which touch each vertex once
-func (a AdjacencyList) HamiltonianPaths() [][]*Vertex {
+// HamiltonianPaths returns paths, the traversal of which touch each vertex once
+func (a AdjacencyList) HamiltonianPaths(minLength int, stopOnFirstPath bool, includeReverse bool) [][]*Vertex {
 	// https://en.wikipedia.org/wiki/Hamiltonian_path
 
 	if !a.Connected() {
 		// An unconnected graph cannot have a path
 		// This also eliminates empty graphs
+		return nil
+	}
+
+	if a.NodeCount() < minLength {
+		// Not a large enough graph to satisfy the caller
 		return nil
 	}
 
@@ -174,15 +197,16 @@ func (a AdjacencyList) HamiltonianPaths() [][]*Vertex {
 
 	// --- Vertex count >= 3 and they are connected ---
 
-	// Convert whisker map to something we can index into.
+	// Convert whisker map to a slice
 	terminals := []*Vertex{}
 	for _, node := range whiskers {
 		terminals = append(terminals, node)
 	}
 
-	// Pad so we are sure to have at least 2 elements.
-	terminals = append(terminals, nil)
-	terminals = append(terminals, nil)
+	// Try to improve the speed of the traversal
+	for _, node := range a.Nodes() {
+		node.SortNeighbors()
+	}
 
-	return a.allPotentialPaths(terminals[0], terminals[1])
+	return a.allPotentialPaths(terminals, stopOnFirstPath, includeReverse)
 }

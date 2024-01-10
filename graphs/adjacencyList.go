@@ -54,8 +54,19 @@ func (a *AdjacencyList) RemoveNode(node Vertex) {
 func (a AdjacencyList) Copy() AdjacencyList {
 	newAL := NewAL()
 
-	for _, node := range a.nodes {
-		newAL.AddNode(node)
+	// Create copies of each node
+	for _, node := range a.Nodes() {
+		n := NewVertex(node.Name(), node.Value())
+		n.id = node.id        // This direct access is slightly sketchy
+		newAL.nodes[n.id] = n // This direct access is slightly sketchy
+	}
+
+	// Link the new nodes together
+	for _, node := range a.Nodes() {
+		n := newAL.nodes[node.id] // This direct access is slightly sketchy
+		for _, neighbor := range node.Neighbors() {
+			n.AddNeighbor(newAL.nodes[neighbor.id]) // This direct access is slightly sketchy
+		}
 	}
 
 	return newAL

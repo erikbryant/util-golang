@@ -35,7 +35,7 @@ func TestHamiltonianPath(t *testing.T) {
 	a := NewAL()
 
 	// Empty graph
-	answer := a.HamiltonianPaths()
+	answer := a.HamiltonianPaths(0, true, true)
 	if answer != nil {
 		t.Errorf("ERROR: Expected nil, got %v", answer)
 	}
@@ -43,7 +43,7 @@ func TestHamiltonianPath(t *testing.T) {
 	// One node
 	nA := NewVertex("A", 4)
 	a.AddNode(nA)
-	answer = a.HamiltonianPaths()
+	answer = a.HamiltonianPaths(0, true, true)
 	if answer == nil {
 		t.Errorf("ERROR: Expected path, got %v", answer)
 	}
@@ -51,7 +51,7 @@ func TestHamiltonianPath(t *testing.T) {
 	// Not connected
 	nB := NewVertex("B", 4)
 	a.AddNode(nB)
-	answer = a.HamiltonianPaths()
+	answer = a.HamiltonianPaths(0, true, true)
 	if answer != nil {
 		t.Errorf("ERROR: Expected nil, got %v", answer)
 	}
@@ -62,28 +62,8 @@ func TestHamiltonianPath(t *testing.T) {
 	a.AddEdge(nA, nB)
 	a.AddEdge(nC, nB)
 	a.AddEdge(nD, nB)
-	answer = a.HamiltonianPaths()
+	answer = a.HamiltonianPaths(0, true, true)
 	if answer != nil {
 		t.Errorf("ERROR: Expected nil, got %v", answer)
 	}
-
-	// nA := NewVertex("A", 4)
-	// a.AddNode(&nA)
-	// answer = a.HamiltonianPath()
-	// if answer != true {
-	// 	t.Errorf("ERROR: Expected true, got %t", answer)
-	// }
-
-	// nB := NewVertex("B", 4)
-	// a.AddNode(&nB)
-	// answer = a.HamiltonianPath()
-	// if answer != false {
-	// 	t.Errorf("ERROR: Expected false, got %t", answer)
-	// }
-
-	// a.AddEdge(&nA, &nB)
-	// answer = a.HamiltonianPath()
-	// if answer != true {
-	// 	t.Errorf("ERROR: Expected true, got %t", answer)
-	// }
 }
