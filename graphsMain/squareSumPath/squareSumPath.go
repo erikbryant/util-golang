@@ -76,13 +76,13 @@ func doit() {
 	nodes = append(nodes, nil)
 
 	lower := 1
-	upper := 1000
+	upper := 300
 
 	for i := lower; i <= upper; i++ {
 		addends := squareAddends(i)
 		connections := connect(&adj, i, addends)
 		paths = adj.HamiltonianPaths(2, true, false)
-		fmt.Fprintf(os.Stderr, "Added %6d: Connections: %3d Paths: %6d GoRoutines: %3d\n", i, connections, len(paths), runtime.NumGoroutine())
+		fmt.Fprintf(os.Stderr, "Added: %6d   Connections: %3d   Paths: %6d   GoRoutines: %3d\n", i, connections, len(paths), runtime.NumGoroutine())
 		// listPaths(paths)
 	}
 
