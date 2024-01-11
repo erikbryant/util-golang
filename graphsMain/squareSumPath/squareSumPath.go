@@ -17,6 +17,7 @@ import (
 
 	"github.com/erikbryant/util-golang/algebra"
 	"github.com/erikbryant/util-golang/graphs"
+	"github.com/erikbryant/util-golang/system"
 )
 
 var (
@@ -37,7 +38,7 @@ func squareAddends(n int) []int {
 }
 
 // connect connects the given int to all addends in the graph
-func connect(adj *graphs.AdjacencyList, n int, addends []int) int {
+func connect(adj *graphs.AdjList, n int, addends []int) int {
 	// Record this new node
 	node := graphs.NewVertex("", n)
 	nodes = append(nodes, node)
@@ -61,7 +62,7 @@ func listPaths(paths [][]*graphs.Vertex) {
 	}
 }
 
-func plotGraph(lower, upper int, adj graphs.AdjacencyList, paths [][]*graphs.Vertex) {
+func plotGraph(lower, upper int, adj graphs.AdjList, paths [][]*graphs.Vertex) {
 	title := fmt.Sprintf("%d..%d Connected: %t #Paths: %d", lower, upper, adj.Connected(), len(paths))
 	serial := adj.Serialize(title)
 	fmt.Println(serial)
@@ -90,6 +91,9 @@ func doit() {
 
 func main() {
 	fmt.Fprintf(os.Stderr, "\nWelcome to square sum path!\n\n")
+
+	pid := system.InstallDebug()
+	fmt.Fprintf(os.Stderr, "Debugging signal handler installd: $ kill -SIGUSR1 %d\n", pid)
 
 	flag.Parse()
 	if *cpuprofile != "" {

@@ -7,7 +7,7 @@ import (
 	"github.com/erikbryant/util-golang/graphs"
 )
 
-func populate() graphs.AdjacencyList {
+func populate() graphs.AdjList {
 	n1 := graphs.NewVertex("", 4)
 	n2 := graphs.NewVertex("", -2)
 	n3 := graphs.NewVertex("", -1)
@@ -23,11 +23,11 @@ func populate() graphs.AdjacencyList {
 	return a
 }
 
-func solvable(a graphs.AdjacencyList) bool {
+func solvable(a graphs.AdjList) bool {
 	return a.ValueSum() >= a.Genus()
 }
 
-func title(a graphs.AdjacencyList) string {
+func title(a graphs.AdjList) string {
 	str := fmt.Sprintf("value: $%d genus: %d", a.ValueSum(), a.Genus())
 	if solvable(a) {
 		str += " -> solvable!"
@@ -38,12 +38,12 @@ func title(a graphs.AdjacencyList) string {
 }
 
 // solved returns true if there are no more negative values
-func solved(a graphs.AdjacencyList) bool {
+func solved(a graphs.AdjList) bool {
 	min := a.ValueLowest()
 	return min.Value() >= 0
 }
 
-func print(a graphs.AdjacencyList) {
+func print(a graphs.AdjList) {
 	s := a.Serialize(title(a))
 	fmt.Println(s)
 }
@@ -55,7 +55,7 @@ func requestAid(node *graphs.Vertex) {
 	}
 }
 
-func solve(a graphs.AdjacencyList) {
+func solve(a graphs.AdjList) {
 	if !solvable(a) {
 		return
 	}

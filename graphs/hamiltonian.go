@@ -12,7 +12,7 @@ var (
 )
 
 // traversePaths pushes to resultsCh [all] paths from startNode that touch each vertex
-func traversePaths(a AdjacencyList, resultsCh chan []*Vertex, startNode *Vertex, stopOnFirstPath bool, myID int64) {
+func traversePaths(a AdjList, resultsCh chan []*Vertex, startNode *Vertex, stopOnFirstPath bool, myID int64) {
 	// Be concurrency safe in here!
 	// * Pass in a COPY of the AdjacencyList. This routine may continue
 	//   to live and access it even after the caller has torn down.
@@ -91,8 +91,8 @@ func hasReverse(foundPaths [][]*Vertex, newPath []*Vertex) bool {
 	return false
 }
 
-// allPotentialPaths returns all combinations of vertex orderings (valid paths or not)
-func (a AdjacencyList) allPotentialPaths(terminals []*Vertex, stopOnFirstPath bool, includeReverse bool) [][]*Vertex {
+// paths returns all combinations of vertex orderings (valid paths or not)
+func (a AdjList) paths(terminals []*Vertex, stopOnFirstPath bool, includeReverse bool) [][]*Vertex {
 	allPaths := [][]*Vertex{}
 
 	resultsCh := make(chan []*Vertex, a.NodeCount()+1000) // How the go routines send us results
@@ -162,7 +162,7 @@ func (a AdjacencyList) allPotentialPaths(terminals []*Vertex, stopOnFirstPath bo
 }
 
 // HamiltonianPaths returns paths, the traversal of which touch each vertex once
-func (a AdjacencyList) HamiltonianPaths(minLength int, stopOnFirstPath bool, includeReverse bool) [][]*Vertex {
+func (a AdjList) HamiltonianPaths(minLength int, stopOnFirstPath bool, includeReverse bool) [][]*Vertex {
 	// https://en.wikipedia.org/wiki/Hamiltonian_path
 
 	if !a.Connected() {
@@ -195,7 +195,7 @@ func (a AdjacencyList) HamiltonianPaths(minLength int, stopOnFirstPath bool, inc
 		return nil
 	}
 
-	// --- Vertex count >= 3 and they are connected ---
+	// --- Vertex count >= 3, whisker count <= 2, and graph is connected ---
 
 	// Convert whisker map to a slice
 	terminals := []*Vertex{}
@@ -208,5 +208,5 @@ func (a AdjacencyList) HamiltonianPaths(minLength int, stopOnFirstPath bool, inc
 		node.SortNeighbors()
 	}
 
-	return a.allPotentialPaths(terminals, stopOnFirstPath, includeReverse)
+	return a.paths(terminals, stopOnFirstPath, includeReverse)
 }
