@@ -2,13 +2,11 @@ package graphs
 
 import (
 	"runtime"
-	"sync"
 	"time"
 )
 
 var (
 	RunningID int64
-	Lock      sync.Mutex
 )
 
 // traversePaths pushes to resultsCh [all] paths from startNode that touch each vertex
@@ -27,11 +25,8 @@ func traversePaths(a AdjList, resultsCh chan []*Vertex, startNode *Vertex, stopO
 	todo.PushNoTrack(startNode, path.Len())
 
 	for todo.Len() > 0 {
-		Lock.Lock()
-		quit := myID != RunningID
-		Lock.Unlock()
-		if quit {
-			break
+		if myID != RunningID {
+			return
 		}
 
 		next, depth := todo.PopNoTrack()
@@ -46,14 +41,12 @@ func traversePaths(a AdjList, resultsCh chan []*Vertex, startNode *Vertex, stopO
 
 		if path.Len() == targetLen {
 			// We found have a path!!!
-			Lock.Lock()
-			quit := myID != RunningID
-			if !quit {
-				resultsCh <- path.Get()
+			if myID != RunningID {
+				return
 			}
-			Lock.Unlock()
-			if quit || stopOnFirstPath {
-				break
+			resultsCh <- path.Get()
+			if stopOnFirstPath {
+				return
 			}
 			continue
 		}
@@ -98,9 +91,7 @@ func (a AdjList) paths(terminals []*Vertex, stopOnFirstPath bool, includeReverse
 	resultsCh := make(chan []*Vertex, a.NodeCount()+1000) // How the go routines send us results
 
 	runID := time.Now().UnixMicro()
-	Lock.Lock()
 	RunningID = runID
-	Lock.Unlock()
 
 	// Sometimes some are already running
 	goRoutinesAlreadyStarted := runtime.NumGoroutine()
@@ -154,9 +145,7 @@ func (a AdjList) paths(terminals []*Vertex, stopOnFirstPath bool, includeReverse
 		}
 	}
 
-	Lock.Lock()
 	RunningID = 0
-	Lock.Unlock()
 
 	return allPaths
 }
