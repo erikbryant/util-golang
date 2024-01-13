@@ -16,34 +16,26 @@ func NewPath(maxLen int) Path {
 	}
 }
 
+func (p *Path) PushAndTrack(node *Vertex, depth int) {
+	p.Push(node, depth)
+	p.visited[node.ID()] = true
+}
+
 func (p *Path) Push(node *Vertex, depth int) {
 	p.index++
 	p.path[p.index] = node
 	p.depth[p.index] = depth
-	p.visited[node.ID()] = true
 }
 
-func (p *Path) PushNoTrack(node *Vertex, depth int) {
-	p.index++
-	p.path[p.index] = node
-	p.depth[p.index] = depth
-}
-
-func (p *Path) Pop() (*Vertex, int) {
-	if p.index < 0 {
-		// The path is empty
-		return nil, 0
+func (p *Path) PopAndTrack() (*Vertex, int) {
+	node, depth := p.Pop()
+	if node != nil {
+		p.visited[node.ID()] = false
 	}
-
-	node := p.path[p.index]
-	depth := p.depth[p.index]
-	p.visited[node.ID()] = false
-	p.index--
-
 	return node, depth
 }
 
-func (p *Path) PopNoTrack() (*Vertex, int) {
+func (p *Path) Pop() (*Vertex, int) {
 	if p.index < 0 {
 		// The path is empty
 		return nil, 0

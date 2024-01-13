@@ -22,22 +22,22 @@ func traversePaths(a AdjList, resultsCh chan []*Vertex, startNode *Vertex, stopO
 	path := NewPath(a.NodeCount())
 
 	// Initialize
-	todo.PushNoTrack(startNode, path.Len())
+	todo.Push(startNode, path.Len())
 
 	for todo.Len() > 0 {
 		if myID != RunningID {
 			return
 		}
 
-		next, depth := todo.PopNoTrack()
+		next, depth := todo.Pop()
 
 		// We have a new node to put in the path, but
 		// it may go in waaaay back near the start
 		for path.Len() > depth {
-			path.Pop()
+			path.PopAndTrack()
 		}
 
-		path.Push(next, -1)
+		path.PushAndTrack(next, -1)
 
 		if path.Len() == targetLen {
 			// We found have a path!!!
@@ -53,7 +53,7 @@ func traversePaths(a AdjList, resultsCh chan []*Vertex, startNode *Vertex, stopO
 
 		for _, node := range next.Neighbors() {
 			if !path.Contains(*node) {
-				todo.PushNoTrack(node, path.Len())
+				todo.Push(node, path.Len())
 			}
 		}
 	}

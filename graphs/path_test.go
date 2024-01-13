@@ -13,8 +13,8 @@ func TestPush(t *testing.T) {
 
 	path := NewPath(10)
 	for _, testCase := range testCases {
-		path.Push(testCase.v, testCase.depth)
-		v, depth := path.Pop()
+		path.PushAndTrack(testCase.v, testCase.depth)
+		v, depth := path.PopAndTrack()
 		if v != testCase.v || depth != testCase.depth {
 			t.Errorf("ERROR: For %v expected %v/%d, got %v/%d", testCase.v, testCase.v, testCase.depth, v, depth)
 		}
@@ -29,19 +29,21 @@ func TestPop(t *testing.T) {
 	if l != 0 {
 		t.Errorf("ERROR: Expected 0, got %d", l)
 	}
-	v, depth := path.Pop()
+	v, depth := path.PopAndTrack()
 	if v != nil || depth != 0 {
 		t.Errorf("ERROR: Expected nil/0, got %v/%d", v, depth)
 	}
 
 	// Can pop a node that was just pushed
 	v1 := NewVertex("X", 999)
-	path.Push(v1, 99)
-	v, depth = path.Pop()
+	path.PushAndTrack(v1, 99)
+	v, depth = path.PopAndTrack()
 	if v != v1 || depth != 99 {
 		t.Errorf("ERROR: Expected %v/%d, got %v/%d", v1, 99, v, depth)
 	}
 }
+
+// TestLen
 
 func TestGet(t *testing.T) {
 	path := NewPath(10)
@@ -50,9 +52,9 @@ func TestGet(t *testing.T) {
 	v1 := NewVertex("Y", 1)
 	v2 := NewVertex("Z", 2)
 
-	path.Push(v0, 0)
-	path.Push(v1, 1)
-	path.Push(v2, 2)
+	path.PushAndTrack(v0, 0)
+	path.PushAndTrack(v1, 1)
+	path.PushAndTrack(v2, 2)
 
 	p := path.Get()
 	if len(p) != 3 {
@@ -76,17 +78,17 @@ func TestContains(t *testing.T) {
 	v1 := NewVertex("Y", 1)
 	v2 := NewVertex("Z", 2)
 
-	path.Push(v0, 0)
-	path.Push(v1, 1)
-	path.Push(v2, 2)
+	path.PushAndTrack(v0, 0)
+	path.PushAndTrack(v1, 1)
+	path.PushAndTrack(v2, 2)
 
 	answer := path.Contains(*v1)
 	if answer != true {
 		t.Errorf("ERROR: Expected true, got %t", answer)
 	}
 
-	path.Pop()
-	path.Pop()
+	path.PopAndTrack()
+	path.PopAndTrack()
 	answer = path.Contains(*v1)
 	if answer != false {
 		t.Errorf("ERROR: Expected false, got %t", answer)
@@ -100,9 +102,9 @@ func TestReset(t *testing.T) {
 	v1 := NewVertex("Y", 1)
 	v2 := NewVertex("Z", 2)
 
-	path.Push(v0, 0)
-	path.Push(v1, 1)
-	path.Push(v2, 2)
+	path.PushAndTrack(v0, 0)
+	path.PushAndTrack(v1, 1)
+	path.PushAndTrack(v2, 2)
 
 	path.Reset()
 	answer := path.Contains(*v1)
