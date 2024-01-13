@@ -28,7 +28,7 @@ func TestPopulateHundreds(t *testing.T) {
 	}
 }
 
-func TestStringify(t *testing.T) {
+func TestWordify(t *testing.T) {
 	testCases := []struct {
 		c        int
 		expected string
