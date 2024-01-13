@@ -44,7 +44,7 @@ func TestPi(t *testing.T) {
 	}
 }
 
-func TestPrime(t *testing.T) {
+func TestSlowPrime(t *testing.T) {
 	testCases := []struct {
 		n        int
 		expected bool
@@ -60,9 +60,62 @@ func TestPrime(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
+		answer := SlowPrime(testCase.n)
+		if answer != testCase.expected {
+			t.Errorf("ERROR: For %d expected %t, got %t", testCase.n, testCase.expected, answer)
+		}
+	}
+}
+
+func TestPrime(t *testing.T) {
+	testCases := []struct {
+		n        int
+		expected bool
+	}{
+		{-1, false},
+		{0, false},
+		{1, false},
+		{2, true},
+		{3, true},
+		{4, false},
+		{5, true},
+		{6, false},
+		{7, true},
+		{101, true},
+	}
+
+	for _, testCase := range testCases {
 		answer := Prime(testCase.n)
 		if answer != testCase.expected {
 			t.Errorf("ERROR: For %d expected %t, got %t", testCase.n, testCase.expected, answer)
+		}
+	}
+}
+
+// TestPackPrimes
+
+func TestPackedIndex(t *testing.T) {
+	testCases := []struct {
+		n        int
+		expected int
+	}{
+		{-1, -1},
+		{0, -1},
+		{1, -1},
+		{2, 0},
+		{3, 1},
+		{4, -1},
+		{5, 2},
+		{6, -2},
+		{89, 23},
+		{97, 24},
+		{121, -29},
+	}
+
+	for _, testCase := range testCases {
+		answer := PackedIndex(testCase.n)
+		if answer != testCase.expected {
+			t.Errorf("ERROR: For %d expected %d, got %d", testCase.n, testCase.expected, answer)
 		}
 	}
 }

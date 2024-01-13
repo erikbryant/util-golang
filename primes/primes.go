@@ -62,11 +62,20 @@ func Pi(n int) int {
 		panic(err)
 	}
 
-	return PackedIndex(n) + 1
+	i := PackedIndex(n)
+	if i < 0 {
+		i *= -1
+	}
+
+	return i + 1
 }
 
 // SlowPrime returns whether a number is prime or not, using a bute force search
 func SlowPrime(n int) bool {
+	if n <= 1 {
+		return false
+	}
+
 	root := int(math.Sqrt(float64(n)))
 
 	if root > PackedPrimes[PackedPrimesEnd] {
@@ -89,7 +98,7 @@ func Prime(number int) bool {
 	if number > PackedPrimes[PackedPrimesEnd] {
 		return SlowPrime(number)
 	}
-	return number == PackedPrimes[PackedIndex(number)]
+	return PackedIndex(number) >= 0
 }
 
 // packPrimes fills PackedPrimes with prime numbers
@@ -102,8 +111,12 @@ func packPrimes() {
 	PackedPrimesEnd = len(PackedPrimes) - 1
 }
 
-// PackedIndex returns the index in PackedPrimes of n
+// PackedIndex returns the index in PackedPrimes of n, or -1 if not found
 func PackedIndex(n int) int {
+	if n <= 1 {
+		return -1
+	}
+
 	upper := PackedPrimesEnd
 	lower := 0
 
@@ -112,20 +125,38 @@ func PackedIndex(n int) int {
 
 		if n > PackedPrimes[mid] {
 			if n < PackedPrimes[mid+1] {
+				if PackedPrimes[mid] != n {
+					// n is not prime
+					return -1 * mid
+				}
 				return mid
 			}
 			lower = mid + 1
 		} else {
 			if n == PackedPrimes[mid] {
+				if PackedPrimes[mid] != n {
+					// n is not prime
+					return -1 * mid
+				}
 				return mid
 			}
 			if mid == 0 {
+				if PackedPrimes[mid] != n {
+					// n is not prime
+					return -1 * mid
+				}
 				return mid
 			}
 			upper = mid - 1
 		}
 
 	}
+
+	if PackedPrimes[upper] != n {
+		// n is not prime
+		return -1 * upper
+	}
+
 	return upper
 }
 
@@ -196,10 +227,8 @@ func Load(fName string) {
 }
 
 // Init initializes the primes package
-func Init(save bool) {
+func GeneratePrimesGob() {
 	seive()
 	packPrimes()
-	if save {
-		Save()
-	}
+	Save()
 }

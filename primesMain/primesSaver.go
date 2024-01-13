@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	primes.Init(true)
+	primes.GeneratePrimesGob()
 }
