@@ -26,8 +26,8 @@ func vowelSound(s string) bool {
 	return vowel(s[0])
 }
 
-// pigLatin translates a single word to Pig Latin
-func pigLatin(s string) string {
+// pigLatinWord translates a single word to Pig Latin
+func pigLatinWord(s string) string {
 	s = strings.TrimSpace(s)
 	s = strings.ToLower(s)
 
@@ -67,7 +67,7 @@ func PigLatin(s string) string {
 	t := []string{}
 
 	for _, word := range strings.Split(s, " ") {
-		t = append(t, pigLatin(word))
+		t = append(t, pigLatinWord(word))
 	}
 
 	return strings.Join(t, " ")

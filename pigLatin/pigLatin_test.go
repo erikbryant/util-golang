@@ -49,7 +49,7 @@ func TestVowelSound(t *testing.T) {
 	}
 }
 
-func TestPigLatin(t *testing.T) {
+func TestPigLatinWord(t *testing.T) {
 	testCases := []struct {
 		c        string
 		expected string
@@ -96,14 +96,14 @@ func TestPigLatin(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		answer := pigLatin(testCase.c)
+		answer := pigLatinWord(testCase.c)
 		if answer != testCase.expected {
 			t.Errorf("ERROR: For %s expected %s, got %s", testCase.c, testCase.expected, answer)
 		}
 	}
 }
 
-func TestTranslate(t *testing.T) {
+func TestPigLatin(t *testing.T) {
 	testCases := []struct {
 		c        string
 		expected string
