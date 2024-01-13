@@ -247,6 +247,29 @@ func TestLCM(t *testing.T) {
 	}
 }
 
+func TestReduceFraction(t *testing.T) {
+	testCases := []struct {
+		a, b      int
+		expectedN int
+		expectedD int
+	}{
+		// Already reduced
+		{1, 2, 1, 2},
+		{2, 7, 2, 7},
+		// Need reducing
+		{12, 24, 1, 2},
+		{49, 7, 7, 1},
+		{2, 30, 1, 15},
+	}
+
+	for _, testCase := range testCases {
+		answer, answer2 := ReduceFraction(testCase.a, testCase.b)
+		if answer != testCase.expectedN || answer2 != testCase.expectedD {
+			t.Errorf("ERROR: For %d/%d expected %d/%d, got %d/%d", testCase.a, testCase.b, testCase.expectedN, testCase.expectedD, answer, answer2)
+		}
+	}
+}
+
 func TestSumFraction(t *testing.T) {
 	testCases := []struct {
 		a, b      int
@@ -356,6 +379,25 @@ func TestIsCube(t *testing.T) {
 		answer := IsCube(testCase.c)
 		if answer != testCase.expected {
 			t.Errorf("ERROR: For %d expected %t, got %t", testCase.c, testCase.expected, answer)
+		}
+	}
+}
+
+func TestEqualIntSlice(t *testing.T) {
+	testCases := []struct {
+		a        []int
+		b        []int
+		expected bool
+	}{
+		{[]int{5, 6, 0, 0, 3}, []int{3, 0, 0, 6, 5}, false},
+		{[]int{2}, []int{2}, true},
+		{[]int{2, 3}, []int{3, 2}, false},
+	}
+
+	for _, testCase := range testCases {
+		answer := EqualIntSlice(testCase.a, testCase.b)
+		if answer != testCase.expected {
+			t.Errorf("ERROR: For %v, %v expected %t, got %t", testCase.a, testCase.b, testCase.expected, answer)
 		}
 	}
 }
