@@ -301,6 +301,7 @@ func TestMulFraction(t *testing.T) {
 		expectedN int
 		expectedD int
 	}{
+		{3, 5, 0, 2, 0, 1},
 		{2, 2, 3, 3, 1, 1},
 		{1, 2, 3, 2, 3, 4},
 		{5, 7, 2, 8, 5, 28},
