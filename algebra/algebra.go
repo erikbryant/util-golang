@@ -198,7 +198,7 @@ func SumFraction(n1, d1, n2, d2 int) (int, int) {
 	lcm := LCM(d1, d2)
 	n1Scalar := lcm / d1
 	n2Scalar := lcm / d2
-	return (n1 * n1Scalar) + (n2 * n2Scalar), lcm
+	return ReduceFraction((n1*n1Scalar)+(n2*n2Scalar), lcm)
 }
 
 // MulFraction returns the product of the two fractions, still in fraction form

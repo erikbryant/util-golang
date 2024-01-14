@@ -278,12 +278,12 @@ func TestSumFraction(t *testing.T) {
 		expectedD int
 	}{
 		// Equal denominators
-		{1, 2, 3, 2, 4, 2},
-		{2, 7, 5, 7, 7, 7},
+		{1, 2, 3, 2, 2, 1},
+		{2, 7, 5, 7, 1, 1},
 		// Differing denominators
 		{1, 2, 1, 3, 5, 6},
-		{1, 2, 3, 10, 8, 10},
-		{2, 30, 2, 72, 34, 360},
+		{1, 2, 3, 10, 4, 5},
+		{2, 30, 2, 72, 17, 180},
 	}
 
 	for _, testCase := range testCases {
