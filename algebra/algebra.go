@@ -162,6 +162,34 @@ func FactorsCounted(n int) map[int]int {
 	return factors
 }
 
+// MaxBigInt returns the larger of a or b
+func MaxBigInt(a, b *big.Int) *big.Int {
+	switch a.Cmp(b) {
+	case -1:
+		return b
+	case 0:
+		return a
+	case 1:
+		return a
+	}
+
+	return b
+}
+
+// MinBigInt returns the smaller of a or b
+func MinBigInt(a, b *big.Int) *big.Int {
+	switch a.Cmp(b) {
+	case -1:
+		return a
+	case 0:
+		return b
+	case 1:
+		return b
+	}
+
+	return a
+}
+
 // GCD returns the greatest common divisor of a and b
 func GCD(a, b int) int {
 	// https://en.wikipedia.org/wiki/Greatest_common_divisor
@@ -177,6 +205,29 @@ func GCD(a, b int) int {
 	return max(a, b)
 }
 
+// GCDBigInt returns the greatest common divisor of a and b
+func GCDBigInt(a, b *big.Int) *big.Int {
+	// https://en.wikipedia.org/wiki/Greatest_common_divisor
+
+	zero := new(big.Int)
+
+	if a.Cmp(zero) == 0 && b.Cmp(zero) == 0 {
+		return zero
+	}
+
+	a2 := new(big.Int)
+	b2 := new(big.Int)
+	a2.Set(a)
+	b2.Set(b)
+
+	for a2.Cmp(zero) == 1 && b2.Cmp(zero) == 1 {
+		z := new(big.Int)
+		a2, b2 = MinBigInt(a2, b2), z.Mod(MaxBigInt(a2, b2), MinBigInt(a2, b2))
+	}
+
+	return MaxBigInt(a2, b2)
+}
+
 // LCM returns the least common multiple of a and b
 func LCM(a, b int) int {
 	// https://en.wikipedia.org/wiki/Least_common_multiple
@@ -188,9 +239,37 @@ func LCM(a, b int) int {
 	return (a / GCD(a, b)) * b
 }
 
+// LCMBigInt returns the least common multiple of a and b
+func LCMBigInt(a, b *big.Int) *big.Int {
+	// https://en.wikipedia.org/wiki/Least_common_multiple
+
+	zero := new(big.Int)
+
+	if a.Cmp(zero) == 0 && b.Cmp(zero) == 0 {
+		return zero
+	}
+
+	temp := new(big.Int)
+	temp.Div(a, GCDBigInt(a, b))
+	temp.Mul(temp, b)
+
+	return temp
+}
+
+// ReduceFraction returns the lowest that n and d reduce to
 func ReduceFraction(n, d int) (int, int) {
 	gcd := GCD(n, d)
 	return n / gcd, d / gcd
+}
+
+// ReduceFractionBigInt returns the lowest that n and d reduce to
+func ReduceFractionBigInt(n, d *big.Int) (*big.Int, *big.Int) {
+	gcd := GCDBigInt(n, d)
+	n2 := new(big.Int)
+	d2 := new(big.Int)
+	n2.Set(n)
+	d2.Set(d)
+	return n2.Div(n, gcd), d2.Div(d, gcd)
 }
 
 // SumFraction returns the sum of the two fractions, still in fraction form
@@ -201,12 +280,38 @@ func SumFraction(n1, d1, n2, d2 int) (int, int) {
 	return ReduceFraction((n1*n1Scalar)+(n2*n2Scalar), lcm)
 }
 
+// SumFractionBigInt returns the sum of the two fractions, still in fraction form
+func SumFractionBigInt(n1, d1, n2, d2 *big.Int) (*big.Int, *big.Int) {
+	lcm := LCMBigInt(d1, d2)
+	temp1 := new(big.Int)
+	temp2 := new(big.Int)
+
+	n1Scalar := temp1.Div(lcm, d1)
+	n2Scalar := temp2.Div(lcm, d2)
+
+	temp1.Mul(n1, n1Scalar)
+	temp2.Mul(n2, n2Scalar)
+
+	return ReduceFractionBigInt(temp1.Add(temp1, temp2), lcm)
+}
+
 // MulFraction returns the product of the two fractions, still in fraction form
 func MulFraction(n1, d1, n2, d2 int) (int, int) {
 	n1, d1 = ReduceFraction(n1, d1)
 	n2, d2 = ReduceFraction(n2, d2)
 	a, b := ReduceFraction(n1*n2, d1*d2)
 	return a, b
+}
+
+// MulFractionBigInt returns the product of the two fractions, still in fraction form
+func MulFractionBigInt(n1, d1, n2, d2 *big.Int) (*big.Int, *big.Int) {
+	tempN := new(big.Int)
+	tempD := new(big.Int)
+
+	tempN.Mul(n1, n2)
+	tempD.Mul(d1, d2)
+
+	return ReduceFractionBigInt(tempN, tempD)
 }
 
 // IsInt returns true if n is an integer

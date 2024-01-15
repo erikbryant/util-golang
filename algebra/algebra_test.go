@@ -203,6 +203,56 @@ func TestFactorsCounted(t *testing.T) {
 	}
 }
 
+func TestMaxBigInt(t *testing.T) {
+	testCases := []struct {
+		a, b     *big.Int
+		expected *big.Int
+	}{
+		{big.NewInt(0), big.NewInt(0), big.NewInt(0)},
+		{big.NewInt(1), big.NewInt(0), big.NewInt(1)},
+		{big.NewInt(0), big.NewInt(1), big.NewInt(1)},
+		{big.NewInt(1), big.NewInt(2), big.NewInt(2)},
+		{big.NewInt(3), big.NewInt(5), big.NewInt(5)},
+		{big.NewInt(2), big.NewInt(4), big.NewInt(4)},
+		{big.NewInt(2), big.NewInt(2), big.NewInt(2)},
+		{big.NewInt(2), big.NewInt(3), big.NewInt(3)},
+		{big.NewInt(9), big.NewInt(28), big.NewInt(28)},
+		{big.NewInt(200), big.NewInt(100), big.NewInt(200)},
+	}
+
+	for _, testCase := range testCases {
+		answer := MaxBigInt(testCase.a, testCase.b)
+		if answer.Cmp(testCase.expected) != 0 {
+			t.Errorf("ERROR: For %d, %d expected %d, got %d", testCase.a, testCase.b, testCase.expected, answer)
+		}
+	}
+}
+
+func TestMinBigInt(t *testing.T) {
+	testCases := []struct {
+		a, b     *big.Int
+		expected *big.Int
+	}{
+		{big.NewInt(0), big.NewInt(0), big.NewInt(0)},
+		{big.NewInt(1), big.NewInt(0), big.NewInt(0)},
+		{big.NewInt(0), big.NewInt(1), big.NewInt(0)},
+		{big.NewInt(1), big.NewInt(2), big.NewInt(1)},
+		{big.NewInt(3), big.NewInt(5), big.NewInt(3)},
+		{big.NewInt(2), big.NewInt(4), big.NewInt(2)},
+		{big.NewInt(2), big.NewInt(2), big.NewInt(2)},
+		{big.NewInt(2), big.NewInt(3), big.NewInt(2)},
+		{big.NewInt(9), big.NewInt(28), big.NewInt(9)},
+		{big.NewInt(200), big.NewInt(100), big.NewInt(100)},
+	}
+
+	for _, testCase := range testCases {
+		answer := MinBigInt(testCase.a, testCase.b)
+		if answer.Cmp(testCase.expected) != 0 {
+			t.Errorf("ERROR: For %d, %d expected %d, got %d", testCase.a, testCase.b, testCase.expected, answer)
+		}
+	}
+}
+
 func TestGCD(t *testing.T) {
 	testCases := []struct {
 		a, b     int
@@ -226,6 +276,31 @@ func TestGCD(t *testing.T) {
 	}
 }
 
+func TestGCDBigInt(t *testing.T) {
+	testCases := []struct {
+		a, b     *big.Int
+		expected *big.Int
+	}{
+		{big.NewInt(0), big.NewInt(0), big.NewInt(0)},
+		{big.NewInt(1), big.NewInt(0), big.NewInt(1)},
+		{big.NewInt(0), big.NewInt(1), big.NewInt(1)},
+		{big.NewInt(1), big.NewInt(2), big.NewInt(1)},
+		{big.NewInt(3), big.NewInt(5), big.NewInt(1)},
+		{big.NewInt(2), big.NewInt(4), big.NewInt(2)},
+		{big.NewInt(2), big.NewInt(2), big.NewInt(2)},
+		{big.NewInt(2), big.NewInt(3), big.NewInt(1)},
+		{big.NewInt(9), big.NewInt(28), big.NewInt(1)},
+		{big.NewInt(200), big.NewInt(100), big.NewInt(100)},
+	}
+
+	for _, testCase := range testCases {
+		answer := GCDBigInt(testCase.a, testCase.b)
+		if answer.Cmp(testCase.expected) != 0 {
+			t.Errorf("ERROR: For %d, %d expected %d, got %d", testCase.a, testCase.b, testCase.expected, answer)
+		}
+	}
+}
+
 func TestLCM(t *testing.T) {
 	testCases := []struct {
 		a, b     int
@@ -237,11 +312,34 @@ func TestLCM(t *testing.T) {
 		{1, 2, 2},
 		{2, 2, 2},
 		{2, 4, 4},
+		{2, 3, 6},
 	}
 
 	for _, testCase := range testCases {
 		answer := LCM(testCase.a, testCase.b)
 		if answer != testCase.expected {
+			t.Errorf("ERROR: For %d, %d expected %d, got %d", testCase.a, testCase.b, testCase.expected, answer)
+		}
+	}
+}
+
+func TestLCMBigInt(t *testing.T) {
+	testCases := []struct {
+		a, b     *big.Int
+		expected *big.Int
+	}{
+		{big.NewInt(0), big.NewInt(0), big.NewInt(0)},
+		{big.NewInt(1), big.NewInt(0), big.NewInt(0)},
+		{big.NewInt(0), big.NewInt(1), big.NewInt(0)},
+		{big.NewInt(1), big.NewInt(2), big.NewInt(2)},
+		{big.NewInt(2), big.NewInt(2), big.NewInt(2)},
+		{big.NewInt(2), big.NewInt(4), big.NewInt(4)},
+		{big.NewInt(2), big.NewInt(3), big.NewInt(6)},
+	}
+
+	for _, testCase := range testCases {
+		answer := LCMBigInt(testCase.a, testCase.b)
+		if answer.Cmp(testCase.expected) != 0 {
 			t.Errorf("ERROR: For %d, %d expected %d, got %d", testCase.a, testCase.b, testCase.expected, answer)
 		}
 	}
@@ -265,6 +363,29 @@ func TestReduceFraction(t *testing.T) {
 	for _, testCase := range testCases {
 		answer, answer2 := ReduceFraction(testCase.a, testCase.b)
 		if answer != testCase.expectedN || answer2 != testCase.expectedD {
+			t.Errorf("ERROR: For %d/%d expected %d/%d, got %d/%d", testCase.a, testCase.b, testCase.expectedN, testCase.expectedD, answer, answer2)
+		}
+	}
+}
+
+func TestReduceFractionBigInt(t *testing.T) {
+	testCases := []struct {
+		a, b      *big.Int
+		expectedN *big.Int
+		expectedD *big.Int
+	}{
+		// Already reduced
+		{big.NewInt(1), big.NewInt(2), big.NewInt(1), big.NewInt(2)},
+		{big.NewInt(2), big.NewInt(7), big.NewInt(2), big.NewInt(7)},
+		// Need reducing
+		{big.NewInt(12), big.NewInt(24), big.NewInt(1), big.NewInt(2)},
+		{big.NewInt(49), big.NewInt(7), big.NewInt(7), big.NewInt(1)},
+		{big.NewInt(2), big.NewInt(30), big.NewInt(1), big.NewInt(15)},
+	}
+
+	for _, testCase := range testCases {
+		answer, answer2 := ReduceFractionBigInt(testCase.a, testCase.b)
+		if answer.Cmp(testCase.expectedN) != 0 || answer2.Cmp(testCase.expectedD) != 0 {
 			t.Errorf("ERROR: For %d/%d expected %d/%d, got %d/%d", testCase.a, testCase.b, testCase.expectedN, testCase.expectedD, answer, answer2)
 		}
 	}
@@ -294,6 +415,30 @@ func TestSumFraction(t *testing.T) {
 	}
 }
 
+func TestSumFractionBigInt(t *testing.T) {
+	testCases := []struct {
+		a, b      *big.Int
+		c, d      *big.Int
+		expectedN *big.Int
+		expectedD *big.Int
+	}{
+		// Equal denominators
+		{big.NewInt(1), big.NewInt(2), big.NewInt(3), big.NewInt(2), big.NewInt(2), big.NewInt(1)},
+		{big.NewInt(2), big.NewInt(7), big.NewInt(5), big.NewInt(7), big.NewInt(1), big.NewInt(1)},
+		// Differing denominators
+		{big.NewInt(1), big.NewInt(2), big.NewInt(1), big.NewInt(3), big.NewInt(5), big.NewInt(6)},
+		{big.NewInt(1), big.NewInt(2), big.NewInt(3), big.NewInt(10), big.NewInt(4), big.NewInt(5)},
+		{big.NewInt(2), big.NewInt(30), big.NewInt(2), big.NewInt(72), big.NewInt(17), big.NewInt(180)},
+	}
+
+	for _, testCase := range testCases {
+		answer, answer2 := SumFractionBigInt(testCase.a, testCase.b, testCase.c, testCase.d)
+		if answer.Cmp(testCase.expectedN) != 0 || answer2.Cmp(testCase.expectedD) != 0 {
+			t.Errorf("ERROR: For %d/%d + %d/%d expected %d/%d, got %d/%d", testCase.a, testCase.b, testCase.c, testCase.d, testCase.expectedN, testCase.expectedD, answer, answer2)
+		}
+	}
+}
+
 func TestMulFraction(t *testing.T) {
 	testCases := []struct {
 		a, b      int
@@ -313,6 +458,30 @@ func TestMulFraction(t *testing.T) {
 	for _, testCase := range testCases {
 		answer, answer2 := MulFraction(testCase.a, testCase.b, testCase.c, testCase.d)
 		if answer != testCase.expectedN || answer2 != testCase.expectedD {
+			t.Errorf("ERROR: For %d/%d * %d/%d expected %d/%d, got %d/%d", testCase.a, testCase.b, testCase.c, testCase.d, testCase.expectedN, testCase.expectedD, answer, answer2)
+		}
+	}
+}
+
+func TestMulFractionBigInt(t *testing.T) {
+	testCases := []struct {
+		a, b      *big.Int
+		c, d      *big.Int
+		expectedN *big.Int
+		expectedD *big.Int
+	}{
+		{big.NewInt(3), big.NewInt(5), big.NewInt(0), big.NewInt(2), big.NewInt(0), big.NewInt(1)},
+		{big.NewInt(2), big.NewInt(2), big.NewInt(3), big.NewInt(3), big.NewInt(1), big.NewInt(1)},
+		{big.NewInt(1), big.NewInt(2), big.NewInt(3), big.NewInt(2), big.NewInt(3), big.NewInt(4)},
+		{big.NewInt(5), big.NewInt(7), big.NewInt(2), big.NewInt(8), big.NewInt(5), big.NewInt(28)},
+		{big.NewInt(6), big.NewInt(9), big.NewInt(1), big.NewInt(3), big.NewInt(2), big.NewInt(9)},
+		{big.NewInt(3), big.NewInt(4), big.NewInt(3), big.NewInt(12), big.NewInt(3), big.NewInt(16)},
+		{big.NewInt(2), big.NewInt(30), big.NewInt(2), big.NewInt(72), big.NewInt(1), big.NewInt(540)},
+	}
+
+	for _, testCase := range testCases {
+		answer, answer2 := MulFractionBigInt(testCase.a, testCase.b, testCase.c, testCase.d)
+		if answer.Cmp(testCase.expectedN) != 0 || answer2.Cmp(testCase.expectedD) != 0 {
 			t.Errorf("ERROR: For %d/%d * %d/%d expected %d/%d, got %d/%d", testCase.a, testCase.b, testCase.c, testCase.d, testCase.expectedN, testCase.expectedD, answer, answer2)
 		}
 	}
