@@ -39,11 +39,11 @@ func title(a graphs.AdjList) string {
 
 // solved returns true if there are no more negative values
 func solved(a graphs.AdjList) bool {
-	min := a.ValueLowest()
-	return min.Value() >= 0
+	low := a.ValueLowest()
+	return low.Value() >= 0
 }
 
-func print(a graphs.AdjList) {
+func printGraph(a graphs.AdjList) {
 	s := a.Serialize(title(a))
 	fmt.Println(s)
 }
@@ -64,7 +64,7 @@ func solve(a graphs.AdjList) {
 		lowest := a.ValueLowest()
 		requestAid(lowest)
 		lowest.SetName("*")
-		print(a)
+		printGraph(a)
 		lowest.SetName("")
 	}
 }
@@ -73,6 +73,6 @@ func main() {
 	fmt.Fprintf(os.Stderr, "Welcome to the dollar game!\n")
 
 	a := populate()
-	print(a)
+	printGraph(a)
 	solve(a)
 }

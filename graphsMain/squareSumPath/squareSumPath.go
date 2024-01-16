@@ -4,7 +4,7 @@ package main
 // time go run squareSumPath.go -cpuprofile cpu.prof | gvpack -u | dot -Tpng > test.png && open test.png
 // go tool pprof cpu.prof
 //
-// The path count (ignorning reverses) should match this sequence
+// The path count (ignoring reverses) should match this sequence
 // https://oeis.org/A071983
 
 import (
@@ -68,7 +68,7 @@ func plotGraph(lower, upper int, adj graphs.AdjList, paths [][]*graphs.Vertex) {
 	fmt.Println(serial)
 }
 
-func doit() {
+func findPaths() {
 	adj := graphs.NewAL()
 	var paths [][]*graphs.Vertex
 
@@ -105,5 +105,5 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	doit()
+	findPaths()
 }
