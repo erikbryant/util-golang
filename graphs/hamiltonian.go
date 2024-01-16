@@ -32,7 +32,7 @@ func traversePaths(a AdjList, resultsCh chan []*Vertex, startNode *Vertex, stopO
 		next, depth := todo.Pop()
 
 		// We have a new node to put in the path, but
-		// it may go in waaaay back near the start
+		// it may go in way back near the start
 		for path.Len() > depth {
 			path.PopAndTrack()
 		}
@@ -85,7 +85,7 @@ func hasReverse(foundPaths [][]*Vertex, newPath []*Vertex) bool {
 }
 
 // paths returns all combinations of vertex orderings (valid paths or not)
-func (a AdjList) paths(terminals []*Vertex, stopOnFirstPath bool, includeReverse bool) [][]*Vertex {
+func (a *AdjList) paths(terminals []*Vertex, stopOnFirstPath bool, includeReverse bool) [][]*Vertex {
 	allPaths := [][]*Vertex{}
 
 	resultsCh := make(chan []*Vertex, a.NodeCount()+1000) // How the go routines send us results
@@ -151,7 +151,7 @@ func (a AdjList) paths(terminals []*Vertex, stopOnFirstPath bool, includeReverse
 }
 
 // HamiltonianPaths returns paths, the traversal of which touch each vertex once
-func (a AdjList) HamiltonianPaths(minLength int, stopOnFirstPath bool, includeReverse bool) [][]*Vertex {
+func (a *AdjList) HamiltonianPaths(minLength int, stopOnFirstPath bool, includeReverse bool) [][]*Vertex {
 	// https://en.wikipedia.org/wiki/Hamiltonian_path
 
 	if !a.Connected() {
@@ -165,7 +165,7 @@ func (a AdjList) HamiltonianPaths(minLength int, stopOnFirstPath bool, includeRe
 		return nil
 	}
 
-	// --- Vertex count >= 1 and they are connected ---
+	// --- Vertex count >= 1, and they are connected ---
 
 	if a.NodeCount() <= 2 {
 		// All such graphs have a Hamiltonian path

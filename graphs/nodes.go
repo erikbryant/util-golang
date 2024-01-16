@@ -1,6 +1,7 @@
 package graphs
 
 import (
+	"fmt"
 	"math/rand"
 	"sort"
 	"time"
@@ -21,7 +22,7 @@ func makeID() uint64 {
 	// if it were not the case that we might have a flurry of vertex
 	// objects created all at once, even in the same microsecond.
 	//
-	// For uniqueness we really only care about the lower half.
+	// For uniqueness, we really only care about the lower half.
 	// Fill the upper half with random garbage to make the composite
 	// value unique.
 	//
@@ -46,7 +47,7 @@ func NewVertex(name string, value int) *Vertex {
 }
 
 // Name returns the vertex name
-func (v Vertex) Name() string {
+func (v *Vertex) Name() string {
 	return v.name
 }
 
@@ -56,7 +57,7 @@ func (v *Vertex) SetName(name string) {
 }
 
 // Value returns the vertex value
-func (v Vertex) Value() int {
+func (v *Vertex) Value() int {
 	return v.value
 }
 
@@ -76,29 +77,29 @@ func (v *Vertex) SetValue(value int) {
 }
 
 // ID returns the id of the vertex
-func (v Vertex) ID() uint64 {
+func (v *Vertex) ID() uint64 {
 	return v.id
 }
 
 // HasNeighbor returns true if the given vertex is already a neighbor
-func (v Vertex) HasNeighbor(node Vertex) bool {
+func (v *Vertex) HasNeighbor(node Vertex) bool {
 	return v.neighborIDs[node.ID()] != nil
 }
 
 // Neighbors returns a slice of all neighbors
-func (v Vertex) Neighbors() []*Vertex {
+func (v *Vertex) Neighbors() []*Vertex {
 	return v.neighbor
 }
 
-// NeighborsSorted returns a sorted slice of all neighbors
-func (v Vertex) SortNeighbors() {
+// SortNeighbors returns a sorted slice of all neighbors
+func (v *Vertex) SortNeighbors() {
 	sort.Slice(v.neighbor, func(i, j int) bool {
 		return v.neighbor[i].NeighborCount() < v.neighbor[j].NeighborCount()
 	})
 }
 
 // FirstNeighbor returns the first neighbor
-func (v Vertex) FirstNeighbor() *Vertex {
+func (v *Vertex) FirstNeighbor() *Vertex {
 	if len(v.neighbor) == 0 {
 		return nil
 	}
@@ -107,6 +108,9 @@ func (v Vertex) FirstNeighbor() *Vertex {
 
 // AddNeighbor adds a neighbor vertex
 func (v *Vertex) AddNeighbor(node *Vertex) {
+	if node == nil {
+		return
+	}
 	v.neighbor = append(v.neighbor, node)
 	v.neighborIDs[node.ID()] = node
 }
@@ -126,7 +130,7 @@ func (v *Vertex) RemoveNeighbor(node Vertex) {
 }
 
 // NeighborCount returns the number of edges (neighbors)
-func (v Vertex) NeighborCount() int {
+func (v *Vertex) NeighborCount() int {
 	return len(v.neighbor)
 }
 
@@ -146,6 +150,11 @@ func (v *Vertex) Degree() int {
 }
 
 // Equal returns true if v and node are the same vertex
-func (v Vertex) Equal(node Vertex) bool {
+func (v *Vertex) Equal(node Vertex) bool {
 	return v.ID() == node.ID()
+}
+
+// label returns a label for the given node
+func label(v *Vertex) string {
+	return fmt.Sprintf("%s %d", v.Name(), v.Value())
 }

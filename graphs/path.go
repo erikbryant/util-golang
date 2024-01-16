@@ -48,17 +48,17 @@ func (p *Path) Pop() (*Vertex, int) {
 	return node, depth
 }
 
-func (p Path) Len() int {
+func (p *Path) Len() int {
 	return p.index + 1
 }
 
-func (p Path) Get() []*Vertex {
+func (p *Path) Get() []*Vertex {
 	path := make([]*Vertex, p.index+1)
 	copy(path, p.path)
 	return path
 }
 
-func (p Path) Contains(node Vertex) bool {
+func (p *Path) Contains(node Vertex) bool {
 	return p.visited[node.ID()]
 }
 
