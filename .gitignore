@@ -1,7 +1,12 @@
-.DS_Store
 *.prof
 gmon.out
 *.gcov
 
-// Output from the graphs package
+# Output from the graphs package
 *.png
+
+# Common local files
+.idea/
+.vscode/
+.fleet/
+.DS_Store
