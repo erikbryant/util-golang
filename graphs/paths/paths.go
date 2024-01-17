@@ -1,4 +1,4 @@
-package graphs
+package paths
 
 import "github.com/erikbryant/util-golang/graphs/vertexes"
 

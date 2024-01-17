@@ -1,6 +1,7 @@
 package graphs
 
 import (
+	"github.com/erikbryant/util-golang/graphs/paths"
 	"github.com/erikbryant/util-golang/graphs/vertexes"
 	"runtime"
 	"time"
@@ -19,8 +20,8 @@ func traversePaths(a AdjList, resultsCh chan []*vertexes.Vertex, startNode *vert
 
 	targetLen := a.NodeCount()
 
-	todo := NewPath(a.EdgeCount())
-	path := NewPath(a.NodeCount())
+	todo := paths.NewPath(a.EdgeCount())
+	path := paths.NewPath(a.NodeCount())
 
 	// Initialize
 	todo.Push(startNode, path.Len())
