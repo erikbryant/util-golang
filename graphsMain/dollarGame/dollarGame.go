@@ -2,19 +2,18 @@ package main
 
 import (
 	"fmt"
+	"github.com/erikbryant/util-golang/graphs/adjLists"
 	"github.com/erikbryant/util-golang/graphs/vertexes"
 	"os"
-
-	"github.com/erikbryant/util-golang/graphs"
 )
 
-func populate() graphs.AdjList {
+func populate() adjLists.AdjList {
 	n1 := vertexes.NewVertex("", 4)
 	n2 := vertexes.NewVertex("", -2)
 	n3 := vertexes.NewVertex("", -1)
 	n4 := vertexes.NewVertex("", 0)
 
-	a := graphs.NewAL()
+	a := adjLists.NewAL()
 
 	a.AddEdge(n1, n2)
 	a.AddEdge(n2, n3)
@@ -24,11 +23,11 @@ func populate() graphs.AdjList {
 	return a
 }
 
-func solvable(a graphs.AdjList) bool {
+func solvable(a adjLists.AdjList) bool {
 	return a.ValueSum() >= a.Genus()
 }
 
-func title(a graphs.AdjList) string {
+func title(a adjLists.AdjList) string {
 	str := fmt.Sprintf("value: $%d genus: %d", a.ValueSum(), a.Genus())
 	if solvable(a) {
 		str += " -> solvable!"
@@ -39,12 +38,12 @@ func title(a graphs.AdjList) string {
 }
 
 // solved returns true if there are no more negative values
-func solved(a graphs.AdjList) bool {
+func solved(a adjLists.AdjList) bool {
 	low := a.ValueLowest()
 	return low.Value() >= 0
 }
 
-func printGraph(a graphs.AdjList) {
+func printGraph(a adjLists.AdjList) {
 	s := a.Serialize(title(a))
 	fmt.Println(s)
 }
@@ -56,7 +55,7 @@ func requestAid(node *vertexes.Vertex) {
 	}
 }
 
-func solve(a graphs.AdjList) {
+func solve(a adjLists.AdjList) {
 	if !solvable(a) {
 		return
 	}

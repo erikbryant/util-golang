@@ -10,6 +10,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/erikbryant/util-golang/graphs/adjLists"
 	"github.com/erikbryant/util-golang/graphs/vertexes"
 	"log"
 	"os"
@@ -17,7 +18,6 @@ import (
 	"runtime/pprof"
 
 	"github.com/erikbryant/util-golang/algebra"
-	"github.com/erikbryant/util-golang/graphs"
 	"github.com/erikbryant/util-golang/system"
 )
 
@@ -39,7 +39,7 @@ func squareAddends(n int) []int {
 }
 
 // connect connects the given int to all addends in the graph
-func connect(adj *graphs.AdjList, n int, addends []int) int {
+func connect(adj *adjLists.AdjList, n int, addends []int) int {
 	// Record this new node
 	node := vertexes.NewVertex("", n)
 	nodes = append(nodes, node)
@@ -63,14 +63,14 @@ func listPaths(paths [][]*vertexes.Vertex) {
 	}
 }
 
-func plotGraph(lower, upper int, adj graphs.AdjList, paths [][]*vertexes.Vertex) {
+func plotGraph(lower, upper int, adj adjLists.AdjList, paths [][]*vertexes.Vertex) {
 	title := fmt.Sprintf("%d..%d Connected: %t #Paths: %d", lower, upper, adj.Connected(), len(paths))
 	serial := adj.Serialize(title)
 	fmt.Println(serial)
 }
 
 func findPaths() {
-	adj := graphs.NewAL()
+	adj := adjLists.NewAL()
 	var paths [][]*vertexes.Vertex
 
 	// Our numbers start at 1, put a placeholder in 0
