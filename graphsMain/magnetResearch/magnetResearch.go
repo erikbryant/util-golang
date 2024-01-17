@@ -14,7 +14,7 @@ func plotGraph(graph *adjLists.AdjLists) {
 }
 
 func makeGraph(row, col int) *adjLists.AdjLists {
-	nodes := map[string]*vertexes.Vertex{}
+	nodes := map[string]*vertexes.Vertexes{}
 	graph := adjLists.NewAL()
 
 	// Create the nodes

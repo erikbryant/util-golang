@@ -7,7 +7,7 @@ import (
 
 func TestPush(t *testing.T) {
 	testCases := []struct {
-		v     *vertexes.Vertex
+		v     *vertexes.Vertexes
 		depth int
 	}{
 		{vertexes.NewVertex("A", 5), 3},
@@ -129,7 +129,7 @@ func TestReset(t *testing.T) {
 
 func TestIsPath(t *testing.T) {
 	// Empty path
-	path := []*vertexes.Vertex{}
+	path := []*vertexes.Vertexes{}
 	answer := IsPath(path)
 	if answer != false {
 		t.Errorf("ERROR: Expected false, got %t", answer)
@@ -140,7 +140,7 @@ func TestIsPath(t *testing.T) {
 	v2 := vertexes.NewVertex("Z", 2)
 
 	// Not a path
-	path = []*vertexes.Vertex{v0, v1, v2}
+	path = []*vertexes.Vertexes{v0, v1, v2}
 	answer = IsPath(path)
 	if answer != false {
 		t.Errorf("ERROR: Expected false, got %t", answer)
@@ -157,7 +157,7 @@ func TestIsPath(t *testing.T) {
 
 func TestIsCycle(t *testing.T) {
 	// Empty path
-	path := []*vertexes.Vertex{}
+	path := []*vertexes.Vertexes{}
 	answer := IsPath(path)
 	if answer != false {
 		t.Errorf("ERROR: Expected false, got %t", answer)
@@ -168,7 +168,7 @@ func TestIsCycle(t *testing.T) {
 	v2 := vertexes.NewVertex("Z", 2)
 
 	// Not a path
-	path = []*vertexes.Vertex{v0, v1, v2}
+	path = []*vertexes.Vertexes{v0, v1, v2}
 	answer = IsPath(path)
 	if answer != false {
 		t.Errorf("ERROR: Expected false, got %t", answer)

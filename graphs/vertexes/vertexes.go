@@ -7,12 +7,12 @@ import (
 	"time"
 )
 
-// Vertex implements a graph Vertex
-type Vertex struct {
+// Vertexes implements a graph vertex
+type Vertexes struct {
 	name        string
 	value       int
-	neighbor    []*Vertex
-	neighborIDs map[uint64]*Vertex
+	neighbor    []*Vertexes
+	neighborIDs map[uint64]*Vertexes
 	id          uint64
 }
 
@@ -35,76 +35,76 @@ func makeID() uint64 {
 	return topHalf | lowHalf
 }
 
-// NewVertex returns a new Vertex
-func NewVertex(name string, value int) *Vertex {
-	return &Vertex{
+// NewVertex returns a new Vertexes
+func NewVertex(name string, value int) *Vertexes {
+	return &Vertexes{
 		name:        name,
 		value:       value,
-		neighbor:    []*Vertex{},
-		neighborIDs: map[uint64]*Vertex{},
+		neighbor:    []*Vertexes{},
+		neighborIDs: map[uint64]*Vertexes{},
 		id:          makeID(),
 	}
 }
 
 // Name returns the vertex name
-func (v *Vertex) Name() string {
+func (v *Vertexes) Name() string {
 	return v.name
 }
 
 // SetName sets the vertex name
-func (v *Vertex) SetName(name string) {
+func (v *Vertexes) SetName(name string) {
 	v.name = name
 }
 
 // Value returns the vertex value
-func (v *Vertex) Value() int {
+func (v *Vertexes) Value() int {
 	return v.value
 }
 
 // Increment increments the vertex value by 1
-func (v *Vertex) Increment() {
+func (v *Vertexes) Increment() {
 	v.value++
 }
 
 // Decrement decrements the vertex value by 1
-func (v *Vertex) Decrement() {
+func (v *Vertexes) Decrement() {
 	v.value--
 }
 
 // SetValue sets the vertex value
-func (v *Vertex) SetValue(value int) {
+func (v *Vertexes) SetValue(value int) {
 	v.value = value
 }
 
 // ID returns the id of the vertex
-func (v *Vertex) ID() uint64 {
+func (v *Vertexes) ID() uint64 {
 	return v.id
 }
 
 // SetID sets the id of the vertex (use with extreme caution)
-func (v *Vertex) SetID(id uint64) {
+func (v *Vertexes) SetID(id uint64) {
 	v.id = id
 }
 
 // HasNeighbor returns true if the given vertex is already a neighbor
-func (v *Vertex) HasNeighbor(vertex Vertex) bool {
+func (v *Vertexes) HasNeighbor(vertex Vertexes) bool {
 	return v.neighborIDs[vertex.ID()] != nil
 }
 
 // Neighbors returns a slice of all neighbors
-func (v *Vertex) Neighbors() []*Vertex {
+func (v *Vertexes) Neighbors() []*Vertexes {
 	return v.neighbor
 }
 
 // SortNeighbors returns a sorted slice of all neighbors
-func (v *Vertex) SortNeighbors() {
+func (v *Vertexes) SortNeighbors() {
 	sort.Slice(v.neighbor, func(i, j int) bool {
 		return v.neighbor[i].NeighborCount() < v.neighbor[j].NeighborCount()
 	})
 }
 
 // FirstNeighbor returns the first neighbor
-func (v *Vertex) FirstNeighbor() *Vertex {
+func (v *Vertexes) FirstNeighbor() *Vertexes {
 	if len(v.neighbor) == 0 {
 		return nil
 	}
@@ -112,7 +112,7 @@ func (v *Vertex) FirstNeighbor() *Vertex {
 }
 
 // AddNeighbor adds a neighbor vertex
-func (v *Vertex) AddNeighbor(vertex *Vertex) {
+func (v *Vertexes) AddNeighbor(vertex *Vertexes) {
 	if vertex == nil {
 		return
 	}
@@ -121,7 +121,7 @@ func (v *Vertex) AddNeighbor(vertex *Vertex) {
 }
 
 // RemoveNeighbor removes a neighbor vertex
-func (v *Vertex) RemoveNeighbor(vertex Vertex) {
+func (v *Vertexes) RemoveNeighbor(vertex Vertexes) {
 	delete(v.neighborIDs, vertex.ID())
 
 	for i := 0; i < len(v.neighbor); i++ {
@@ -135,12 +135,12 @@ func (v *Vertex) RemoveNeighbor(vertex Vertex) {
 }
 
 // NeighborCount returns the number of edges (neighbors)
-func (v *Vertex) NeighborCount() int {
+func (v *Vertexes) NeighborCount() int {
 	return len(v.neighbor)
 }
 
 // Degree returns the degree of the incoming edges (loops count as 2)
-func (v *Vertex) Degree() int {
+func (v *Vertexes) Degree() int {
 	degree := 0
 
 	for _, vertex := range v.Neighbors() {
@@ -155,11 +155,11 @@ func (v *Vertex) Degree() int {
 }
 
 // Equal returns true if v and vertex represent the same vertex
-func (v *Vertex) Equal(vertex Vertex) bool {
+func (v *Vertexes) Equal(vertex Vertexes) bool {
 	return v.ID() == vertex.ID()
 }
 
 // Label returns a label for the given vertex
-func (v *Vertex) Label() string {
+func (v *Vertexes) Label() string {
 	return fmt.Sprintf("%s %d", v.Name(), v.Value())
 }

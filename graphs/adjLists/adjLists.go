@@ -9,23 +9,23 @@ import (
 
 // AdjLists implements an undirected graph
 type AdjLists struct {
-	nodes map[uint64]*vertexes.Vertex
+	nodes map[uint64]*vertexes.Vertexes
 }
 
 // NewAL returns a new, empty adjacency list
 func NewAL() AdjLists {
 	return AdjLists{
-		nodes: map[uint64]*vertexes.Vertex{},
+		nodes: map[uint64]*vertexes.Vertexes{},
 	}
 }
 
 // HasNode returns true if the node is already in the adjacency list
-func (a *AdjLists) HasNode(node vertexes.Vertex) bool {
+func (a *AdjLists) HasNode(node vertexes.Vertexes) bool {
 	return a.nodes[node.ID()] != nil
 }
 
 // FirstNode returns a node from the map
-func (a *AdjLists) FirstNode() *vertexes.Vertex {
+func (a *AdjLists) FirstNode() *vertexes.Vertexes {
 	for _, node := range a.Nodes() {
 		return node
 	}
@@ -33,12 +33,12 @@ func (a *AdjLists) FirstNode() *vertexes.Vertex {
 }
 
 // AddNode adds a node to the adjacency list if not already present
-func (a *AdjLists) AddNode(node *vertexes.Vertex) {
+func (a *AdjLists) AddNode(node *vertexes.Vertexes) {
 	a.nodes[node.ID()] = node
 }
 
 // RemoveNode removes a node from the adjacency list
-func (a *AdjLists) RemoveNode(node vertexes.Vertex) {
+func (a *AdjLists) RemoveNode(node vertexes.Vertexes) {
 	for _, n := range a.Nodes() {
 		if n.ID() == node.ID() {
 			// Remove it from its neighbors
@@ -74,7 +74,7 @@ func (a *AdjLists) Copy() AdjLists {
 }
 
 // Nodes returns the map of nodes in the adjacency list
-func (a *AdjLists) Nodes() map[uint64]*vertexes.Vertex {
+func (a *AdjLists) Nodes() map[uint64]*vertexes.Vertexes {
 	return a.nodes
 }
 
@@ -84,7 +84,7 @@ func (a *AdjLists) NodeCount() int {
 }
 
 // AddEdge adds an edge, adding the nodes if they are not already present
-func (a *AdjLists) AddEdge(n1, n2 *vertexes.Vertex) {
+func (a *AdjLists) AddEdge(n1, n2 *vertexes.Vertexes) {
 	a.AddNode(n1)
 	a.AddNode(n2)
 	n1.AddNeighbor(n2)
@@ -118,7 +118,7 @@ func (a *AdjLists) ValueSum() int {
 }
 
 // ValueLowest returns the node with the lowest value
-func (a *AdjLists) ValueLowest() *vertexes.Vertex {
+func (a *AdjLists) ValueLowest() *vertexes.Vertexes {
 	minVal := a.FirstNode()
 
 	for _, node := range a.Nodes() {
@@ -131,8 +131,8 @@ func (a *AdjLists) ValueLowest() *vertexes.Vertex {
 }
 
 // Whiskers returns a map of vertices that have only one edge
-func (a *AdjLists) Whiskers() map[uint64]*vertexes.Vertex {
-	whiskers := map[uint64]*vertexes.Vertex{}
+func (a *AdjLists) Whiskers() map[uint64]*vertexes.Vertexes {
+	whiskers := map[uint64]*vertexes.Vertexes{}
 
 	for _, node := range a.Nodes() {
 		if node.NeighborCount() == 1 {
@@ -150,8 +150,8 @@ func (a *AdjLists) Whiskers() map[uint64]*vertexes.Vertex {
 }
 
 // NodeWithMostEdges returns the node with the highest edge count
-func (a *AdjLists) NodeWithMostEdges() *vertexes.Vertex {
-	var maxEdgeNode *vertexes.Vertex
+func (a *AdjLists) NodeWithMostEdges() *vertexes.Vertexes {
+	var maxEdgeNode *vertexes.Vertexes
 
 	maxEdges := -1
 	maxEdgeNode = nil
@@ -175,7 +175,7 @@ func (a *AdjLists) RemoveOrphans() {
 	}
 }
 
-func visitAll(node vertexes.Vertex, visited map[uint64]bool) {
+func visitAll(node vertexes.Vertexes, visited map[uint64]bool) {
 	if visited[node.ID()] {
 		return
 	}
@@ -205,9 +205,9 @@ func (a *AdjLists) Connected() bool {
 }
 
 // MinimalVertexCover returns vertices that make a minimal (not guaranteed to be minimum) vertex cover
-func (a *AdjLists) MinimalVertexCover() map[uint64]*vertexes.Vertex {
+func (a *AdjLists) MinimalVertexCover() map[uint64]*vertexes.Vertexes {
 	aCopy := a.Copy()
-	mvc := map[uint64]*vertexes.Vertex{}
+	mvc := map[uint64]*vertexes.Vertexes{}
 
 	for len(aCopy.Nodes()) > 0 {
 		// Axiom: Nodes with whiskers must be in the MVC

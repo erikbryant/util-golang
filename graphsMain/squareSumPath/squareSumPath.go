@@ -22,7 +22,7 @@ import (
 )
 
 var (
-	nodes      = []*vertexes.Vertex{}
+	nodes      = []*vertexes.Vertexes{}
 	cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
 )
 
@@ -53,7 +53,7 @@ func connect(adj *adjLists.AdjLists, n int, addends []int) int {
 	return len(addends)
 }
 
-func listPaths(paths [][]*vertexes.Vertex) {
+func listPaths(paths [][]*vertexes.Vertexes) {
 	for _, path := range paths {
 		fmt.Fprintf(os.Stderr, "  ")
 		for _, node := range path {
@@ -63,7 +63,7 @@ func listPaths(paths [][]*vertexes.Vertex) {
 	}
 }
 
-func plotGraph(lower, upper int, adj adjLists.AdjLists, paths [][]*vertexes.Vertex) {
+func plotGraph(lower, upper int, adj adjLists.AdjLists, paths [][]*vertexes.Vertexes) {
 	title := fmt.Sprintf("%d..%d Connected: %t #Paths: %d", lower, upper, adj.Connected(), len(paths))
 	serial := adj.Serialize(title)
 	fmt.Println(serial)
@@ -71,7 +71,7 @@ func plotGraph(lower, upper int, adj adjLists.AdjLists, paths [][]*vertexes.Vert
 
 func findPaths() {
 	adj := adjLists.NewAL()
-	var paths [][]*vertexes.Vertex
+	var paths [][]*vertexes.Vertexes
 
 	// Our numbers start at 1, put a placeholder in 0
 	nodes = append(nodes, nil)

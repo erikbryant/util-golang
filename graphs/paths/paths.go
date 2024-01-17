@@ -3,7 +3,7 @@ package paths
 import "github.com/erikbryant/util-golang/graphs/vertexes"
 
 type Paths struct {
-	path    []*vertexes.Vertex
+	path    []*vertexes.Vertexes
 	depth   []int
 	index   int
 	visited map[uint64]bool
@@ -11,25 +11,25 @@ type Paths struct {
 
 func NewPath(maxLen int) Paths {
 	return Paths{
-		path:    make([]*vertexes.Vertex, maxLen),
+		path:    make([]*vertexes.Vertexes, maxLen),
 		depth:   make([]int, maxLen),
 		index:   -1,
 		visited: make(map[uint64]bool, maxLen),
 	}
 }
 
-func (p *Paths) PushAndTrack(node *vertexes.Vertex, depth int) {
+func (p *Paths) PushAndTrack(node *vertexes.Vertexes, depth int) {
 	p.Push(node, depth)
 	p.visited[node.ID()] = true
 }
 
-func (p *Paths) Push(node *vertexes.Vertex, depth int) {
+func (p *Paths) Push(node *vertexes.Vertexes, depth int) {
 	p.index++
 	p.path[p.index] = node
 	p.depth[p.index] = depth
 }
 
-func (p *Paths) PopAndTrack() (*vertexes.Vertex, int) {
+func (p *Paths) PopAndTrack() (*vertexes.Vertexes, int) {
 	node, depth := p.Pop()
 	if node != nil {
 		p.visited[node.ID()] = false
@@ -37,7 +37,7 @@ func (p *Paths) PopAndTrack() (*vertexes.Vertex, int) {
 	return node, depth
 }
 
-func (p *Paths) Pop() (*vertexes.Vertex, int) {
+func (p *Paths) Pop() (*vertexes.Vertexes, int) {
 	if p.index < 0 {
 		// The path is empty
 		return nil, 0
@@ -54,13 +54,13 @@ func (p *Paths) Len() int {
 	return p.index + 1
 }
 
-func (p *Paths) Get() []*vertexes.Vertex {
-	path := make([]*vertexes.Vertex, p.index+1)
+func (p *Paths) Get() []*vertexes.Vertexes {
+	path := make([]*vertexes.Vertexes, p.index+1)
 	copy(path, p.path)
 	return path
 }
 
-func (p *Paths) Contains(node vertexes.Vertex) bool {
+func (p *Paths) Contains(node vertexes.Vertexes) bool {
 	return p.visited[node.ID()]
 }
 
@@ -69,7 +69,7 @@ func (p *Paths) Reset() {
 }
 
 // IsPath returns true if the nodes form a path
-func IsPath(path []*vertexes.Vertex) bool {
+func IsPath(path []*vertexes.Vertexes) bool {
 	if len(path) == 0 {
 		// An empty path is not a path
 		return false
@@ -85,7 +85,7 @@ func IsPath(path []*vertexes.Vertex) bool {
 }
 
 // IsCycle returns true if the nodes form a cycle
-func IsCycle(path []*vertexes.Vertex) bool {
+func IsCycle(path []*vertexes.Vertexes) bool {
 	if !IsPath(path) {
 		// If it is not a path it cannot be a cycle
 		return false

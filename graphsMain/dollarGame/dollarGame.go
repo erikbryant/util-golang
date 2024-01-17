@@ -48,7 +48,7 @@ func printGraph(a adjLists.AdjLists) {
 	fmt.Println(s)
 }
 
-func requestAid(node *vertexes.Vertex) {
+func requestAid(node *vertexes.Vertexes) {
 	for _, neighbor := range node.Neighbors() {
 		node.Increment()
 		neighbor.Decrement()
