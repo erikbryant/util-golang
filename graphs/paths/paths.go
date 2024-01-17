@@ -2,15 +2,15 @@ package paths
 
 import "github.com/erikbryant/util-golang/graphs/vertexes"
 
-type Path struct {
+type Paths struct {
 	path    []*vertexes.Vertex
 	depth   []int
 	index   int
 	visited map[uint64]bool
 }
 
-func NewPath(maxLen int) Path {
-	return Path{
+func NewPath(maxLen int) Paths {
+	return Paths{
 		path:    make([]*vertexes.Vertex, maxLen),
 		depth:   make([]int, maxLen),
 		index:   -1,
@@ -18,18 +18,18 @@ func NewPath(maxLen int) Path {
 	}
 }
 
-func (p *Path) PushAndTrack(node *vertexes.Vertex, depth int) {
+func (p *Paths) PushAndTrack(node *vertexes.Vertex, depth int) {
 	p.Push(node, depth)
 	p.visited[node.ID()] = true
 }
 
-func (p *Path) Push(node *vertexes.Vertex, depth int) {
+func (p *Paths) Push(node *vertexes.Vertex, depth int) {
 	p.index++
 	p.path[p.index] = node
 	p.depth[p.index] = depth
 }
 
-func (p *Path) PopAndTrack() (*vertexes.Vertex, int) {
+func (p *Paths) PopAndTrack() (*vertexes.Vertex, int) {
 	node, depth := p.Pop()
 	if node != nil {
 		p.visited[node.ID()] = false
@@ -37,7 +37,7 @@ func (p *Path) PopAndTrack() (*vertexes.Vertex, int) {
 	return node, depth
 }
 
-func (p *Path) Pop() (*vertexes.Vertex, int) {
+func (p *Paths) Pop() (*vertexes.Vertex, int) {
 	if p.index < 0 {
 		// The path is empty
 		return nil, 0
@@ -50,21 +50,21 @@ func (p *Path) Pop() (*vertexes.Vertex, int) {
 	return node, depth
 }
 
-func (p *Path) Len() int {
+func (p *Paths) Len() int {
 	return p.index + 1
 }
 
-func (p *Path) Get() []*vertexes.Vertex {
+func (p *Paths) Get() []*vertexes.Vertex {
 	path := make([]*vertexes.Vertex, p.index+1)
 	copy(path, p.path)
 	return path
 }
 
-func (p *Path) Contains(node vertexes.Vertex) bool {
+func (p *Paths) Contains(node vertexes.Vertex) bool {
 	return p.visited[node.ID()]
 }
 
-func (p *Path) Reset() {
+func (p *Paths) Reset() {
 	*p = NewPath(len(p.path))
 }
 
