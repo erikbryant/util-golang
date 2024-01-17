@@ -1,6 +1,8 @@
-package graphs
+package vertexes
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestMakeID(t *testing.T) {
 	// If we generate a large number of IDs are any

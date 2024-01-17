@@ -1,4 +1,4 @@
-package graphs
+package vertexes
 
 import (
 	"fmt"
@@ -81,9 +81,14 @@ func (v *Vertex) ID() uint64 {
 	return v.id
 }
 
+// SetID sets the id of the vertex (use with extreme caution)
+func (v *Vertex) SetID(id uint64) {
+	v.id = id
+}
+
 // HasNeighbor returns true if the given vertex is already a neighbor
-func (v *Vertex) HasNeighbor(node Vertex) bool {
-	return v.neighborIDs[node.ID()] != nil
+func (v *Vertex) HasNeighbor(vertex Vertex) bool {
+	return v.neighborIDs[vertex.ID()] != nil
 }
 
 // Neighbors returns a slice of all neighbors
@@ -107,20 +112,20 @@ func (v *Vertex) FirstNeighbor() *Vertex {
 }
 
 // AddNeighbor adds a neighbor vertex
-func (v *Vertex) AddNeighbor(node *Vertex) {
-	if node == nil {
+func (v *Vertex) AddNeighbor(vertex *Vertex) {
+	if vertex == nil {
 		return
 	}
-	v.neighbor = append(v.neighbor, node)
-	v.neighborIDs[node.ID()] = node
+	v.neighbor = append(v.neighbor, vertex)
+	v.neighborIDs[vertex.ID()] = vertex
 }
 
 // RemoveNeighbor removes a neighbor vertex
-func (v *Vertex) RemoveNeighbor(node Vertex) {
-	delete(v.neighborIDs, node.ID())
+func (v *Vertex) RemoveNeighbor(vertex Vertex) {
+	delete(v.neighborIDs, vertex.ID())
 
 	for i := 0; i < len(v.neighbor); i++ {
-		if node.Equal(*v.neighbor[i]) {
+		if vertex.Equal(*v.neighbor[i]) {
 			// Copy terminal cell to here, shrink slice by one
 			v.neighbor[i] = v.neighbor[len(v.neighbor)-1]
 			v.neighbor = v.neighbor[:len(v.neighbor)-1]
@@ -138,8 +143,8 @@ func (v *Vertex) NeighborCount() int {
 func (v *Vertex) Degree() int {
 	degree := 0
 
-	for _, node := range v.Neighbors() {
-		if v.ID() == node.ID() {
+	for _, vertex := range v.Neighbors() {
+		if v.ID() == vertex.ID() {
 			// We own *both* ends of this edge
 			degree++
 		}
@@ -149,12 +154,12 @@ func (v *Vertex) Degree() int {
 	return degree
 }
 
-// Equal returns true if v and node are the same vertex
-func (v *Vertex) Equal(node Vertex) bool {
-	return v.ID() == node.ID()
+// Equal returns true if v and vertex represent the same vertex
+func (v *Vertex) Equal(vertex Vertex) bool {
+	return v.ID() == vertex.ID()
 }
 
-// label returns a label for the given node
-func label(v *Vertex) string {
+// Label returns a label for the given vertex
+func (v *Vertex) Label() string {
 	return fmt.Sprintf("%s %d", v.Name(), v.Value())
 }

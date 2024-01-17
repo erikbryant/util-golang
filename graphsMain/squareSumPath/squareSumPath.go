@@ -10,6 +10,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/erikbryant/util-golang/graphs/vertexes"
 	"log"
 	"os"
 	"runtime"
@@ -21,7 +22,7 @@ import (
 )
 
 var (
-	nodes      = []*graphs.Vertex{}
+	nodes      = []*vertexes.Vertex{}
 	cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
 )
 
@@ -40,7 +41,7 @@ func squareAddends(n int) []int {
 // connect connects the given int to all addends in the graph
 func connect(adj *graphs.AdjList, n int, addends []int) int {
 	// Record this new node
-	node := graphs.NewVertex("", n)
+	node := vertexes.NewVertex("", n)
 	nodes = append(nodes, node)
 	adj.AddNode(node)
 
@@ -52,7 +53,7 @@ func connect(adj *graphs.AdjList, n int, addends []int) int {
 	return len(addends)
 }
 
-func listPaths(paths [][]*graphs.Vertex) {
+func listPaths(paths [][]*vertexes.Vertex) {
 	for _, path := range paths {
 		fmt.Fprintf(os.Stderr, "  ")
 		for _, node := range path {
@@ -62,7 +63,7 @@ func listPaths(paths [][]*graphs.Vertex) {
 	}
 }
 
-func plotGraph(lower, upper int, adj graphs.AdjList, paths [][]*graphs.Vertex) {
+func plotGraph(lower, upper int, adj graphs.AdjList, paths [][]*vertexes.Vertex) {
 	title := fmt.Sprintf("%d..%d Connected: %t #Paths: %d", lower, upper, adj.Connected(), len(paths))
 	serial := adj.Serialize(title)
 	fmt.Println(serial)
@@ -70,7 +71,7 @@ func plotGraph(lower, upper int, adj graphs.AdjList, paths [][]*graphs.Vertex) {
 
 func findPaths() {
 	adj := graphs.NewAL()
-	var paths [][]*graphs.Vertex
+	var paths [][]*vertexes.Vertex
 
 	// Our numbers start at 1, put a placeholder in 0
 	nodes = append(nodes, nil)

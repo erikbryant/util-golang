@@ -1,6 +1,7 @@
 package graphs
 
 import (
+	"github.com/erikbryant/util-golang/graphs/vertexes"
 	"runtime"
 	"time"
 )
@@ -10,7 +11,7 @@ var (
 )
 
 // traversePaths pushes to resultsCh [all] paths from startNode that touch each vertex
-func traversePaths(a AdjList, resultsCh chan []*Vertex, startNode *Vertex, stopOnFirstPath bool, myID int64) {
+func traversePaths(a AdjList, resultsCh chan []*vertexes.Vertex, startNode *vertexes.Vertex, stopOnFirstPath bool, myID int64) {
 	// Be concurrency safe in here!
 	// * Pass in a COPY of the AdjacencyList. This routine may continue
 	//   to live and access it even after the caller has torn down.
@@ -60,7 +61,7 @@ func traversePaths(a AdjList, resultsCh chan []*Vertex, startNode *Vertex, stopO
 }
 
 // isEqualReverse returns true if path1 is the reverse of path2
-func isEqualReverse(path1, path2 []*Vertex) bool {
+func isEqualReverse(path1, path2 []*vertexes.Vertex) bool {
 	if len(path1) != len(path2) {
 		return false
 	}
@@ -75,7 +76,7 @@ func isEqualReverse(path1, path2 []*Vertex) bool {
 }
 
 // foundForward returns true if there is a path that is the reverse of newPath
-func hasReverse(foundPaths [][]*Vertex, newPath []*Vertex) bool {
+func hasReverse(foundPaths [][]*vertexes.Vertex, newPath []*vertexes.Vertex) bool {
 	for _, path := range foundPaths {
 		if isEqualReverse(path, newPath) {
 			return true
@@ -85,10 +86,10 @@ func hasReverse(foundPaths [][]*Vertex, newPath []*Vertex) bool {
 }
 
 // paths returns all combinations of vertex orderings (valid paths or not)
-func (a *AdjList) paths(terminals []*Vertex, stopOnFirstPath bool, includeReverse bool) [][]*Vertex {
-	allPaths := [][]*Vertex{}
+func (a *AdjList) paths(terminals []*vertexes.Vertex, stopOnFirstPath bool, includeReverse bool) [][]*vertexes.Vertex {
+	allPaths := [][]*vertexes.Vertex{}
 
-	resultsCh := make(chan []*Vertex, a.NodeCount()+1000) // How the go routines send us results
+	resultsCh := make(chan []*vertexes.Vertex, a.NodeCount()+1000) // How the go routines send us results
 
 	runID := time.Now().UnixMicro()
 	RunningID = runID
@@ -100,20 +101,20 @@ func (a *AdjList) paths(terminals []*Vertex, stopOnFirstPath bool, includeRevers
 	if len(terminals) > 0 {
 		for _, node := range terminals {
 			tmpA := a.Copy()
-			tmpNode := tmpA.nodes[node.id]
+			tmpNode := tmpA.nodes[node.ID()]
 			go traversePaths(tmpA, resultsCh, tmpNode, stopOnFirstPath, runID)
 		}
 	} else {
 		for _, node := range a.Nodes() {
 			tmpA := a.Copy()
-			tmpNode := tmpA.nodes[node.id]
+			tmpNode := tmpA.nodes[node.ID()]
 			go traversePaths(tmpA, resultsCh, tmpNode, stopOnFirstPath, runID)
 		}
 	}
 
 	// Collect results from the workers
 	for {
-		var path []*Vertex
+		var path []*vertexes.Vertex
 
 		path = nil
 		for path == nil {
@@ -151,7 +152,7 @@ func (a *AdjList) paths(terminals []*Vertex, stopOnFirstPath bool, includeRevers
 }
 
 // HamiltonianPaths returns paths, the traversal of which touch each vertex once
-func (a *AdjList) HamiltonianPaths(minLength int, stopOnFirstPath bool, includeReverse bool) [][]*Vertex {
+func (a *AdjList) HamiltonianPaths(minLength int, stopOnFirstPath bool, includeReverse bool) [][]*vertexes.Vertex {
 	// https://en.wikipedia.org/wiki/Hamiltonian_path
 
 	if !a.Connected() {
@@ -169,8 +170,8 @@ func (a *AdjList) HamiltonianPaths(minLength int, stopOnFirstPath bool, includeR
 
 	if a.NodeCount() <= 2 {
 		// All such graphs have a Hamiltonian path
-		path := [][]*Vertex{}
-		path = append(path, []*Vertex{})
+		path := [][]*vertexes.Vertex{}
+		path = append(path, []*vertexes.Vertex{})
 		for _, node := range a.Nodes() {
 			path[0] = append(path[0], node)
 		}
@@ -187,7 +188,7 @@ func (a *AdjList) HamiltonianPaths(minLength int, stopOnFirstPath bool, includeR
 	// --- Vertex count >= 3, whisker count <= 2, and graph is connected ---
 
 	// Convert whisker map to a slice
-	terminals := []*Vertex{}
+	terminals := []*vertexes.Vertex{}
 	for _, node := range whiskers {
 		terminals = append(terminals, node)
 	}

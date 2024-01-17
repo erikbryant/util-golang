@@ -2,6 +2,7 @@ package graphs
 
 import (
 	"fmt"
+	"github.com/erikbryant/util-golang/graphs/vertexes"
 	"testing"
 )
 
@@ -22,8 +23,8 @@ func TestAddEdge(t *testing.T) {
 
 	// Implied addition of nodes
 
-	n1 := NewVertex("A", 4)
-	n2 := NewVertex("B", 4)
+	n1 := vertexes.NewVertex("A", 4)
+	n2 := vertexes.NewVertex("B", 4)
 	a.AddEdge(n1, n2)
 
 	answer = a.NodeCount()
@@ -38,7 +39,7 @@ func TestAddEdge(t *testing.T) {
 
 	// Explicit addition of nodes
 
-	n3 := NewVertex("C", 4)
+	n3 := vertexes.NewVertex("C", 4)
 
 	a.AddNode(n3)
 	a.AddEdge(n1, n3)
@@ -76,7 +77,7 @@ func TestWhiskers(t *testing.T) {
 	}
 
 	a = NewAL()
-	n1 := NewVertex("A", 4)
+	n1 := vertexes.NewVertex("A", 4)
 	a.AddNode(n1)
 	whiskers = a.Whiskers()
 	if len(whiskers) != 0 {
@@ -84,8 +85,8 @@ func TestWhiskers(t *testing.T) {
 	}
 
 	a = NewAL()
-	n1 = NewVertex("B", 4)
-	n2 := NewVertex("C", 4)
+	n1 = vertexes.NewVertex("B", 4)
+	n2 := vertexes.NewVertex("C", 4)
 	a.AddNode(n1)
 	a.AddNode(n2)
 	whiskers = a.Whiskers()
@@ -94,8 +95,8 @@ func TestWhiskers(t *testing.T) {
 	}
 
 	a = NewAL()
-	n1 = NewVertex("B", 4)
-	n2 = NewVertex("C", 4)
+	n1 = vertexes.NewVertex("B", 4)
+	n2 = vertexes.NewVertex("C", 4)
 	a.AddEdge(n1, n2)
 	whiskers = a.Whiskers()
 	if len(whiskers) != 1 {
@@ -103,9 +104,9 @@ func TestWhiskers(t *testing.T) {
 	}
 
 	a = NewAL()
-	n1 = NewVertex("D", 4)
-	n2 = NewVertex("E", 4)
-	n3 := NewVertex("F", 4)
+	n1 = vertexes.NewVertex("D", 4)
+	n2 = vertexes.NewVertex("E", 4)
+	n3 := vertexes.NewVertex("F", 4)
 	a.AddEdge(n1, n2)
 	a.AddEdge(n2, n3)
 	whiskers = a.Whiskers()
@@ -122,7 +123,7 @@ func TestMinimalVertexCover(t *testing.T) {
 	}
 
 	a = NewAL()
-	n1 := NewVertex("A", 4)
+	n1 := vertexes.NewVertex("A", 4)
 	a.AddNode(n1)
 	mvc = a.MinimalVertexCover()
 	if len(mvc) != 0 {
@@ -130,8 +131,8 @@ func TestMinimalVertexCover(t *testing.T) {
 	}
 
 	a = NewAL()
-	n1 = NewVertex("B", 4)
-	n2 := NewVertex("C", 4)
+	n1 = vertexes.NewVertex("B", 4)
+	n2 := vertexes.NewVertex("C", 4)
 	a.AddNode(n1)
 	a.AddNode(n2)
 	mvc = a.MinimalVertexCover()
@@ -140,8 +141,8 @@ func TestMinimalVertexCover(t *testing.T) {
 	}
 
 	a = NewAL()
-	n1 = NewVertex("B", 4)
-	n2 = NewVertex("C", 4)
+	n1 = vertexes.NewVertex("B", 4)
+	n2 = vertexes.NewVertex("C", 4)
 	a.AddEdge(n1, n2)
 	mvc = a.MinimalVertexCover()
 	if len(mvc) != 1 {
@@ -149,9 +150,9 @@ func TestMinimalVertexCover(t *testing.T) {
 	}
 
 	a = NewAL()
-	n1 = NewVertex("D", 4)
-	n2 = NewVertex("E", 4)
-	n3 := NewVertex("F", 4)
+	n1 = vertexes.NewVertex("D", 4)
+	n2 = vertexes.NewVertex("E", 4)
+	n3 := vertexes.NewVertex("F", 4)
 	a.AddEdge(n1, n2)
 	a.AddEdge(n2, n3)
 	mvc = a.MinimalVertexCover()
@@ -169,12 +170,12 @@ func TestMinimalVertexCoverOctahedral(t *testing.T) {
 	// https://www.researchgate.net/figure/Octahedral-graph_fig3_365219344
 
 	a := NewAL()
-	nA := NewVertex("A", 4)
-	nB := NewVertex("B", 4)
-	nC := NewVertex("C", 4)
-	nD := NewVertex("D", 4)
-	nE := NewVertex("E", 4)
-	nF := NewVertex("F", 4)
+	nA := vertexes.NewVertex("A", 4)
+	nB := vertexes.NewVertex("B", 4)
+	nC := vertexes.NewVertex("C", 4)
+	nD := vertexes.NewVertex("D", 4)
+	nE := vertexes.NewVertex("E", 4)
+	nF := vertexes.NewVertex("F", 4)
 
 	a.AddEdge(nA, nB)
 	a.AddEdge(nB, nC)

@@ -1,14 +1,17 @@
 package graphs
 
-import "testing"
+import (
+	"github.com/erikbryant/util-golang/graphs/vertexes"
+	"testing"
+)
 
 func TestPush(t *testing.T) {
 	testCases := []struct {
-		v     *Vertex
+		v     *vertexes.Vertex
 		depth int
 	}{
-		{NewVertex("A", 5), 3},
-		{NewVertex("B", 12), -1},
+		{vertexes.NewVertex("A", 5), 3},
+		{vertexes.NewVertex("B", 12), -1},
 	}
 
 	path := NewPath(10)
@@ -35,7 +38,7 @@ func TestPop(t *testing.T) {
 	}
 
 	// Can pop a node that was just pushed
-	v1 := NewVertex("X", 999)
+	v1 := vertexes.NewVertex("X", 999)
 	path.PushAndTrack(v1, 99)
 	v, depth = path.PopAndTrack()
 	if v != v1 || depth != 99 {
@@ -48,9 +51,9 @@ func TestPop(t *testing.T) {
 func TestGet(t *testing.T) {
 	path := NewPath(10)
 
-	v0 := NewVertex("X", 0)
-	v1 := NewVertex("Y", 1)
-	v2 := NewVertex("Z", 2)
+	v0 := vertexes.NewVertex("X", 0)
+	v1 := vertexes.NewVertex("Y", 1)
+	v2 := vertexes.NewVertex("Z", 2)
 
 	path.PushAndTrack(v0, 0)
 	path.PushAndTrack(v1, 1)
@@ -74,9 +77,9 @@ func TestGet(t *testing.T) {
 func TestContains(t *testing.T) {
 	path := NewPath(10)
 
-	v0 := NewVertex("X", 0)
-	v1 := NewVertex("Y", 1)
-	v2 := NewVertex("Z", 2)
+	v0 := vertexes.NewVertex("X", 0)
+	v1 := vertexes.NewVertex("Y", 1)
+	v2 := vertexes.NewVertex("Z", 2)
 
 	path.PushAndTrack(v0, 0)
 	path.PushAndTrack(v1, 1)
@@ -98,9 +101,9 @@ func TestContains(t *testing.T) {
 func TestReset(t *testing.T) {
 	path := NewPath(10)
 
-	v0 := NewVertex("X", 0)
-	v1 := NewVertex("Y", 1)
-	v2 := NewVertex("Z", 2)
+	v0 := vertexes.NewVertex("X", 0)
+	v1 := vertexes.NewVertex("Y", 1)
+	v2 := vertexes.NewVertex("Z", 2)
 
 	path.PushAndTrack(v0, 0)
 	path.PushAndTrack(v1, 1)
@@ -126,18 +129,18 @@ func TestReset(t *testing.T) {
 
 func TestIsPath(t *testing.T) {
 	// Empty path
-	path := []*Vertex{}
+	path := []*vertexes.Vertex{}
 	answer := IsPath(path)
 	if answer != false {
 		t.Errorf("ERROR: Expected false, got %t", answer)
 	}
 
-	v0 := NewVertex("X", 0)
-	v1 := NewVertex("Y", 1)
-	v2 := NewVertex("Z", 2)
+	v0 := vertexes.NewVertex("X", 0)
+	v1 := vertexes.NewVertex("Y", 1)
+	v2 := vertexes.NewVertex("Z", 2)
 
 	// Not a path
-	path = []*Vertex{v0, v1, v2}
+	path = []*vertexes.Vertex{v0, v1, v2}
 	answer = IsPath(path)
 	if answer != false {
 		t.Errorf("ERROR: Expected false, got %t", answer)
@@ -154,18 +157,18 @@ func TestIsPath(t *testing.T) {
 
 func TestIsCycle(t *testing.T) {
 	// Empty path
-	path := []*Vertex{}
+	path := []*vertexes.Vertex{}
 	answer := IsPath(path)
 	if answer != false {
 		t.Errorf("ERROR: Expected false, got %t", answer)
 	}
 
-	v0 := NewVertex("X", 0)
-	v1 := NewVertex("Y", 1)
-	v2 := NewVertex("Z", 2)
+	v0 := vertexes.NewVertex("X", 0)
+	v1 := vertexes.NewVertex("Y", 1)
+	v2 := vertexes.NewVertex("Z", 2)
 
 	// Not a path
-	path = []*Vertex{v0, v1, v2}
+	path = []*vertexes.Vertex{v0, v1, v2}
 	answer = IsPath(path)
 	if answer != false {
 		t.Errorf("ERROR: Expected false, got %t", answer)

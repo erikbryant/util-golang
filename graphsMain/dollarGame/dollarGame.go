@@ -2,16 +2,17 @@ package main
 
 import (
 	"fmt"
+	"github.com/erikbryant/util-golang/graphs/vertexes"
 	"os"
 
 	"github.com/erikbryant/util-golang/graphs"
 )
 
 func populate() graphs.AdjList {
-	n1 := graphs.NewVertex("", 4)
-	n2 := graphs.NewVertex("", -2)
-	n3 := graphs.NewVertex("", -1)
-	n4 := graphs.NewVertex("", 0)
+	n1 := vertexes.NewVertex("", 4)
+	n2 := vertexes.NewVertex("", -2)
+	n3 := vertexes.NewVertex("", -1)
+	n4 := vertexes.NewVertex("", 0)
 
 	a := graphs.NewAL()
 
@@ -48,7 +49,7 @@ func printGraph(a graphs.AdjList) {
 	fmt.Println(s)
 }
 
-func requestAid(node *graphs.Vertex) {
+func requestAid(node *vertexes.Vertex) {
 	for _, neighbor := range node.Neighbors() {
 		node.Increment()
 		neighbor.Decrement()

@@ -1,6 +1,9 @@
 package graphs
 
-import "testing"
+import (
+	"github.com/erikbryant/util-golang/graphs/vertexes"
+	"testing"
+)
 
 func TestConnected(t *testing.T) {
 	a := NewAL()
@@ -10,14 +13,14 @@ func TestConnected(t *testing.T) {
 		t.Errorf("ERROR: Expected false, got %t", answer)
 	}
 
-	nA := NewVertex("A", 4)
+	nA := vertexes.NewVertex("A", 4)
 	a.AddNode(nA)
 	answer = a.Connected()
 	if answer != true {
 		t.Errorf("ERROR: Expected true, got %t", answer)
 	}
 
-	nB := NewVertex("B", 4)
+	nB := vertexes.NewVertex("B", 4)
 	a.AddNode(nB)
 	answer = a.Connected()
 	if answer != false {
@@ -41,7 +44,7 @@ func TestHamiltonianPath(t *testing.T) {
 	}
 
 	// One node
-	nA := NewVertex("A", 4)
+	nA := vertexes.NewVertex("A", 4)
 	a.AddNode(nA)
 	answer = a.HamiltonianPaths(0, true, true)
 	if answer == nil {
@@ -49,7 +52,7 @@ func TestHamiltonianPath(t *testing.T) {
 	}
 
 	// Not connected
-	nB := NewVertex("B", 4)
+	nB := vertexes.NewVertex("B", 4)
 	a.AddNode(nB)
 	answer = a.HamiltonianPaths(0, true, true)
 	if answer != nil {
@@ -57,8 +60,8 @@ func TestHamiltonianPath(t *testing.T) {
 	}
 
 	// More than 2 whiskers
-	nC := NewVertex("C", 4)
-	nD := NewVertex("D", 4)
+	nC := vertexes.NewVertex("C", 4)
+	nD := vertexes.NewVertex("D", 4)
 	a.AddEdge(nA, nB)
 	a.AddEdge(nC, nB)
 	a.AddEdge(nD, nB)
