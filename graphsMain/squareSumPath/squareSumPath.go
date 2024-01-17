@@ -39,7 +39,7 @@ func squareAddends(n int) []int {
 }
 
 // connect connects the given int to all addends in the graph
-func connect(adj *adjLists.AdjList, n int, addends []int) int {
+func connect(adj *adjLists.AdjLists, n int, addends []int) int {
 	// Record this new node
 	node := vertexes.NewVertex("", n)
 	nodes = append(nodes, node)
@@ -63,7 +63,7 @@ func listPaths(paths [][]*vertexes.Vertex) {
 	}
 }
 
-func plotGraph(lower, upper int, adj adjLists.AdjList, paths [][]*vertexes.Vertex) {
+func plotGraph(lower, upper int, adj adjLists.AdjLists, paths [][]*vertexes.Vertex) {
 	title := fmt.Sprintf("%d..%d Connected: %t #Paths: %d", lower, upper, adj.Connected(), len(paths))
 	serial := adj.Serialize(title)
 	fmt.Println(serial)

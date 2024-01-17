@@ -7,25 +7,25 @@ import (
 	"github.com/emicklei/dot"
 )
 
-// AdjList implements an undirected graph
-type AdjList struct {
+// AdjLists implements an undirected graph
+type AdjLists struct {
 	nodes map[uint64]*vertexes.Vertex
 }
 
 // NewAL returns a new, empty adjacency list
-func NewAL() AdjList {
-	return AdjList{
+func NewAL() AdjLists {
+	return AdjLists{
 		nodes: map[uint64]*vertexes.Vertex{},
 	}
 }
 
 // HasNode returns true if the node is already in the adjacency list
-func (a *AdjList) HasNode(node vertexes.Vertex) bool {
+func (a *AdjLists) HasNode(node vertexes.Vertex) bool {
 	return a.nodes[node.ID()] != nil
 }
 
 // FirstNode returns a node from the map
-func (a *AdjList) FirstNode() *vertexes.Vertex {
+func (a *AdjLists) FirstNode() *vertexes.Vertex {
 	for _, node := range a.Nodes() {
 		return node
 	}
@@ -33,12 +33,12 @@ func (a *AdjList) FirstNode() *vertexes.Vertex {
 }
 
 // AddNode adds a node to the adjacency list if not already present
-func (a *AdjList) AddNode(node *vertexes.Vertex) {
+func (a *AdjLists) AddNode(node *vertexes.Vertex) {
 	a.nodes[node.ID()] = node
 }
 
 // RemoveNode removes a node from the adjacency list
-func (a *AdjList) RemoveNode(node vertexes.Vertex) {
+func (a *AdjLists) RemoveNode(node vertexes.Vertex) {
 	for _, n := range a.Nodes() {
 		if n.ID() == node.ID() {
 			// Remove it from its neighbors
@@ -52,7 +52,7 @@ func (a *AdjList) RemoveNode(node vertexes.Vertex) {
 }
 
 // Copy returns a copy of the AdjacencyList
-func (a *AdjList) Copy() AdjList {
+func (a *AdjLists) Copy() AdjLists {
 	newAL := NewAL()
 
 	// Create copies of each node
@@ -74,17 +74,17 @@ func (a *AdjList) Copy() AdjList {
 }
 
 // Nodes returns the map of nodes in the adjacency list
-func (a *AdjList) Nodes() map[uint64]*vertexes.Vertex {
+func (a *AdjLists) Nodes() map[uint64]*vertexes.Vertex {
 	return a.nodes
 }
 
 // NodeCount returns the number of nodes in the adjacency list
-func (a *AdjList) NodeCount() int {
+func (a *AdjLists) NodeCount() int {
 	return len(a.Nodes())
 }
 
 // AddEdge adds an edge, adding the nodes if they are not already present
-func (a *AdjList) AddEdge(n1, n2 *vertexes.Vertex) {
+func (a *AdjLists) AddEdge(n1, n2 *vertexes.Vertex) {
 	a.AddNode(n1)
 	a.AddNode(n2)
 	n1.AddNeighbor(n2)
@@ -92,7 +92,7 @@ func (a *AdjList) AddEdge(n1, n2 *vertexes.Vertex) {
 }
 
 // EdgeCount returns the number of distinct edges in the adjacency list
-func (a *AdjList) EdgeCount() int {
+func (a *AdjLists) EdgeCount() int {
 	edges := 0
 
 	for _, node := range a.Nodes() {
@@ -104,12 +104,12 @@ func (a *AdjList) EdgeCount() int {
 }
 
 // Genus returns the genus number of the adjacency list
-func (a *AdjList) Genus() int {
+func (a *AdjLists) Genus() int {
 	return a.EdgeCount() - a.NodeCount() + 1
 }
 
 // ValueSum returns the sum of all node values
-func (a *AdjList) ValueSum() int {
+func (a *AdjLists) ValueSum() int {
 	sum := 0
 	for _, node := range a.Nodes() {
 		sum += node.Value()
@@ -118,7 +118,7 @@ func (a *AdjList) ValueSum() int {
 }
 
 // ValueLowest returns the node with the lowest value
-func (a *AdjList) ValueLowest() *vertexes.Vertex {
+func (a *AdjLists) ValueLowest() *vertexes.Vertex {
 	minVal := a.FirstNode()
 
 	for _, node := range a.Nodes() {
@@ -131,7 +131,7 @@ func (a *AdjList) ValueLowest() *vertexes.Vertex {
 }
 
 // Whiskers returns a map of vertices that have only one edge
-func (a *AdjList) Whiskers() map[uint64]*vertexes.Vertex {
+func (a *AdjLists) Whiskers() map[uint64]*vertexes.Vertex {
 	whiskers := map[uint64]*vertexes.Vertex{}
 
 	for _, node := range a.Nodes() {
@@ -150,7 +150,7 @@ func (a *AdjList) Whiskers() map[uint64]*vertexes.Vertex {
 }
 
 // NodeWithMostEdges returns the node with the highest edge count
-func (a *AdjList) NodeWithMostEdges() *vertexes.Vertex {
+func (a *AdjLists) NodeWithMostEdges() *vertexes.Vertex {
 	var maxEdgeNode *vertexes.Vertex
 
 	maxEdges := -1
@@ -167,7 +167,7 @@ func (a *AdjList) NodeWithMostEdges() *vertexes.Vertex {
 }
 
 // RemoveOrphans removes all vertices that have no edges
-func (a *AdjList) RemoveOrphans() {
+func (a *AdjLists) RemoveOrphans() {
 	for _, node := range a.Nodes() {
 		if node.NeighborCount() == 0 {
 			a.RemoveNode(*node)
@@ -190,7 +190,7 @@ func visitAll(node vertexes.Vertex, visited map[uint64]bool) {
 }
 
 // Connected returns true if every vertex is reachable from every other vertex
-func (a *AdjList) Connected() bool {
+func (a *AdjLists) Connected() bool {
 	// https://en.wikipedia.org/wiki/Connectivity_(graph_theory)
 
 	if len(a.Nodes()) == 0 {
@@ -205,7 +205,7 @@ func (a *AdjList) Connected() bool {
 }
 
 // MinimalVertexCover returns vertices that make a minimal (not guaranteed to be minimum) vertex cover
-func (a *AdjList) MinimalVertexCover() map[uint64]*vertexes.Vertex {
+func (a *AdjLists) MinimalVertexCover() map[uint64]*vertexes.Vertex {
 	aCopy := a.Copy()
 	mvc := map[uint64]*vertexes.Vertex{}
 
@@ -239,7 +239,7 @@ func (a *AdjList) MinimalVertexCover() map[uint64]*vertexes.Vertex {
 }
 
 // Serialize returns the adjacency list in graphviz format
-func (a *AdjList) Serialize(title string) string {
+func (a *AdjLists) Serialize(title string) string {
 	g := dot.NewGraph(dot.Undirected)
 	g.Label(title)
 

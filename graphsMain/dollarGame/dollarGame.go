@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func populate() adjLists.AdjList {
+func populate() adjLists.AdjLists {
 	n1 := vertexes.NewVertex("", 4)
 	n2 := vertexes.NewVertex("", -2)
 	n3 := vertexes.NewVertex("", -1)
@@ -23,11 +23,11 @@ func populate() adjLists.AdjList {
 	return a
 }
 
-func solvable(a adjLists.AdjList) bool {
+func solvable(a adjLists.AdjLists) bool {
 	return a.ValueSum() >= a.Genus()
 }
 
-func title(a adjLists.AdjList) string {
+func title(a adjLists.AdjLists) string {
 	str := fmt.Sprintf("value: $%d genus: %d", a.ValueSum(), a.Genus())
 	if solvable(a) {
 		str += " -> solvable!"
@@ -38,12 +38,12 @@ func title(a adjLists.AdjList) string {
 }
 
 // solved returns true if there are no more negative values
-func solved(a adjLists.AdjList) bool {
+func solved(a adjLists.AdjLists) bool {
 	low := a.ValueLowest()
 	return low.Value() >= 0
 }
 
-func printGraph(a adjLists.AdjList) {
+func printGraph(a adjLists.AdjLists) {
 	s := a.Serialize(title(a))
 	fmt.Println(s)
 }
@@ -55,7 +55,7 @@ func requestAid(node *vertexes.Vertex) {
 	}
 }
 
-func solve(a adjLists.AdjList) {
+func solve(a adjLists.AdjLists) {
 	if !solvable(a) {
 		return
 	}

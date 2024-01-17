@@ -12,7 +12,7 @@ var (
 )
 
 // traversePaths pushes to resultsCh [all] paths from startNode that touch each vertex
-func traversePaths(a AdjList, resultsCh chan []*vertexes.Vertex, startNode *vertexes.Vertex, stopOnFirstPath bool, myID int64) {
+func traversePaths(a AdjLists, resultsCh chan []*vertexes.Vertex, startNode *vertexes.Vertex, stopOnFirstPath bool, myID int64) {
 	// Be concurrency safe in here!
 	// * Pass in a COPY of the AdjacencyList. This routine may continue
 	//   to live and access it even after the caller has torn down.
@@ -87,7 +87,7 @@ func hasReverse(foundPaths [][]*vertexes.Vertex, newPath []*vertexes.Vertex) boo
 }
 
 // paths returns all combinations of vertex orderings (valid paths or not)
-func (a *AdjList) paths(terminals []*vertexes.Vertex, stopOnFirstPath bool, includeReverse bool) [][]*vertexes.Vertex {
+func (a *AdjLists) paths(terminals []*vertexes.Vertex, stopOnFirstPath bool, includeReverse bool) [][]*vertexes.Vertex {
 	allPaths := [][]*vertexes.Vertex{}
 
 	resultsCh := make(chan []*vertexes.Vertex, a.NodeCount()+1000) // How the go routines send us results
@@ -153,7 +153,7 @@ func (a *AdjList) paths(terminals []*vertexes.Vertex, stopOnFirstPath bool, incl
 }
 
 // HamiltonianPaths returns paths, the traversal of which touch each vertex once
-func (a *AdjList) HamiltonianPaths(minLength int, stopOnFirstPath bool, includeReverse bool) [][]*vertexes.Vertex {
+func (a *AdjLists) HamiltonianPaths(minLength int, stopOnFirstPath bool, includeReverse bool) [][]*vertexes.Vertex {
 	// https://en.wikipedia.org/wiki/Hamiltonian_path
 
 	if !a.Connected() {
