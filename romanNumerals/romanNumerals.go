@@ -43,7 +43,7 @@ func Arabic(roman string) int {
 
 	roman = strings.ToUpper(roman)
 
-	// Add a sentinel so we don't have to keep checking for string overrun
+	// Add a sentinel, so we don't have to keep checking for string overrun
 	roman += "_"
 
 	for i := 0; i < len(roman); i++ {

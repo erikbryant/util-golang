@@ -46,7 +46,7 @@ func Sqrt2(n int) int64 {
 	return int64(2)
 }
 
-// Convergent returns the nth convegence of whichever series you pass in a function for
+// Convergent returns the nth convergence of whichever series you pass in a function for
 func Convergent(n int, fn convergentSeries) (*big.Int, *big.Int) {
 	numerator := big.NewInt(fn(n))
 	denominator := big.NewInt(1)
@@ -134,7 +134,7 @@ func Factors(n int) []int {
 func FactorsCounted(n int) map[int]int {
 	factors := make(map[int]int)
 
-	// Find all of the 2 factors, since they are quick
+	// Find all the 2 factors, since they are quick
 	for (n & 0x01) == 0 {
 		factors[2]++
 		n = n >> 1
@@ -162,7 +162,7 @@ func FactorsCounted(n int) map[int]int {
 	return factors
 }
 
-// MaxBigInt returns the larger of a or b
+// MaxBigInt returns the largest of a or b
 func MaxBigInt(a, b *big.Int) *big.Int {
 	switch a.Cmp(b) {
 	case -1:
@@ -176,7 +176,7 @@ func MaxBigInt(a, b *big.Int) *big.Int {
 	return b
 }
 
-// MinBigInt returns the smaller of a or b
+// MinBigInt returns the smallest of a or b
 func MinBigInt(a, b *big.Int) *big.Int {
 	switch a.Cmp(b) {
 	case -1:

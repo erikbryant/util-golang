@@ -70,7 +70,7 @@ func Pi(n int) int {
 	return i + 1
 }
 
-// SlowPrime returns whether a number is prime or not, using a bute force search
+// SlowPrime returns whether a number is prime or not, using a brute force search
 func SlowPrime(n int) bool {
 	if n <= 1 {
 		return false
@@ -160,7 +160,7 @@ func PackedIndex(n int) int {
 	return upper
 }
 
-// excludes generates the numbers to exclude from the seive (the non-primes)
+// excludes generates the numbers to exclude from the sieve (the non-primes)
 func excludes(upper int, c chan int) {
 	c <- 0
 	c <- 1
@@ -173,8 +173,8 @@ func excludes(upper int, c chan int) {
 	close(c)
 }
 
-// seive implements the Seive of Eranthoses to find prime numbers
-func seive() {
+// sieve implements the Sieve of Eratosthenes to find prime numbers
+func sieve() {
 	upper := MaxPrime
 	fmt.Println("upper: ", upper)
 	for i := 0; i <= upper; i++ {
@@ -228,7 +228,7 @@ func Load(fName string) {
 
 // Init initializes the primes package
 func GeneratePrimesGob() {
-	seive()
+	sieve()
 	packPrimes()
 	Save()
 }
