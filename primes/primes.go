@@ -58,7 +58,7 @@ func Pi(n int) int {
 	}
 
 	if n > PackedPrimes[PackedPrimesEnd] {
-		err := fmt.Errorf("Pi(%d) exceeded max prime. Did you call Init()?", n)
+		err := fmt.Errorf("pi(%d) exceeded max prime; did you call Init()", n)
 		panic(err)
 	}
 
@@ -79,7 +79,7 @@ func SlowPrime(n int) bool {
 	root := int(math.Sqrt(float64(n)))
 
 	if root > PackedPrimes[PackedPrimesEnd] {
-		err := fmt.Errorf("SlowPrime(%d) exceeded max prime. Did you call Init()?", n)
+		err := fmt.Errorf("SlowPrime(%d) exceeded max prime; did you call Init()", n)
 		panic(err)
 	}
 
@@ -226,7 +226,7 @@ func Load(fName string) {
 	}
 }
 
-// Init initializes the primes package
+// GeneratePrimesGob finds, packs, and saves primes to a GOB file
 func GeneratePrimesGob() {
 	sieve()
 	packPrimes()
