@@ -2,25 +2,26 @@ package main
 
 import (
 	"fmt"
-	"github.com/erikbryant/util-golang/graphs"
+	"github.com/erikbryant/util-golang/graphs/adjLists"
+	"github.com/erikbryant/util-golang/graphs/vertexes"
 	"os"
 )
 
-func plotGraph(graph *graphs.AdjList) {
+func plotGraph(graph *adjLists.AdjLists) {
 	title := fmt.Sprintf("Magnets")
 	serial := graph.Serialize(title)
 	fmt.Println(serial)
 }
 
-func makeGraph(row, col int) *graphs.AdjList {
-	nodes := map[string]*graphs.Vertex{}
-	graph := graphs.NewAL()
+func makeGraph(row, col int) *adjLists.AdjLists {
+	nodes := map[string]*vertexes.Vertex{}
+	graph := adjLists.NewAL()
 
 	// Create the nodes
 	for r := 0; r < row; r++ {
 		for c := 0; c < col; c++ {
 			coord := fmt.Sprintf("%dx%d", r, c)
-			node := graphs.NewVertex(coord, 0)
+			node := vertexes.NewVertex(coord, 0)
 			nodes[coord] = node
 			graph.AddNode(node)
 		}
