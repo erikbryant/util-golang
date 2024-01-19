@@ -238,6 +238,78 @@ func (a *AdjLists) MinimalVertexCover() map[uint64]*vertexes.Vertexes {
 	return mvc
 }
 
+// IsSymmetric returns true if for each edge u1->v1 there is an edge v1->u1
+func (a *AdjLists) IsSymmetric() bool {
+	// https://en.wikipedia.org/wiki/Symmetric_graph
+
+	// This is an undirected graph, so it is guaranteed to be symmetric
+	return true
+}
+
+// IsBipartite returns true if the vertexes can be divided into two sets that connect to each other, but not within a set
+func (a *AdjLists) IsBipartite() bool {
+	// https://en.wikipedia.org/wiki/Bipartite_graph
+
+	left := map[uint64]bool{}
+	right := map[uint64]bool{}
+
+	// Partition vertexes into left and right sides
+	for _, node := range a.Nodes() {
+		id := node.ID()
+		if left[id] && right[id] {
+			// Same vertex on both sides, is not bipartite :(
+			return false
+		}
+
+		// If we already have this node registered in one side, stay with that side
+		side := left
+		opposite := right
+		if right[id] {
+			side = right
+			opposite = left
+		}
+
+		// Add this node on one side and its neighbors on the opposite side
+		side[id] = true
+		for _, neighbor := range node.Neighbors() {
+			opposite[neighbor.ID()] = true
+		}
+	}
+
+	for id := range left {
+		if right[id] {
+			// Same vertex on both sides, is not bipartite :(
+			return false
+		}
+	}
+
+	return true
+}
+
+// IsComplete returns true if every vertex has an edge to every other vertex
+func (a *AdjLists) IsComplete() bool {
+	// https://en.wikipedia.org/wiki/Complete_graph
+
+	if len(a.Nodes()) == 0 {
+		// By definition an empty graph is not complete
+		return false
+	}
+
+	for _, node := range a.Nodes() {
+		for _, neighbor := range a.Nodes() {
+			if node == neighbor {
+				// We are looking at ourselves
+				continue
+			}
+			if !node.HasNeighbor(*neighbor) {
+				return false
+			}
+		}
+	}
+
+	return true
+}
+
 // Serialize returns the adjacency list in graphviz format
 func (a *AdjLists) Serialize(title string) string {
 	g := dot.NewGraph(dot.Undirected)

@@ -199,3 +199,90 @@ func TestMinimalVertexCoverOctahedral(t *testing.T) {
 		t.Errorf("ERROR: For 'two nodes' expected len=4, got len=%d", len(mvc))
 	}
 }
+
+func TestIsSymmetric(t *testing.T) {
+	a := NewAL()
+
+	answer := a.IsSymmetric()
+	if answer != true {
+		t.Errorf("ERROR: Expected true, got %t", answer)
+	}
+
+	nA := vertexes.NewVertex("A", 4)
+	nB := vertexes.NewVertex("B", 4)
+
+	a.AddEdge(nA, nB)
+
+	answer = a.IsSymmetric()
+	if answer != true {
+		t.Errorf("ERROR: Expected true, got %t", answer)
+	}
+}
+
+func TestIsBipartite(t *testing.T) {
+	a := NewAL()
+
+	// Empty
+	answer := a.IsBipartite()
+	if answer != true {
+		t.Errorf("ERROR: Expected true, got %t", answer)
+	}
+
+	// Two connected vertexes
+	nA := vertexes.NewVertex("A", 4)
+	nB := vertexes.NewVertex("B", 4)
+	a.AddEdge(nA, nB)
+	answer = a.IsBipartite()
+	if answer != true {
+		t.Errorf("ERROR: Expected true, got %t", answer)
+	}
+
+	// Three vertexes connected in a V
+	nC := vertexes.NewVertex("C", 4)
+	a.AddEdge(nA, nC)
+	answer = a.IsBipartite()
+	if answer != true {
+		t.Errorf("ERROR: Expected true, got %t", answer)
+	}
+
+	// Three vertexes connected in a triangle
+	a.AddEdge(nB, nC)
+	answer = a.IsBipartite()
+	if answer != false {
+		t.Errorf("ERROR: Expected false, got %t", answer)
+	}
+}
+
+func TestIsComplete(t *testing.T) {
+	a := NewAL()
+
+	// Empty
+	answer := a.IsComplete()
+	if answer != false {
+		t.Errorf("ERROR: Expected false, got %t", answer)
+	}
+
+	// Two connected vertexes
+	nA := vertexes.NewVertex("A", 4)
+	nB := vertexes.NewVertex("B", 4)
+	a.AddEdge(nA, nB)
+	answer = a.IsComplete()
+	if answer != true {
+		t.Errorf("ERROR: Expected true, got %t", answer)
+	}
+
+	// Three vertexes connected in a V
+	nC := vertexes.NewVertex("C", 4)
+	a.AddEdge(nA, nC)
+	answer = a.IsComplete()
+	if answer != false {
+		t.Errorf("ERROR: Expected false, got %t", answer)
+	}
+
+	// Three vertexes connected in a triangle
+	a.AddEdge(nB, nC)
+	answer = a.IsComplete()
+	if answer != true {
+		t.Errorf("ERROR: Expected true, got %t", answer)
+	}
+}
