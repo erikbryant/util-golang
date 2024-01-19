@@ -4,6 +4,25 @@ import (
 	"testing"
 )
 
+func TestSetUVGetUV(t *testing.T) {
+	v1 := NewVertex("ABC", 123)
+	answer := v1.GetUV()
+	if answer != nil {
+		t.Errorf("ERROR: Expected <nil>, got %v", answer)
+	}
+
+	var data interface{}
+	data = 8
+	v1.SetUV(&data)
+	answer = v1.GetUV()
+	if answer != &data {
+		t.Errorf("ERROR: Expected address %v, got %v", &data, answer)
+	}
+	if *answer != data {
+		t.Errorf("ERROR: Expected value %v, got %v", data, *answer)
+	}
+}
+
 func TestMakeID(t *testing.T) {
 	// If we generate a large number of IDs are any
 	// duplicates?
@@ -151,5 +170,22 @@ func TestEqual(t *testing.T) {
 	answer = v3.Equal(*vN)
 	if answer != true {
 		t.Errorf("ERROR: Expected true, got %t", answer)
+	}
+}
+
+func TestDerefUV(t *testing.T) {
+	v1 := NewVertex("ABC", 123)
+
+	answer := v1.derefUV()
+	if answer != nil {
+		t.Errorf("ERROR: Expected <nil>, got %v", answer)
+	}
+
+	var data interface{}
+	data = 10
+	v1.SetUV(&data)
+	answer = v1.derefUV()
+	if answer != data {
+		t.Errorf("ERROR: Expected %v, got %v", data, answer)
 	}
 }

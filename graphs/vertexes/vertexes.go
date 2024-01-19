@@ -11,6 +11,7 @@ import (
 type Vertexes struct {
 	name        string
 	value       int
+	userValue   *interface{}
 	neighbor    []*Vertexes
 	neighborIDs map[uint64]*Vertexes
 	id          uint64
@@ -74,6 +75,16 @@ func (v *Vertexes) Decrement() {
 // SetValue sets the vertex value
 func (v *Vertexes) SetValue(value int) {
 	v.value = value
+}
+
+// SetUV stores the arbitrary value sent by the caller
+func (v *Vertexes) SetUV(uv *interface{}) {
+	v.userValue = uv
+}
+
+// GetUV returns the arbitrary value that had been stored by the caller
+func (v *Vertexes) GetUV() *interface{} {
+	return v.userValue
 }
 
 // ID returns the id of the vertex
@@ -159,7 +170,16 @@ func (v *Vertexes) Equal(vertex Vertexes) bool {
 	return v.ID() == vertex.ID()
 }
 
+// derefUV returns the value of userValue or nil if userValue is nil
+func (v *Vertexes) derefUV() interface{} {
+	uv := v.GetUV()
+	if uv == nil {
+		return nil
+	}
+	return *uv
+}
+
 // Label returns a label for the given vertex
 func (v *Vertexes) Label() string {
-	return fmt.Sprintf("%s %d", v.Name(), v.Value())
+	return fmt.Sprintf("%s %d %v", v.Name(), v.Value(), v.derefUV())
 }
