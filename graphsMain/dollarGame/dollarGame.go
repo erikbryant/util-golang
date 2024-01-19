@@ -73,6 +73,7 @@ func main() {
 	fmt.Fprintf(os.Stderr, "Welcome to the dollar game!\n")
 
 	a := populate()
+	fmt.Fprintf(os.Stderr, "Symmetric: %t, Bipartite: %t, Complete: %t\n", a.IsSymmetric(), a.IsBipartite(), a.IsComplete())
 	printGraph(a)
 	solve(a)
 }
