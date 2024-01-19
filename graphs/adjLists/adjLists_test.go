@@ -335,4 +335,26 @@ func TestChromaticNumber(t *testing.T) {
 	if answer != 3 {
 		t.Errorf("ERROR: Expected 3, got %d", answer)
 	}
+
+	// Four vertexes connected in a diamond
+	a.AddEdge(nD, nA)
+	answer = a.ChromaticNumber()
+	if answer != 3 {
+		t.Errorf("ERROR: Expected 3, got %d", answer)
+	}
+
+	// Four vertexes complete-connected
+	a.AddEdge(nD, nB)
+	answer = a.ChromaticNumber()
+	if answer != 4 {
+		t.Errorf("ERROR: Expected 4, got %d", answer)
+	}
+
+	// Four vertexes complete-connected with 1 whisker
+	nE := vertexes.NewVertex("C", 4)
+	a.AddEdge(nD, nE)
+	answer = a.ChromaticNumber()
+	if answer != 4 {
+		t.Errorf("ERROR: Expected 4, got %d", answer)
+	}
 }
