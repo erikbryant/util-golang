@@ -290,7 +290,7 @@ func (a *AdjLists) IsBipartite() bool {
 func (a *AdjLists) IsComplete() bool {
 	// https://en.wikipedia.org/wiki/Complete_graph
 
-	if len(a.Nodes()) == 0 {
+	if a.NodeCount() == 0 {
 		// By definition an empty graph is not complete
 		return false
 	}
@@ -308,6 +308,136 @@ func (a *AdjLists) IsComplete() bool {
 	}
 
 	return true
+}
+
+func neighborColors(node *vertexes.Vertexes, nodeColors map[uint64]int) map[int]bool {
+	colors := map[int]bool{}
+
+	for _, neighbor := range node.Neighbors() {
+		if color, ok := nodeColors[neighbor.ID()]; ok {
+			colors[color] = true
+		}
+	}
+
+	return colors
+}
+
+func minColorNotIn(colors map[int]bool) int {
+	// Find the lowest number that is not in colors
+	color := 0
+	for {
+		if !colors[color] {
+			// We found a color that has not been used
+			return color
+		}
+		color++
+	}
+}
+
+// ChromaticNumber returns a minimum(ish) number of colors required to color the graph such that no two adjacent vertexes are the same color
+func (a *AdjLists) ChromaticNumber() int {
+	// https://mathworld.wolfram.com/ChromaticNumber.html
+
+	if a.NodeCount() == 0 {
+		// By definition, empty graphs have a chromatic number of 1
+		return 1
+	}
+
+	if a.EdgeCount() == 0 {
+		// If there are no edges each vertex can be the same color
+		return 1
+	}
+
+	if a.IsBipartite() && a.EdgeCount() > 0 {
+		return 2
+	}
+
+	if a.IsComplete() {
+		return a.NodeCount()
+	}
+
+	// Make a copy of the nodes, so we can delete as we go
+	nodes := map[uint64]*vertexes.Vertexes{}
+	for id, node := range a.Nodes() {
+		nodes[id] = node
+	}
+
+	// Worst case, we need a separate color for each node
+	nodeColors := map[uint64]int{}
+
+	// Orphan nodes get color0 and then we can ignore them
+	for id, node := range nodes {
+		if node.Degree() != 0 {
+			continue
+		}
+		nodeColors[id] = 0
+		delete(nodes, id)
+	}
+
+	// Whiskers get color0 and then we can ignore them
+	for id, node := range nodes {
+
+		if node.Degree() != 1 {
+			// We only care about whiskers
+			continue
+		}
+
+		if _, ok := nodeColors[id]; ok {
+			// It already has a color
+			continue
+		}
+
+		// If our neighbor already has a color, set us to not-that-color
+		neighbor := node.FirstNeighbor()
+		if neighborColor, ok := nodeColors[neighbor.ID()]; ok {
+			ourColor := 0
+			if neighborColor == 0 {
+				ourColor = 1
+			}
+			nodeColors[id] = ourColor
+			delete(nodes, id)
+			continue
+		}
+
+		// Set us to color0
+		nodeColors[id] = 0
+		delete(nodes, id)
+	}
+
+	// Now for the more connected parts of the graph...
+
+	// Keep iterating until all nodes are colored
+	for len(nodes) > 0 {
+		found := false
+
+		for id, node := range nodes {
+			colors := neighborColors(node, nodeColors)
+			if len(colors) > 0 {
+				found = true
+				nodeColors[id] = minColorNotIn(colors)
+				delete(nodes, id)
+				// We have changed the map we are iterating over; restart for loop
+				break
+			}
+		}
+
+		if !found {
+			// If no nodes are adjacent to colored nodes, color the first node color0
+			for id := range nodes {
+				nodeColors[id] = 0
+				delete(nodes, id)
+				break
+			}
+		}
+	}
+
+	// Find which unique colors were used
+	colorsUsed := map[int]bool{}
+	for _, color := range nodeColors {
+		colorsUsed[color] = true
+	}
+
+	return len(colorsUsed)
 }
 
 // Serialize returns the adjacency list in graphviz format

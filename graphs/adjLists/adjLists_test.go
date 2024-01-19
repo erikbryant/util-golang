@@ -286,3 +286,53 @@ func TestIsComplete(t *testing.T) {
 		t.Errorf("ERROR: Expected true, got %t", answer)
 	}
 }
+
+func TestChromaticNumber(t *testing.T) {
+	a := NewAL()
+
+	// Empty
+	answer := a.ChromaticNumber()
+	if answer != 1 {
+		t.Errorf("ERROR: Expected 1, got %d", answer)
+	}
+
+	// Two non-connected vertexes
+	nA := vertexes.NewVertex("A", 4)
+	nB := vertexes.NewVertex("B", 4)
+	a.AddNode(nA)
+	a.AddNode(nB)
+	answer = a.ChromaticNumber()
+	if answer != 1 {
+		t.Errorf("ERROR: Expected 1, got %d", answer)
+	}
+
+	// Two connected vertexes
+	a.AddEdge(nA, nB)
+	answer = a.ChromaticNumber()
+	if answer != 2 {
+		t.Errorf("ERROR: Expected 2, got %d", answer)
+	}
+
+	// Three vertexes connected in a V
+	nC := vertexes.NewVertex("C", 4)
+	a.AddEdge(nA, nC)
+	answer = a.ChromaticNumber()
+	if answer != 2 {
+		t.Errorf("ERROR: Expected 2, got %d", answer)
+	}
+
+	// Three vertexes connected in a triangle (graph is complete)
+	a.AddEdge(nB, nC)
+	answer = a.ChromaticNumber()
+	if answer != 3 {
+		t.Errorf("ERROR: Expected 3, got %d", answer)
+	}
+
+	// Three vertexes connected in a triangle and 1 whisker
+	nD := vertexes.NewVertex("D", 4)
+	a.AddEdge(nC, nD)
+	answer = a.ChromaticNumber()
+	if answer != 3 {
+		t.Errorf("ERROR: Expected 3, got %d", answer)
+	}
+}
