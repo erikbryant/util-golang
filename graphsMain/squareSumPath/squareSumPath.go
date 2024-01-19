@@ -82,8 +82,11 @@ func findPaths() {
 	for i := lower; i <= upper; i++ {
 		addends := squareAddends(i)
 		connections := connect(&adj, i, addends)
+		symmetric := adj.IsSymmetric()
+		bipartite := adj.IsBipartite()
+		complete := adj.IsComplete()
 		paths = adj.HamiltonianPaths(2, true, false)
-		fmt.Fprintf(os.Stderr, "Added: %6d   Connections: %3d   Paths: %6d   GoRoutines: %3d\n", i, connections, len(paths), runtime.NumGoroutine())
+		fmt.Fprintf(os.Stderr, "Added: %6d   Connections: %3d   Paths: %6d   Symmetric: %t  Bipartite: %t  Complete: %t  GoRoutines: %3d\n", i, connections, len(paths), symmetric, bipartite, complete, runtime.NumGoroutine())
 		// listPaths(paths)
 	}
 
