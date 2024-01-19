@@ -47,5 +47,6 @@ func main() {
 	_, _ = fmt.Fprintf(os.Stderr, "Welcome to magnets research facility #848!\n")
 
 	graph := makeGraph(2, 2)
+	fmt.Fprintf(os.Stderr, "Symmetric: %t, Bipartite: %t, Complete: %t\n", graph.IsSymmetric(), graph.IsBipartite(), graph.IsComplete())
 	plotGraph(graph)
 }
