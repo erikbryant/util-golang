@@ -241,7 +241,8 @@ func (a *AdjLists) MinimalVertexCover() map[uint64]*vertexes.Vertexes {
 // Serialize returns the adjacency list in graphviz format
 func (a *AdjLists) Serialize(title string) string {
 	g := dot.NewGraph(dot.Undirected)
-	g.Label(title)
+	g.Attr("label", title)
+	g.Attr("overlap", "false")
 
 	// Create the nodes
 	nodes := map[uint64]dot.Node{}
