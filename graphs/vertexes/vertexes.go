@@ -2,9 +2,7 @@ package vertexes
 
 import (
 	"fmt"
-	"math/rand"
 	"sort"
-	"time"
 )
 
 // Vertexes implements a graph vertex
@@ -17,23 +15,12 @@ type Vertexes struct {
 	id          uint64
 }
 
+var uniqueID uint64 = 0
+
 // makeID returns a unique ID
 func makeID() uint64 {
-	// Use micro time as the ID. That would almost be unique on its own
-	// if it were not the case that we might have a flurry of vertex
-	// objects created all at once, even in the same microsecond.
-	//
-	// For uniqueness, we really only care about the lower half.
-	// Fill the upper half with random garbage to make the composite
-	// value unique.
-	//
-	// We could use a string to make this simpler to create, but
-	// uint64 is a much faster map index, making 'neighborIDs' about
-	// 1.3x faster to access.
-
-	lowHalf := 0x00000000ffffffff & uint64(time.Now().UnixMicro())
-	topHalf := rand.Uint64() << 32
-	return topHalf | lowHalf
+	uniqueID++
+	return uniqueID
 }
 
 // NewVertex returns a new Vertexes
