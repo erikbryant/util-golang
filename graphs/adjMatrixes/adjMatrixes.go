@@ -2,41 +2,33 @@ package adjMatrixes
 
 import (
 	"fmt"
-	"github.com/erikbryant/util-golang/graphs/adjLists"
 	"github.com/erikbryant/util-golang/graphs/vertexes"
 	"slices"
 	"strings"
 )
 
 type AdjMatrix struct {
-	size         int
 	nodes        map[uint64]*vertexes.Vertexes
 	nodesOrdered []uint64
 	matrix       [][]int
 }
 
-// Matrix returns a matrix of size x size with the diagonal set to zero and all other cells set to -1
-func Matrix(size int) *AdjMatrix {
-	// TODO: This is not used. Consider removing it.
-
-	m := AdjMatrix{
-		size: size,
+func Matrix() *AdjMatrix {
+	return &AdjMatrix{
+		nodes: map[uint64]*vertexes.Vertexes{},
 	}
+}
 
-	m.nodes = make(map[uint64]*vertexes.Vertexes)
-	m.nodesOrdered = make([]uint64, 0)
+// AddNode adds the given node to the matrix (be sure to call ComputeDistances after)
+func (m *AdjMatrix) AddNode(id uint64, node *vertexes.Vertexes) {
+	m.nodes[id] = node
+	m.nodesOrdered = append(m.nodesOrdered, node.ID())
+	slices.Sort(m.nodesOrdered)
+}
 
-	// Initialize major diagonal with 0, -1 elsewhere
-	m.matrix = make([][]int, m.size)
-	for i := range m.matrix {
-		m.matrix[i] = make([]int, m.size)
-		for j := 0; j < m.size; j++ {
-			m.matrix[i][j] = -1
-		}
-		m.matrix[i][i] = 0
-	}
-
-	return &m
+// NodeCount returns the number of vertexes in the matrix
+func (m *AdjMatrix) NodeCount() int {
+	return len(m.nodesOrdered)
 }
 
 // reachable sets the weights for each column (that is reachable) for row r
@@ -72,38 +64,48 @@ func (m *AdjMatrix) reachable(r int) {
 	}
 }
 
-// MatrixFromAdjList returns a new matrix representing al
-func MatrixFromAdjList(al *adjLists.AdjLists) *AdjMatrix {
-	m := Matrix(len(al.Nodes()))
+// initMatrix allocates space for the matrix
+func (m *AdjMatrix) initMatrix() {
+	size := m.NodeCount()
 
-	// Record a copy of the list of vertexes
-	for id, node := range al.Nodes() {
-		m.nodes[id] = node
-		m.nodesOrdered = append(m.nodesOrdered, node.ID())
+	if len(m.matrix) != size {
+		// Initialize major diagonal with 0, -1 elsewhere
+		m.matrix = make([][]int, size)
+		for i := range m.matrix {
+			m.matrix[i] = make([]int, size)
+			for j := 0; j < size; j++ {
+				m.matrix[i][j] = -1
+			}
+			m.matrix[i][i] = 0
+		}
 	}
 
-	slices.Sort(m.nodesOrdered)
+}
+
+// ComputeDistances sets the matrix distance values for each vertex pair
+func (m *AdjMatrix) ComputeDistances() {
+	// Make sure the matrix is allocated
+	m.initMatrix()
 
 	// Populate the distance from each vertex to each other vertex
 	for r := range m.nodesOrdered {
 		m.reachable(r)
 	}
-
-	return m
-}
-
-// Size returns the width/height (they are identical) of the matrix
-func (m *AdjMatrix) Size() int {
-	return m.size
 }
 
 // GetValue returns the value at that row/col
 func (m *AdjMatrix) GetValue(r, c int) int {
+	// Make sure the matrix is allocated
+	m.initMatrix()
+
 	return m.matrix[r][c]
 }
 
 // SetValue returns the value at that row/col
 func (m *AdjMatrix) SetValue(r, c, value int) {
+	// Make sure the matrix is allocated
+	m.initMatrix()
+
 	m.matrix[r][c] = value
 }
 
@@ -126,6 +128,31 @@ func (m *AdjMatrix) IndexFromID(id uint64) int {
 	return -1
 }
 
+// Diameter returns the length of the path between the two most distance vertexes
+func (m *AdjMatrix) Diameter() int {
+	// https://en.wikipedia.org/wiki/Distance_(graph_theory)
+
+	if m.NodeCount() == 0 {
+		// Undefined for no nodes
+		return -1
+	}
+
+	if m.NodeCount() == 1 {
+		// The distance between a vertex and itself is zero
+		return 0
+	}
+
+	size := m.NodeCount()
+	maxDistance := -1
+	for r := 0; r < size; r++ {
+		for c := 0; c < size; c++ {
+			maxDistance = max(m.GetValue(r, c), maxDistance)
+		}
+	}
+
+	return maxDistance
+}
+
 // trunc returns a [possibly] truncated string
 func trunc(s string, l int) string {
 	str := strings.TrimSpace(s)
@@ -140,11 +167,11 @@ func (m *AdjMatrix) Serialize() string {
 	s := ""
 
 	// Meta info
-	s += fmt.Sprintf("%dx%d\n", m.size, m.size)
+	s += fmt.Sprintf("%dx%d\n", m.NodeCount(), m.NodeCount())
 
 	// Column headers
 	s += "     "
-	for c := 0; c < m.size; c++ {
+	for c := 0; c < m.NodeCount(); c++ {
 		label := "???"
 		node := m.NodeFromIndex(c)
 		if node != nil {
@@ -155,14 +182,14 @@ func (m *AdjMatrix) Serialize() string {
 	s += "\n"
 
 	// Body of the matrix
-	for r := 0; r < m.size; r++ {
+	for r := 0; r < m.NodeCount(); r++ {
 		label := "???"
 		node := m.NodeFromIndex(r)
 		if node != nil {
 			label = trunc(node.Label(), 4)
 		}
 		s += fmt.Sprintf("%4s ", label)
-		for c := 0; c < m.size; c++ {
+		for c := 0; c < m.NodeCount(); c++ {
 			// -1 is a representation of no edge, not an actual value
 			v := m.GetValue(r, c)
 			if v == -1 {

@@ -1,70 +1,47 @@
 package adjMatrixes
 
 import (
-	"github.com/erikbryant/util-golang/graphs/adjLists"
 	"github.com/erikbryant/util-golang/graphs/vertexes"
 	"testing"
 )
 
-func TestMatrix(t *testing.T) {
-	m := Matrix(4)
+//func TestAddNode(t *testing.T) {
+//}
 
-	answer := m.Size()
-	if answer != 4 {
-		t.Errorf("ERROR: Expected 4, got %d", answer)
+func TestNodeCount(t *testing.T) {
+	m := Matrix()
+
+	answer := m.NodeCount()
+	if answer != 0 {
+		t.Errorf("ERROR: Expected 0, got %d", answer)
+	}
+
+	vA := vertexes.NewVertex("A", 1)
+	m.AddNode(vA.ID(), vA)
+	answer = m.NodeCount()
+	if answer != 1 {
+		t.Errorf("ERROR: Expected 1, got %d", answer)
+	}
+
+	vB := vertexes.NewVertex("B", 1)
+	m.AddNode(vB.ID(), vB)
+	answer = m.NodeCount()
+	if answer != 2 {
+		t.Errorf("ERROR: Expected 2, got %d", answer)
 	}
 }
 
 //func TestReachable(t *testing.T) {
 //}
 
-func TestMatrixFromAdjList(t *testing.T) {
-	graph := adjLists.NewAL()
-	nA := vertexes.NewVertex("A", 0)
-	nB := vertexes.NewVertex("B", 0)
-	nC := vertexes.NewVertex("C", 0)
-	graph.AddEdge(nA, nB)
-	graph.AddEdge(nB, nC)
+//func TestInitMatrix(t *testing.T) {
+//}
 
-	m := MatrixFromAdjList(&graph)
-
-	testCases := []struct {
-		r, c     int
-		expected int
-	}{
-		// Major diagonal
-		{0, 0, 0},
-		{1, 1, 0},
-		{2, 2, 0},
-
-		// Weights
-		{0, 1, 1},
-		{0, 2, 2},
-		{1, 0, 1},
-		{1, 2, 1},
-		{2, 0, 2},
-		{2, 1, 1},
-	}
-
-	for _, testCase := range testCases {
-		answer := m.GetValue(testCase.r, testCase.c)
-		if answer != testCase.expected {
-			t.Errorf("ERROR: For %d,%d expected %d, got %d", testCase.r, testCase.c, testCase.expected, answer)
-		}
-	}
-}
-
-func TestSize(t *testing.T) {
-	m := Matrix(4)
-
-	answer := m.Size()
-	if answer != 4 {
-		t.Errorf("ERROR: Expected 4, got %d", answer)
-	}
-}
+//func TestComputeDistance(t *testing.T) {
+//}
 
 func TestSetValueGetValue(t *testing.T) {
-	m := Matrix(3)
+	m := Matrix()
 
 	testCases := []struct {
 		r, c int
@@ -75,6 +52,13 @@ func TestSetValueGetValue(t *testing.T) {
 		{0, 1, 1},
 		{1, 1, -1},
 	}
+
+	vA := vertexes.NewVertex("A", 1)
+	m.AddNode(vA.ID(), vA)
+	vB := vertexes.NewVertex("B", 1)
+	m.AddNode(vB.ID(), vB)
+	vC := vertexes.NewVertex("C", 1)
+	m.AddNode(vC.ID(), vC)
 
 	for _, testCase := range testCases {
 		m.SetValue(testCase.r, testCase.c, testCase.v)
@@ -90,6 +74,62 @@ func TestSetValueGetValue(t *testing.T) {
 
 //func TestIndexFromID(t *testing.T) {
 //}
+
+func TestDiameter(t *testing.T) {
+	m := Matrix()
+
+	// No vertex
+	m.ComputeDistances()
+	answer := m.Diameter()
+	if answer != -1 {
+		t.Errorf("ERROR: Expected -1, got %d", answer)
+	}
+
+	// One vertex
+	vA := vertexes.NewVertex("A", 1)
+	m.AddNode(vA.ID(), vA)
+	m.ComputeDistances()
+	answer = m.Diameter()
+	if answer != 0 {
+		t.Errorf("ERROR: Expected 0, got %d", answer)
+	}
+
+	// Two vertexes, not connected
+	vB := vertexes.NewVertex("B", 1)
+	m.AddNode(vB.ID(), vB)
+	m.ComputeDistances()
+	answer = m.Diameter()
+	if answer != 0 {
+		t.Errorf("ERROR: Expected 0, got %d", answer)
+	}
+
+	// Two vertexes connected
+	vA.AddNeighbor(vB)
+	m.ComputeDistances()
+	answer = m.Diameter()
+	if answer != 1 {
+		t.Errorf("ERROR: Expected 1, got %d", answer)
+	}
+
+	// Three vertexes connected
+	vC := vertexes.NewVertex("C", 1)
+	m.AddNode(vC.ID(), vC)
+	vB.AddNeighbor(vC)
+	m.ComputeDistances()
+	answer = m.Diameter()
+	if answer != 2 {
+		t.Errorf("ERROR: Expected 2, got %d", answer)
+	}
+
+	// Four vertexes, 3 connected, 1 not
+	vD := vertexes.NewVertex("D", 1)
+	m.AddNode(vD.ID(), vD)
+	m.ComputeDistances()
+	answer = m.Diameter()
+	if answer != 2 {
+		t.Errorf("ERROR: Expected 2, got %d", answer)
+	}
+}
 
 func TestTrunc(t *testing.T) {
 	testCases := []struct {

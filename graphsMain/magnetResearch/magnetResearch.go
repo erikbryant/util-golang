@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/erikbryant/util-golang/graphs/adjLists"
-	"github.com/erikbryant/util-golang/graphs/adjMatrixes"
+	"github.com/erikbryant/util-golang/graphs/converters"
 	"github.com/erikbryant/util-golang/graphs/vertexes"
 	"os"
 )
@@ -49,10 +49,10 @@ func main() {
 
 	graph := makeGraph(5, 5)
 
-	matrix := adjMatrixes.MatrixFromAdjList(graph)
+	matrix := converters.MatrixFromAdjList(graph)
 	s := matrix.Serialize()
 	fmt.Fprintf(os.Stderr, "%s\n", s)
 
-	fmt.Fprintf(os.Stderr, "Symmetric: %t, Bipartite: %t, Complete: %t, Chromatic#: %d\n", graph.IsSymmetric(), graph.IsBipartite(), graph.IsComplete(), graph.ChromaticNumber())
+	fmt.Fprintf(os.Stderr, "Symmetric: %t, Bipartite: %t, Complete: %t, Chromatic#: %d, Diameter: %d\n", graph.IsSymmetric(), graph.IsBipartite(), graph.IsComplete(), graph.ChromaticNumber(), matrix.Diameter())
 	plotGraph(graph)
 }
