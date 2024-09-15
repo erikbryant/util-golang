@@ -346,6 +346,21 @@ func EqualIntSlice(a, b []int) bool {
 	return true
 }
 
+// EqualByteSlice returns true if the two slices have identical contents
+func EqualByteSlice(a, b []byte) bool {
+	if len(a) != len(b) {
+		return false
+	}
+
+	for i, v := range a {
+		if v != b[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
 // Reverse reverses the order of the elements in a slice
 func Reverse(digits []int) []int {
 	rev := make([]int, 0)
