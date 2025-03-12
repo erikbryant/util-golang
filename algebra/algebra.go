@@ -71,19 +71,18 @@ func Divisors(n int) []int {
 	// Everything is divisible by 1
 	d := []int{1}
 
-	root := int(math.Sqrt(float64(n)))
-
 	// Degenerate cases
-	if root <= 1 {
-		if n < 0 {
-			return []int{}
-		}
-		if n == 0 || n == 1 {
+	if n <= 3 {
+		// We are cheating here. Zero actually has an infinite number
+		// of divisors [1..infinity]. We are just going to return [1].
+		if n <= 1 {
 			return d
 		}
 		d = append(d, n)
 		return d
 	}
+
+	root := int(math.Sqrt(float64(n)))
 
 	// Find the lower divisors
 	for i := 2; i < root; i++ {
