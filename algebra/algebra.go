@@ -137,9 +137,9 @@ func FactorsCounted(n int) map[int]int {
 	for (n & 0x01) == 0 {
 		factors[2]++
 		n = n >> 1
-		if n == 1 {
-			return factors
-		}
+	}
+	if n == 1 {
+		return factors
 	}
 
 	root := int(math.Sqrt(float64(n)))
@@ -148,9 +148,9 @@ func FactorsCounted(n int) map[int]int {
 		for n%p == 0 {
 			factors[p]++
 			n = n / p
-			if n == 1 {
-				return factors
-			}
+		}
+		if n == 1 {
+			return factors
 		}
 	}
 
