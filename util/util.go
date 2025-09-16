@@ -1,6 +1,7 @@
 package util
 
 import (
+	"sort"
 	"strings"
 )
 
@@ -150,4 +151,29 @@ func IsDigitPermutation(a, b int) bool {
 	}
 
 	return true
+}
+
+// Partitions returns all integer partitions of n
+func Partitions(n int) [][]int {
+	partitions := [][]int{}
+
+	a := make([]int, n)
+	k := 1
+	a[1] = n
+	for k != 0 {
+		x := a[k-1] + 1
+		y := a[k] - 1
+		k -= 1
+		for x <= y {
+			a[k] = x
+			y -= x
+			k += 1
+		}
+		a[k] = x + y
+		c := append([]int{}, a[0:k+1]...)
+		sort.Sort(sort.Reverse(sort.IntSlice(c)))
+		partitions = append(partitions, c)
+	}
+
+	return partitions
 }
