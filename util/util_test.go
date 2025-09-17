@@ -142,3 +142,26 @@ func TestPartitions(t *testing.T) {
 		}
 	}
 }
+
+func TestPartitionCount(t *testing.T) {
+	testCases := []struct {
+		n        int
+		expected int
+	}{
+		{-12, 0},
+		{0, 0},
+		{1, 1},
+		{2, 2},
+		{3, 3},
+		{4, 5},
+		{9, 30},
+		{45, 89134},
+	}
+
+	for _, testCase := range testCases {
+		answer := PartitionCount(testCase.n)
+		if answer != testCase.expected {
+			t.Errorf("ERROR: For %d expected %d, got %d", testCase.n, testCase.expected, answer)
+		}
+	}
+}

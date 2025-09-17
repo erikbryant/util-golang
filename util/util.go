@@ -2,6 +2,8 @@ package util
 
 import (
 	"strings"
+
+	"github.com/erikbryant/util-golang/figurate"
 )
 
 // heapPermutation generates a permutation using Heap Algorithm
@@ -187,4 +189,42 @@ func Partitions(n int) [][]int {
 	}
 
 	return partitions
+}
+
+// pIndex returns p[k] or zero if k < 0 (safe indexing)
+func pIndex(p []int, n int) int {
+	if n < 0 {
+		return 0
+	}
+	return p[n]
+}
+
+// PartitionCount returns the number of integer partitions for target
+func PartitionCount(target int) int {
+	// 𝑝(𝑛)=𝑝(𝑛−1)+𝑝(𝑛−2)−𝑝(𝑛−5)−𝑝(𝑛−7)+𝑝(𝑛−12)+𝑝(𝑛−15)+…
+	// where the integers are pentagonal numbers
+
+	if target <= 0 {
+		return 0
+	}
+
+	if target == 1 {
+		return 1
+	}
+
+	p := make([]int, target+1)
+	p[0] = 1
+
+	for n := 1; n <= target; n++ {
+		for k := 1; k < n+1; {
+			p[n] += pIndex(p, n-figurate.Pentagonal(k))
+			p[n] += pIndex(p, n-figurate.Pentagonal(-k))
+			k++
+			p[n] -= pIndex(p, n-figurate.Pentagonal(k))
+			p[n] -= pIndex(p, n-figurate.Pentagonal(-k))
+			k++
+		}
+	}
+
+	return p[target]
 }
