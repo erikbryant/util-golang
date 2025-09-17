@@ -120,3 +120,25 @@ func TestIsDigitPermutation(t *testing.T) {
 		}
 	}
 }
+
+func TestPartitions(t *testing.T) {
+	testCases := []struct {
+		c        int
+		expected int
+	}{
+		{-12, 0},
+		{0, 0},
+		{1, 1},
+		{2, 2},
+		{3, 3},
+		{4, 5},
+		{9, 30},
+	}
+
+	for _, testCase := range testCases {
+		answer := Partitions(testCase.c)
+		if len(answer) != testCase.expected {
+			t.Errorf("ERROR: For %d expected len=%d, got len=%d", testCase.c, testCase.expected, len(answer))
+		}
+	}
+}
