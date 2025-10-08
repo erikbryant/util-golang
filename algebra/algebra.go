@@ -111,10 +111,10 @@ func Divisors(n int) []int {
 	return d
 }
 
-// Factors returns a sorted list of the unique prime factors of n (excluding n)
+// Factors returns a sorted list of the unique prime factors of n
 func Factors(n int) []int {
 	if primes.Prime(n) {
-		return []int{}
+		return []int{n}
 	}
 
 	f := []int{}
