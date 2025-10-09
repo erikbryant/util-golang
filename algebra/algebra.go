@@ -418,29 +418,26 @@ func Totient(n int) int {
 	// no common divisors (other than 1). 1 is considered relatively
 	// prime to all other numbers.
 	//
-	// From https://www.doc.ic.ac.uk/~mrh/330tutor/ch05s02.html
+	// From https://en.wikipedia.org/wiki/Euler%27s_totient_function
 	//
-	// The general formula to compute φ(n) is the following:
-	//
-	// If the prime factorisation of n is given by n =p1e1*...*pnen, then
-	// φ(n) = n *(1 - 1/p1)* ... (1 - 1/pn).
+	// Given the prime factors of n are p1, p2, ... pk:
+	// φ(n) = n * (1 - 1/p1) * (1 - 1/p2) * ... (1 - 1/pk)
+	//      = n * (p1-1)/p1 * (p2-1)/p2 * ... (pk-1)/pk
 	//
 	// For example:
 	//
-	// 9 = 32, φ(9) = 9* (1-1/3) = 6
-	//
-	// 4 =22, φ(4) = 4* (1-1/2) = 2
-	//
-	// 15 = 3*5, φ(15) = 15* (1-1/3)*(1-1/5) = 15*(2/3)*(4/5) =8
+	// Prime factors of  4 =   {2},  φ(4) =  4 * (1-1/2) = 2
+	// Prime factors of  9 =   {3},  φ(9) =  9 * (1-1/3) = 6
+	// Prime factors of 12 = {2,3}, φ(12) = 12 * (1-1/2) * (1-1/3) = 12 * 1/2 * 2/3 = 4
+	// Prime factors of 15 = {3,5}, φ(15) = 15 * (1-1/3) * (1-1/5) = 15 * 2/3 * 4/5 = 8
 
 	if primes.Prime(n) {
 		return n - 1
 	}
 
-	factors := Factors(n)
 	count := n
 
-	for _, f := range factors {
+	for _, f := range Factors(n) {
 		count /= f
 		count *= f - 1
 	}
