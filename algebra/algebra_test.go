@@ -690,7 +690,9 @@ func TestTotient(t *testing.T) {
 		n        int
 		expected int
 	}{
-		{2, 1}, // Totient() has had a lot of bugs. Use lots of test cases!
+		{0, 0}, // Totient() has had a lot of bugs. Use lots of test cases!
+		{1, 1},
+		{2, 1},
 		{3, 2},
 		{4, 2},
 		{5, 4},
@@ -739,10 +741,80 @@ func TestTotient(t *testing.T) {
 		{97, 96},
 		{98, 42},
 		{99, 60},
+		{100, 40},
 	}
 
 	for _, testCase := range testCases {
 		answer := Totient(testCase.n)
+		if answer != testCase.expected {
+			t.Errorf("ERROR: For %d expected %d, got %d", testCase.n, testCase.expected, answer)
+		}
+	}
+}
+
+func TestTotients(t *testing.T) {
+	testCases := []struct {
+		n        int
+		expected int
+	}{
+		{0, 0},
+		{1, 1},
+		{2, 1},
+		{3, 2},
+		{4, 2},
+		{5, 4},
+		{6, 2},
+		{7, 6},
+		{8, 4},
+		{9, 6},
+		{10, 4},
+		{11, 10},
+		{12, 4},
+		{13, 12},
+		{14, 6},
+		{15, 8},
+		{16, 8},
+		{17, 16},
+		{18, 6},
+		{19, 18},
+		{20, 8},
+		{21, 12},
+		{22, 10},
+		{23, 22},
+		{24, 8},
+		{25, 20},
+		{26, 12},
+		{27, 18},
+		{28, 12},
+		{29, 28},
+		{30, 8},
+		{80, 32},
+		{81, 54},
+		{82, 40},
+		{83, 82},
+		{84, 24},
+		{85, 64},
+		{86, 42},
+		{87, 56},
+		{88, 40},
+		{89, 88},
+		{90, 24},
+		{91, 72},
+		{92, 44},
+		{93, 60},
+		{94, 46},
+		{95, 72},
+		{96, 32},
+		{97, 96},
+		{98, 42},
+		{99, 60},
+		{100, 40},
+	}
+
+	totients := Totients(100)
+
+	for _, testCase := range testCases {
+		answer := totients[testCase.n]
 		if answer != testCase.expected {
 			t.Errorf("ERROR: For %d expected %d, got %d", testCase.n, testCase.expected, answer)
 		}

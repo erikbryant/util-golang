@@ -445,6 +445,27 @@ func Totient(n int) int {
 	return count
 }
 
+// Totients returns a slice where a[x] =ɸ(x) for 0 <= x <= upper
+func Totients(upper int) []int {
+	totients := make([]int, upper+1)
+
+	// a[x] = x
+	for i := range totients {
+		totients[i] = i
+	}
+
+	// Sieve of Eratosthenes
+	for x := 2; x <= upper; x++ {
+		if totients[x] == x {
+			for y := x; y <= upper; y += x {
+				totients[y] -= totients[y] / x
+			}
+		}
+	}
+
+	return totients
+}
+
 // SquareFree returns true if no square of a prime divides n
 func SquareFree(n int) bool {
 	for _, prime := range primes.PackedPrimes {
