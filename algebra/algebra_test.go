@@ -877,3 +877,55 @@ func TestPascalTriangle(t *testing.T) {
 		}
 	}
 }
+
+func TestKSmooth(t *testing.T) {
+	testCases := []struct {
+		n        int
+		k        int
+		expected bool
+	}{
+		// Out of bounds
+		{0, 0, false},
+		{0, 1, false},
+		{1, 0, false},
+		{1, 1, false},
+
+		// Bad base
+		{12, 4, false},
+
+		// Valid data
+		{1, 2, true},
+		{5, 5, true},
+		{5, 7, true},
+		{700, 3, false},
+		{700, 5, false},
+		{700, 7, true},
+	}
+
+	for _, testCase := range testCases {
+		answer := KSmooth(testCase.n, testCase.k)
+		if answer != testCase.expected {
+			t.Errorf("ERROR: For %d %d expected %t, got %t", testCase.n, testCase.k, testCase.expected, answer)
+		}
+	}
+}
+
+func TestHamming(t *testing.T) {
+	testCases := []struct {
+		n        int
+		expected bool
+	}{
+		{1, true},
+		{5, true},
+		{5, true},
+		{60, true},
+		{70, false},
+	}
+
+	for _, testCase := range testCases {
+		answer := Hamming(testCase.n)
+		if answer != testCase.expected {
+			t.Errorf("ERROR: For %d expected %t, got %t", testCase.n, testCase.expected, answer)
+		}
+	}
+}

@@ -513,3 +513,26 @@ func PascalTriangle(max int) [][]int {
 
 	return rows
 }
+
+// KSmooth returns true if n is a k-smooth number
+func KSmooth(n, k int) bool {
+	if n < 1 || k < 2 || !primes.Prime(k) {
+		// Invalid input
+		return false
+	}
+
+	start := primes.PackedIndex(k) + 1
+
+	for i := start; primes.PackedPrimes[i] <= n/2; i++ {
+		if n%primes.PackedPrimes[i] == 0 {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Hamming returns true if n is a Hamming number (a 5-smooth number)
+func Hamming(n int) bool {
+	return KSmooth(n, 5)
+}
