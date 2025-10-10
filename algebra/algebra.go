@@ -532,15 +532,16 @@ func KSmooth(n, k int) bool {
 		return false
 	}
 
-	start := primes.PackedIndex(k) + 1
-
-	for i := start; primes.PackedPrimes[i] <= n/2; i++ {
-		if n%primes.PackedPrimes[i] == 0 {
-			return false
+	for _, prime := range primes.PackedPrimes {
+		if prime > k {
+			break
+		}
+		for n%prime == 0 {
+			n /= prime
 		}
 	}
 
-	return true
+	return n == 1
 }
 
 // Hamming returns true if n is a Hamming number (a 5-smooth number)
