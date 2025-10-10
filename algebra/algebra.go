@@ -449,13 +449,24 @@ func Totient(n int) int {
 func Totients(upper int) []int {
 	totients := make([]int, upper+1)
 
-	// a[x] = x
 	for i := range totients {
 		totients[i] = i
 	}
 
 	// Sieve of Eratosthenes
-	for x := 2; x <= upper; x++ {
+
+	// Fast mode
+	for _, prime := range primes.PackedPrimes {
+		if prime > upper {
+			break
+		}
+		for y := prime; y <= upper; y += prime {
+			totients[y] -= totients[y] / prime
+		}
+	}
+
+	// If we ran out of pre-computed primes, switch to slow mode
+	for x := primes.PackedPrimes[len(primes.PackedPrimes)-1] + 1; x <= upper; x++ {
 		if totients[x] == x {
 			for y := x; y <= upper; y += x {
 				totients[y] -= totients[y] / x
@@ -535,4 +546,35 @@ func KSmooth(n, k int) bool {
 // Hamming returns true if n is a Hamming number (a 5-smooth number)
 func Hamming(n int) bool {
 	return KSmooth(n, 5)
+}
+
+// Hammings returns a sorted list of all Hamming numbers <= n
+func Hammings(n int) []int {
+	// https://rosettacode.org/wiki/Hamming_numbers#Go
+	h := []int{1}
+
+	next2, next3, next5 := 2, 3, 5
+	i, j, k := 0, 0, 0
+
+	for m := 1; ; m++ {
+		next := min(next2, min(next3, next5))
+		if next > n {
+			break
+		}
+		h = append(h, next)
+		if h[m] == next2 {
+			i++
+			next2 = 2 * h[i]
+		}
+		if h[m] == next3 {
+			j++
+			next3 = 3 * h[j]
+		}
+		if h[m] == next5 {
+			k++
+			next5 = 5 * h[k]
+		}
+	}
+
+	return h
 }

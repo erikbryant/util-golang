@@ -929,3 +929,57 @@ func TestHamming(t *testing.T) {
 		}
 	}
 }
+
+func TestHammings(t *testing.T) {
+	testCases := []int{
+		1,
+		2,
+		3,
+		4,
+		5,
+		6,
+		8,
+		9,
+		10,
+		12,
+		15,
+		16,
+		18,
+		20,
+		24,
+		25,
+		27,
+		30,
+		32,
+		36,
+		40,
+		45,
+		48,
+		50,
+		54,
+		60,
+		64,
+		72,
+		75,
+		80,
+		81,
+		90,
+		96,
+		100,
+	}
+
+	hammings := Hammings(100)
+
+	expected := 34
+	answer := len(hammings)
+	if answer != expected {
+		t.Errorf("ERROR: For len(hammings) expected %d, got %d", answer, expected)
+	}
+
+	for i, expected := range testCases {
+		answer := hammings[i]
+		if answer != expected {
+			t.Errorf("ERROR: For hammings[%d] expected %d, got %d", i, expected, answer)
+		}
+	}
+}
