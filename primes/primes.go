@@ -2,7 +2,7 @@ package primes
 
 // https://primes.utm.edu/howmany.html
 //
-// pi(x) = # of primes <= x
+// pi(x) = approx # of primes <= x
 //
 //                          x                pi(x)
 // 1                       10                    4
