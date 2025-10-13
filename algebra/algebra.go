@@ -549,33 +549,44 @@ func Hamming(n int) bool {
 	return KSmooth(n, 5)
 }
 
-// Hammings returns a sorted list of all Hamming numbers <= n
-func Hammings(n int) []int {
+func minimum(s []int) int {
+	m := s[0]
+	for _, i := range s {
+		m = min(m, i)
+	}
+	return m
+}
+
+// KSmooths returns a sorted list of all k-smooth numbers <= n
+func KSmooths(n, k int) []int {
 	// https://rosettacode.org/wiki/Hamming_numbers#Go
 	h := []int{1}
+	nexts := []int{}
+	indices := []int{}
 
-	next2, next3, next5 := 2, 3, 5
-	i, j, k := 0, 0, 0
+	for i := 0; primes.PackedPrimes[i] <= k; i++ {
+		nexts = append(nexts, primes.PackedPrimes[i])
+		indices = append(indices, 0)
+	}
 
 	for m := 1; ; m++ {
-		next := min(next2, min(next3, next5))
+		next := minimum(nexts)
 		if next > n {
 			break
 		}
 		h = append(h, next)
-		if h[m] == next2 {
-			i++
-			next2 = 2 * h[i]
-		}
-		if h[m] == next3 {
-			j++
-			next3 = 3 * h[j]
-		}
-		if h[m] == next5 {
-			k++
-			next5 = 5 * h[k]
+		for i := 0; i < len(nexts); i++ {
+			if h[m] == nexts[i] {
+				indices[i]++
+				nexts[i] = primes.PackedPrimes[i] * h[indices[i]]
+			}
 		}
 	}
 
 	return h
+}
+
+// Hammings returns a sorted list of all Hamming numbers <= n
+func Hammings(n int) []int {
+	return KSmooths(n, 5)
 }
