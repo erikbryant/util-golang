@@ -1018,3 +1018,28 @@ func TestHammings(t *testing.T) {
 		}
 	}
 }
+
+func TestPowerMod(t *testing.T) {
+	testCases := []struct {
+		b        int
+		e        int
+		m        int
+		expected int
+	}{
+		{10, 1, 10, 0},
+
+		// Primes 2,5 return 0
+		{10, 1000 * 1000 * 1000, 2, 0},
+		{10, 1000 * 1000 * 1000, 5, 0},
+
+		{10, 1000 * 1000 * 1000, 3, 1},
+		{10, 1000 * 1000 * 1000, 41, 1},
+	}
+
+	for _, testCase := range testCases {
+		answer := PowerMod(testCase.b, testCase.e, testCase.m)
+		if answer != testCase.expected {
+			t.Errorf("ERROR: For %d^%d mod %d expected %d, got %d", testCase.b, testCase.e, testCase.m, testCase.expected, answer)
+		}
+	}
+}

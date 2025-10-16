@@ -123,6 +123,9 @@ func Factors(n int) []int {
 		if n%primes.PackedPrimes[i] == 0 {
 			f = append(f, primes.PackedPrimes[i])
 			n /= primes.PackedPrimes[i]
+			for n%primes.PackedPrimes[i] == 0 {
+				n /= primes.PackedPrimes[i]
+			}
 		}
 	}
 
@@ -589,4 +592,20 @@ func KSmooths(n, k int) []int {
 // Hammings returns a sorted list of all Hamming numbers <= n
 func Hammings(n int) []int {
 	return KSmooths(n, 5)
+}
+
+// PowerMod returns (base^exp)%mod
+func PowerMod(base, exp, mod int) int {
+	// https://rosettacode.org/wiki/Modular_exponentiation#Python
+	x := 1
+
+	for exp > 0 {
+		if exp%2 != 0 {
+			x = (base * x) % mod
+		}
+		base = (base * base) % mod
+		exp /= 2
+	}
+
+	return x
 }
