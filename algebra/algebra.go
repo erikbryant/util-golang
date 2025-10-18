@@ -3,6 +3,7 @@ package algebra
 import (
 	"math"
 	"math/big"
+	"sort"
 
 	"github.com/erikbryant/util-golang/primes"
 )
@@ -608,4 +609,48 @@ func PowerMod(base, exp, mod int) int {
 	}
 
 	return x
+}
+
+// PythagoreanTriples returns Pythagorean Triple primitives [a,b,c] where c <= upper
+func PythagoreanTriples(upper int) [][3]int {
+	pt := [][3]int{}
+
+	sortFunc := func(i int, j int) bool {
+		a, _, c := 0, 1, 2
+		// Primary sort on c
+		if pt[i][c] < pt[j][c] {
+			return true
+		}
+		if pt[i][c] > pt[j][c] {
+			return false
+		}
+		// pt[i][c] == pt[j][c], secondary sort on a
+		return pt[i][a] < pt[j][a]
+	}
+
+	var a, b, c int
+	for m := 2; ; m++ {
+		for n := 1; n < m; n++ {
+			if GCD(m, n) != 1 {
+				continue
+			}
+			if m&0x01 == n&0x01 {
+				continue
+			}
+			a = m*m - n*n
+			b = 2 * m * n
+			c = m*m + n*n
+			// These are not generated in sorter order. Keep generating
+			// too far to ensure we have found all.
+			if a >= upper {
+				sort.Slice(pt, sortFunc)
+				return pt
+			}
+			if c > upper {
+				continue
+			}
+			a, b = min(a, b), max(a, b)
+			pt = append(pt, [3]int{a, b, c})
+		}
+	}
 }

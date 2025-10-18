@@ -2,6 +2,7 @@ package algebra
 
 import (
 	"math/big"
+	"slices"
 	"testing"
 )
 
@@ -1040,6 +1041,39 @@ func TestPowerMod(t *testing.T) {
 		answer := PowerMod(testCase.b, testCase.e, testCase.m)
 		if answer != testCase.expected {
 			t.Errorf("ERROR: For %d^%d mod %d expected %d, got %d", testCase.b, testCase.e, testCase.m, testCase.expected, answer)
+		}
+	}
+}
+
+func TestCanPythagoreanTriples(t *testing.T) {
+	testCases := []struct {
+		c        int
+		expected [][3]int
+	}{
+		{0, [][3]int{}},
+		{1, [][3]int{}},
+		{5, [][3]int{
+			{3, 4, 5},
+		}},
+		{65, [][3]int{
+			{3, 4, 5},
+			{5, 12, 13},
+			{8, 15, 17},
+			{7, 24, 25},
+			{20, 21, 29},
+			{12, 35, 37},
+			{9, 40, 41},
+			{28, 45, 53},
+			{11, 60, 61},
+			{16, 63, 65},
+			{33, 56, 65},
+		}},
+	}
+
+	for _, testCase := range testCases {
+		answer := PythagoreanTriples(testCase.c)
+		if !slices.Equal(answer, testCase.expected) {
+			t.Errorf("ERROR: For %d expected %v, got %v", testCase.c, testCase.expected, answer)
 		}
 	}
 }
