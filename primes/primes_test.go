@@ -4,10 +4,6 @@ import (
 	"testing"
 )
 
-func init() {
-	Load("primes.gob")
-}
-
 func TestPi(t *testing.T) {
 	testCases := []struct {
 		n        int
@@ -91,8 +87,6 @@ func TestPrime(t *testing.T) {
 		}
 	}
 }
-
-// TestPackPrimes
 
 func TestPackedIndex(t *testing.T) {
 	testCases := []struct {

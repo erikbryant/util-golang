@@ -31,33 +31,35 @@ import (
 	"github.com/erikbryant/util-golang/system"
 )
 
-const (
-	// MaxPrime is the highest value up to which we will search for primes
-	MaxPrime = 100*1000*1000 + 1000
+var (
+	// Primes is a list of the first n prime numbers
+	Primes []int
+	// PrimesEnd is the index of the final value in the Primes slice
+	PrimesEnd int
 )
 
-var (
-	// isPrime indicates whether the index is prime or not
-	isPrime []bool
-	// PackedPrimes is a list of the first n prime numbers
-	PackedPrimes []int
-	// PackedPrimesEnd is the index of the final value in the PackedPrimes slice
-	PackedPrimesEnd int
+const (
+	// maxPrime is the highest value up to which we will search for primes
+	maxPrime = 100*1000*1000 + 1000
+	gobName  = "primes.gob"
 )
 
 func init() {
-	fileName := system.MyPath("primes.gob")
-	Load(fileName)
+	//primes := MakePrimes(maxPrime)
+	//Save(primes)
+	fileName := system.MyPath(gobName)
+	Primes = Load(fileName)
+	PrimesEnd = len(Primes) - 1
 }
 
 // Pi is the prime counting function, returning the number of primes below n
 // https://en.wikipedia.org/wiki/Prime-counting_function
 func Pi(n int) int {
-	if n < PackedPrimes[0] {
+	if n < Primes[0] {
 		return 0
 	}
 
-	if n > PackedPrimes[PackedPrimesEnd] {
+	if n > Primes[PrimesEnd] {
 		err := fmt.Errorf("pi(%d) exceeded max prime; did you call Init()", n)
 		panic(err)
 	}
@@ -78,14 +80,14 @@ func SlowPrime(n int) bool {
 
 	root := int(math.Sqrt(float64(n)))
 
-	if root > PackedPrimes[PackedPrimesEnd] {
+	if root > Primes[PrimesEnd] {
 		err := fmt.Errorf("SlowPrime(%d) exceeded max prime; did you call Init()", n)
 		panic(err)
 	}
 
 	// Check each potential divisor to see if number divides evenly (i.e., is not prime).
-	for i := 0; PackedPrimes[i] <= root; i++ {
-		if n%PackedPrimes[i] == 0 {
+	for i := 0; Primes[i] <= root; i++ {
+		if n%Primes[i] == 0 {
 			return false
 		}
 	}
@@ -95,37 +97,27 @@ func SlowPrime(n int) bool {
 
 // Prime returns true if number is prime
 func Prime(number int) bool {
-	if number > PackedPrimes[PackedPrimesEnd] {
+	if number > Primes[PrimesEnd] {
 		return SlowPrime(number)
 	}
 	return PackedIndex(number) >= 0
 }
 
-// packPrimes fills PackedPrimes with prime numbers
-func packPrimes() {
-	for i := 0; i < len(isPrime); i++ {
-		if isPrime[i] {
-			PackedPrimes = append(PackedPrimes, i)
-		}
-	}
-	PackedPrimesEnd = len(PackedPrimes) - 1
-}
-
-// PackedIndex returns the index in PackedPrimes of n, or -1 if not found
+// PackedIndex returns the index in Primes of n, or -1 if not found
 func PackedIndex(n int) int {
 	if n <= 1 {
 		return -1
 	}
 
-	upper := PackedPrimesEnd
+	upper := PrimesEnd
 	lower := 0
 
 	for upper > lower {
 		mid := (upper + lower) >> 1
 
-		if n > PackedPrimes[mid] {
-			if n < PackedPrimes[mid+1] {
-				if PackedPrimes[mid] != n {
+		if n > Primes[mid] {
+			if n < Primes[mid+1] {
+				if Primes[mid] != n {
 					// n is not prime
 					return -1 * mid
 				}
@@ -133,15 +125,15 @@ func PackedIndex(n int) int {
 			}
 			lower = mid + 1
 		} else {
-			if n == PackedPrimes[mid] {
-				if PackedPrimes[mid] != n {
+			if n == Primes[mid] {
+				if Primes[mid] != n {
 					// n is not prime
 					return -1 * mid
 				}
 				return mid
 			}
 			if mid == 0 {
-				if PackedPrimes[mid] != n {
+				if Primes[mid] != n {
 					// n is not prime
 					return -1 * mid
 				}
@@ -152,7 +144,7 @@ func PackedIndex(n int) int {
 
 	}
 
-	if PackedPrimes[upper] != n {
+	if Primes[upper] != n {
 		// n is not prime
 		return -1 * upper
 	}
@@ -160,75 +152,83 @@ func PackedIndex(n int) int {
 	return upper
 }
 
-// excludes generates the numbers to exclude from the sieve (the non-primes)
-func excludes(upper int, c chan int) {
-	c <- 0
-	c <- 1
-	mid := int(math.Sqrt(float64(upper)))
-	for i := 2; i <= mid; i++ {
-		for j := i * 2; j <= upper; j += i {
-			c <- j
-		}
-	}
-	close(c)
-}
+// MakePrimes returns all primes <= maxPrime
+func MakePrimes(maxPrime int) []int {
+	// Sieve of Eratosthenes
+	// Original Python Code by David Eppstein, UC Irvine, 28 Feb 2002
+	// http://code.activestate.com/recipes/117119/
+	// Found on:
+	// https://stackoverflow.com/questions/567222/simple-prime-number-generator-in-python
 
-// sieve implements the Sieve of Eratosthenes to find prime numbers
-func sieve() {
-	upper := MaxPrime
-	fmt.Println("upper: ", upper)
-	for i := 0; i <= upper; i++ {
-		isPrime = append(isPrime, true)
-	}
-	c := make(chan int)
-	go excludes(upper, c)
-	for {
-		exclude, ok := <-c
+	// Maps composites to primes witnessing their compositeness.
+	// This is memory efficient, as the sieve is not "run forward"
+	// indefinitely, but only as long as required by the current
+	// number being tested.
+
+	primes := []int{}
+	D := map[int][]int{}
+
+	// The running integer that's checked for primeness
+	for q := 2; ; q++ {
+		_, ok := D[q]
 		if !ok {
-			// Channel is empty
-			break
+			if q > maxPrime {
+				break
+			}
+			// q is a new prime.
+			// Yield it and mark its first multiple that isn't
+			// already marked in previous iterations
+			primes = append(primes, q)
+			D[q*q] = []int{q}
+		} else {
+			// q is composite. D[q] is the list of primes that
+			// divide it. Since we've reached q, we no longer
+			// need it in the map, but we'll mark the next
+			// multiples of its witnesses to prepare for larger
+			// numbers
+			for _, p := range D[q] {
+				_, ok := D[p+q]
+				if !ok {
+					D[p+q] = []int{}
+				}
+				D[p+q] = append(D[p+q], p)
+				delete(D, q)
+			}
 		}
-		isPrime[exclude] = false
 	}
+
+	return primes
 }
 
-// Save writes PackedPrimes to a file
-func Save() {
-	file, err := os.Create("primes.gob")
+// Save writes an int slice to the gob file
+func Save(primes []int) {
+	file, err := os.Create(gobName)
 	if err != nil {
 		fmt.Printf("error creating file: %v", err)
 		panic(err)
 	}
 	defer file.Close()
+
 	encoder := gob.NewEncoder(file)
-	encoder.Encode(PackedPrimesEnd)
-	encoder.Encode(PackedPrimes)
+	encoder.Encode(primes)
 }
 
-// Load reads the contents of a file into PackedPrimes
-func Load(fName string) {
+// Load returns the contents of the gob file as an int slice
+func Load(fName string) []int {
 	file, err := os.Open(fName)
 	if err != nil {
 		fmt.Printf("error opening file: %v", err)
 		panic(err)
 	}
 	defer file.Close()
+
+	primes := []int{}
 	decoder := gob.NewDecoder(file)
-	err = decoder.Decode(&PackedPrimesEnd)
-	if err != nil {
-		fmt.Printf("error reading PackedPrimesEnd: %v", err)
-		panic(err)
-	}
-	err = decoder.Decode(&PackedPrimes)
+	err = decoder.Decode(&primes)
 	if err != nil {
 		fmt.Printf("error reading packedPrimes: %v", err)
 		panic(err)
 	}
-}
 
-// GeneratePrimesGob finds, packs, and saves primes to a GOB file
-func GeneratePrimesGob() {
-	sieve()
-	packPrimes()
-	Save()
+	return primes
 }

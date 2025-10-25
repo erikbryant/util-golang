@@ -120,12 +120,12 @@ func Factors(n int) []int {
 
 	f := []int{}
 
-	for i := 0; primes.PackedPrimes[i] <= n; i++ {
-		if n%primes.PackedPrimes[i] == 0 {
-			f = append(f, primes.PackedPrimes[i])
-			n /= primes.PackedPrimes[i]
-			for n%primes.PackedPrimes[i] == 0 {
-				n /= primes.PackedPrimes[i]
+	for i := 0; primes.Primes[i] <= n; i++ {
+		if n%primes.Primes[i] == 0 {
+			f = append(f, primes.Primes[i])
+			n /= primes.Primes[i]
+			for n%primes.Primes[i] == 0 {
+				n /= primes.Primes[i]
 			}
 		}
 	}
@@ -147,8 +147,8 @@ func FactorsCounted(n int) map[int]int {
 	}
 
 	root := int(math.Sqrt(float64(n)))
-	for i := 1; primes.PackedPrimes[i] <= root; i++ {
-		p := primes.PackedPrimes[i]
+	for i := 1; primes.Primes[i] <= root; i++ {
+		p := primes.Primes[i]
 		for n%p == 0 {
 			factors[p]++
 			n = n / p
@@ -460,7 +460,7 @@ func Totients(upper int) []int {
 	// Sieve of Eratosthenes
 
 	// Fast mode
-	for _, prime := range primes.PackedPrimes {
+	for _, prime := range primes.Primes {
 		if prime > upper {
 			break
 		}
@@ -470,7 +470,7 @@ func Totients(upper int) []int {
 	}
 
 	// If we ran out of pre-computed primes, switch to slow mode
-	for x := primes.PackedPrimes[len(primes.PackedPrimes)-1] + 1; x <= upper; x++ {
+	for x := primes.Primes[len(primes.Primes)-1] + 1; x <= upper; x++ {
 		if totients[x] == x {
 			for y := x; y <= upper; y += x {
 				totients[y] -= totients[y] / x
@@ -483,7 +483,7 @@ func Totients(upper int) []int {
 
 // SquareFree returns true if no square of a prime divides n
 func SquareFree(n int) bool {
-	for _, prime := range primes.PackedPrimes {
+	for _, prime := range primes.Primes {
 		if prime > int(math.Sqrt(float64(n))) {
 			break
 		}
@@ -536,7 +536,7 @@ func KSmooth(n, k int) bool {
 		return false
 	}
 
-	for _, prime := range primes.PackedPrimes {
+	for _, prime := range primes.Primes {
 		if prime > k {
 			break
 		}
@@ -568,8 +568,8 @@ func KSmooths(n, k int) []int {
 	nexts := []int{}
 	indices := []int{}
 
-	for i := 0; primes.PackedPrimes[i] <= k; i++ {
-		nexts = append(nexts, primes.PackedPrimes[i])
+	for i := 0; primes.Primes[i] <= k; i++ {
+		nexts = append(nexts, primes.Primes[i])
 		indices = append(indices, 0)
 	}
 
@@ -582,7 +582,7 @@ func KSmooths(n, k int) []int {
 		for i := 0; i < len(nexts); i++ {
 			if h[m] == nexts[i] {
 				indices[i]++
-				nexts[i] = primes.PackedPrimes[i] * h[indices[i]]
+				nexts[i] = primes.Primes[i] * h[indices[i]]
 			}
 		}
 	}
