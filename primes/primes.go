@@ -64,7 +64,7 @@ func Pi(n int) int {
 		panic(err)
 	}
 
-	i := PackedIndex(n)
+	i := Index(n)
 	if i < 0 {
 		i *= -1
 	}
@@ -100,11 +100,11 @@ func Prime(number int) bool {
 	if number > Primes[PrimesEnd] {
 		return SlowPrime(number)
 	}
-	return PackedIndex(number) >= 0
+	return Index(number) >= 0
 }
 
-// PackedIndex returns the index in Primes of n, or -1 if not found
-func PackedIndex(n int) int {
+// Index returns the index in Primes of n, or -1 if not found
+func Index(n int) int {
 	if n <= 1 {
 		return -1
 	}
@@ -226,7 +226,7 @@ func Load(fName string) []int {
 	decoder := gob.NewDecoder(file)
 	err = decoder.Decode(&primes)
 	if err != nil {
-		fmt.Printf("error reading packedPrimes: %v", err)
+		fmt.Printf("error reading primes gob: %v", err)
 		panic(err)
 	}
 

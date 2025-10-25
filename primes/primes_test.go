@@ -88,7 +88,7 @@ func TestPrime(t *testing.T) {
 	}
 }
 
-func TestPackedIndex(t *testing.T) {
+func TestIndex(t *testing.T) {
 	testCases := []struct {
 		n        int
 		expected int
@@ -107,7 +107,7 @@ func TestPackedIndex(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		answer := PackedIndex(testCase.n)
+		answer := Index(testCase.n)
 		if answer != testCase.expected {
 			t.Errorf("ERROR: For %d expected %d, got %d", testCase.n, testCase.expected, answer)
 		}
