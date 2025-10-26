@@ -115,10 +115,20 @@ func TestIndex(t *testing.T) {
 	}
 }
 
+func TestIter(t *testing.T) {
+	primes := make([]int, 5)
+	for i, prime := range Iter(0, 5) {
+		primes[i] = prime
+	}
+	if !slices.Equal(primes, []int{2, 3, 5, 7, 11}) {
+		t.Error("Iter failed to regenerate simple test!", primes)
+	}
+}
+
 func TestMakePrimes(t *testing.T) {
 	primes := MakePrimes(13)
-	if !slices.Equal(primes, []int{2, 3, 5, 7, 11, 13}) {
-		t.Error("MakePrimes failed to regenerate simple test!")
+	if !slices.Equal(primes, []int32{2, 3, 5, 7, 11, 13}) {
+		t.Error("MakePrimes failed to regenerate simple test!", primes)
 	}
 
 	primes = MakePrimes(uint(Primes[End]))

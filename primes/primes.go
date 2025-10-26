@@ -34,7 +34,7 @@ import (
 
 var (
 	// Primes is a list of the first n prime numbers
-	Primes []int
+	Primes []int32
 	// End is the index of the final value in the Primes slice
 	End int
 )
@@ -45,6 +45,7 @@ const (
 	gobName  = "primes.gob"
 )
 
+// init loads the primes into memory
 func init() {
 	//primes := MakePrimes(maxPrime)
 	//Save(primes)
@@ -53,8 +54,23 @@ func init() {
 	End = len(Primes) - 1
 }
 
-func boundsCheck(n int) {
-	if n > Primes[End] {
+// Iter returns an iterator over Primes
+func Iter(start, end int) func(func(int, int) bool) {
+	return func(yield func(int, int) bool) {
+		if end < 0 {
+			end = len(Primes)
+		}
+		for i, prime := range Primes[start:end] {
+			if !yield(i, int(prime)) {
+				return
+			}
+		}
+	}
+}
+
+// boundsCheck panics if n is outside the range of Primes
+func boundsCheck(n int32) {
+	if n <= 0 || n > Primes[End] {
 		err := fmt.Errorf("exceeded max prime; did you call Init() n = %d", n)
 		panic(err)
 	}
@@ -81,12 +97,12 @@ func SlowPrime(n int) bool {
 		return false
 	}
 
-	root := int(math.Sqrt(float64(n)))
+	root := int32(math.Sqrt(float64(n)))
 
 	// Check each potential divisor to see if number divides evenly (i.e., is not prime).
 	boundsCheck(root)
 	for i := 0; Primes[i] <= root; i++ {
-		if n%Primes[i] == 0 {
+		if n%int(Primes[i]) == 0 {
 			return false
 		}
 	}
@@ -96,18 +112,19 @@ func SlowPrime(n int) bool {
 
 // Prime returns true if n is prime
 func Prime(n int) bool {
-	if n > Primes[End] {
+	if n > int(Primes[End]) {
 		return SlowPrime(n)
 	}
 	return Index(n) >= 0
 }
 
 // Index returns the index in Primes of n, or negative of the next highest index if not found
-func Index(n int) int {
-	if n <= 1 {
+func Index(N int) int {
+	if N <= 1 {
 		return -1
 	}
 
+	n := int32(N)
 	upper := End
 	lower := 0
 
@@ -152,7 +169,7 @@ func Index(n int) int {
 }
 
 // MakePrimes returns all primes <= maxPrime
-func MakePrimes(maxPrime uint) []int {
+func MakePrimes(maxPrime uint) []int32 {
 	// Sieve of Eratosthenes
 	// Original Python Code by David Eppstein, UC Irvine, 28 Feb 2002
 	// http://code.activestate.com/recipes/117119/
@@ -165,11 +182,11 @@ func MakePrimes(maxPrime uint) []int {
 	// number being tested.
 
 	if maxPrime > 4294967296 {
-		// We calculate q*q below; verify that will not overflow a uint
+		// We calculate q*q below; verify q*q will not overflow uint
 		log.Fatal("maxPrime > sqrt(2^64 - 1)! ", maxPrime)
 	}
 
-	primes := []int{}
+	primes := []int32{}
 	D := map[uint][]uint{}
 
 	// The running integer that's checked for primeness
@@ -182,7 +199,7 @@ func MakePrimes(maxPrime uint) []int {
 			// q is a new prime.
 			// Yield it and mark its first multiple that isn't
 			// already marked in previous iterations
-			primes = append(primes, int(q))
+			primes = append(primes, int32(q))
 			D[q*q] = []uint{q}
 		} else {
 			// q is composite. D[q] is the list of primes that
@@ -205,7 +222,7 @@ func MakePrimes(maxPrime uint) []int {
 }
 
 // Save writes an int slice to the gob file
-func Save(primes []int) {
+func Save(primes []int32) {
 	file, err := os.Create(gobName)
 	if err != nil {
 		fmt.Printf("error creating file: %v", err)
@@ -218,7 +235,7 @@ func Save(primes []int) {
 }
 
 // Load returns the contents of the gob file as an int slice
-func Load(name string) []int {
+func Load(name string) []int32 {
 	file, err := os.Open(name)
 	if err != nil {
 		fmt.Printf("error opening file: %v", err)
@@ -226,7 +243,7 @@ func Load(name string) []int {
 	}
 	defer file.Close()
 
-	primes := []int{}
+	primes := []int32{}
 	decoder := gob.NewDecoder(file)
 	err = decoder.Decode(&primes)
 	if err != nil {
