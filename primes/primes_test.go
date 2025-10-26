@@ -1,6 +1,7 @@
 package primes
 
 import (
+	"slices"
 	"testing"
 )
 
@@ -111,5 +112,17 @@ func TestIndex(t *testing.T) {
 		if answer != testCase.expected {
 			t.Errorf("ERROR: For %d expected %d, got %d", testCase.n, testCase.expected, answer)
 		}
+	}
+}
+
+func TestMakePrimes(t *testing.T) {
+	primes := MakePrimes(13)
+	if !slices.Equal(primes, []int{2, 3, 5, 7, 11, 13}) {
+		t.Error("MakePrimes failed to regenerate simple test!")
+	}
+
+	primes = MakePrimes(uint(Primes[End]))
+	if !slices.Equal(primes, Primes) {
+		t.Error("MakePrimes failed to regenerate Primes!")
 	}
 }

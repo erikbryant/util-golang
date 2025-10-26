@@ -25,6 +25,7 @@ package primes
 import (
 	"encoding/gob"
 	"fmt"
+	"log"
 	"math"
 	"os"
 
@@ -151,7 +152,7 @@ func Index(n int) int {
 }
 
 // MakePrimes returns all primes <= maxPrime
-func MakePrimes(maxPrime int) []int {
+func MakePrimes(maxPrime uint) []int {
 	// Sieve of Eratosthenes
 	// Original Python Code by David Eppstein, UC Irvine, 28 Feb 2002
 	// http://code.activestate.com/recipes/117119/
@@ -163,11 +164,16 @@ func MakePrimes(maxPrime int) []int {
 	// indefinitely, but only as long as required by the current
 	// number being tested.
 
+	if maxPrime > 4294967296 {
+		// We calculate q*q below; verify that will not overflow a uint
+		log.Fatal("maxPrime > sqrt(2^64 - 1)! ", maxPrime)
+	}
+
 	primes := []int{}
-	D := map[int][]int{}
+	D := map[uint][]uint{}
 
 	// The running integer that's checked for primeness
-	for q := 2; ; q++ {
+	for q := uint(2); ; q++ {
 		_, ok := D[q]
 		if !ok {
 			if q > maxPrime {
@@ -176,8 +182,8 @@ func MakePrimes(maxPrime int) []int {
 			// q is a new prime.
 			// Yield it and mark its first multiple that isn't
 			// already marked in previous iterations
-			primes = append(primes, q)
-			D[q*q] = []int{q}
+			primes = append(primes, int(q))
+			D[q*q] = []uint{q}
 		} else {
 			// q is composite. D[q] is the list of primes that
 			// divide it. Since we've reached q, we no longer
@@ -187,11 +193,11 @@ func MakePrimes(maxPrime int) []int {
 			for _, p := range D[q] {
 				_, ok := D[p+q]
 				if !ok {
-					D[p+q] = []int{}
+					D[p+q] = []uint{}
 				}
 				D[p+q] = append(D[p+q], p)
-				delete(D, q)
 			}
+			delete(D, q)
 		}
 	}
 
