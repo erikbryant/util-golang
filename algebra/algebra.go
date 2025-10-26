@@ -3,19 +3,21 @@ package algebra
 import (
 	"math"
 	"math/big"
+	"slices"
 	"sort"
 
+	"github.com/erikbryant/util-golang/common"
 	"github.com/erikbryant/util-golang/primes"
 )
 
 // NextSquare returns the next highest square and its square root
-func NextSquare(n uint) (uint, uint) {
+func NextSquare[T common.Numbers](n T) (uint, uint) {
 	r := math.Sqrt(float64(n))
 	root := uint(r)
 
 	// If n is a square we can save a mul
 	if float64(root) == r {
-		next := n + root<<1 + 1
+		next := uint(n) + root<<1 + 1
 		return next, root + 1
 	}
 
@@ -23,10 +25,8 @@ func NextSquare(n uint) (uint, uint) {
 	return next, root + 1
 }
 
-type convergentSeries func(int) int64
-
 // E returns the nth number (1-based) in the convergent series of e
-func E(n int) int64 {
+func E[T common.Integers](n T) int64 {
 	// e.g., [2; 1,2,1, 1,4,1, 1,6,1, ... ,1,2k,1, ...]
 	if n == 1 {
 		return int64(2)
@@ -38,39 +38,38 @@ func E(n int) int64 {
 }
 
 // Sqrt2 returns the nth number (1-based) in the convergent series of root 2
-func Sqrt2(n int) int64 {
+func Sqrt2[T common.Integers](n T) int64 {
 	// e.g., [2;(2)]
-
 	if n == 1 {
 		return int64(1)
 	}
 	return int64(2)
 }
 
+type convergentSeries func(int) int64
+
 // Convergent returns the nth convergence of whichever series you pass in a function for
-func Convergent(n int, fn convergentSeries) (*big.Int, *big.Int) {
-	numerator := big.NewInt(fn(n))
+func Convergent[T common.Integers](n T, fn convergentSeries) (*big.Int, *big.Int) {
+	numerator := big.NewInt(fn(int(n)))
 	denominator := big.NewInt(1)
 
-	for n > 1 {
+	for ; n > 1; n-- {
 		// Invert
 		denominator, numerator = numerator, denominator
 
 		// Add e(n-1)
-		product := big.NewInt(fn(n - 1))
+		product := big.NewInt(fn(int(n) - 1))
 		product.Mul(product, denominator)
 		numerator.Add(numerator, product)
-
-		n--
 	}
 
 	return numerator, denominator
 }
 
 // Divisors returns a sorted list of all positive divisors of n
-func Divisors(n int) []int {
+func Divisors[T common.Integers](n T) []T {
 	// Everything is divisible by 1
-	d := []int{1}
+	d := []T{1}
 
 	// Degenerate cases
 	if n <= 3 {
@@ -83,10 +82,10 @@ func Divisors(n int) []int {
 		return d
 	}
 
-	root := int(math.Sqrt(float64(n)))
+	root := T(math.Sqrt(float64(n)))
 
 	// Find the lower divisors
-	for i := 2; i < root; i++ {
+	for i := T(2); i < root; i++ {
 		if n%i == 0 {
 			d = append(d, i)
 		}
@@ -194,7 +193,7 @@ func MinBigInt(a, b *big.Int) *big.Int {
 }
 
 // GCD returns the greatest common divisor of a and b
-func GCD(a, b int) int {
+func GCD[T common.Integers](a, b T) T {
 	// https://en.wikipedia.org/wiki/Greatest_common_divisor
 
 	if a == 0 && b == 0 {
@@ -232,7 +231,7 @@ func GCDBigInt(a, b *big.Int) *big.Int {
 }
 
 // LCM returns the least common multiple of a and b
-func LCM(a, b int) int {
+func LCM[T common.Integers](a, b T) T {
 	// https://en.wikipedia.org/wiki/Least_common_multiple
 
 	if a == 0 && b == 0 {
@@ -260,7 +259,7 @@ func LCMBigInt(a, b *big.Int) *big.Int {
 }
 
 // ReduceFraction returns the lowest that n and d reduce to
-func ReduceFraction(n, d int) (int, int) {
+func ReduceFraction[T common.Integers](n, d T) (T, T) {
 	gcd := GCD(n, d)
 	return n / gcd, d / gcd
 }
@@ -276,7 +275,7 @@ func ReduceFractionBigInt(n, d *big.Int) (*big.Int, *big.Int) {
 }
 
 // SumFraction returns the sum of the two fractions, still in fraction form
-func SumFraction(n1, d1, n2, d2 int) (int, int) {
+func SumFraction[T common.Integers](n1, d1, n2, d2 T) (T, T) {
 	lcm := LCM(d1, d2)
 	n1Scalar := lcm / d1
 	n2Scalar := lcm / d2
@@ -299,7 +298,7 @@ func SumFractionBigInt(n1, d1, n2, d2 *big.Int) (*big.Int, *big.Int) {
 }
 
 // MulFraction returns the product of the two fractions, still in fraction form
-func MulFraction(n1, d1, n2, d2 int) (int, int) {
+func MulFraction[T common.Integers](n1, d1, n2, d2 T) (T, T) {
 	n1, d1 = ReduceFraction(n1, d1)
 	n2, d2 = ReduceFraction(n2, d2)
 	a, b := ReduceFraction(n1*n2, d1*d2)
@@ -318,90 +317,50 @@ func MulFractionBigInt(n1, d1, n2, d2 *big.Int) (*big.Int, *big.Int) {
 }
 
 // IsInt returns true if n is an integer
-func IsInt(n float64) bool {
-	return n == float64(int(n))
+func IsInt[T common.Floats](n T) bool {
+	return n == T(int(n))
 }
 
 // IsSquare returns true if n is a square number
-func IsSquare(n int) bool {
+func IsSquare[T common.Integers](n T) bool {
 	root := math.Sqrt(float64(n))
 	return IsInt(root)
 }
 
 // IsCube returns true if n is a cube number
-func IsCube(n int) bool {
+func IsCube[T common.Integers](n T) bool {
 	root := math.Cbrt(float64(n))
 	return IsInt(root)
 }
 
-// EqualIntSlice returns true if the two slices have identical contents
-func EqualIntSlice(a, b []int) bool {
-	if len(a) != len(b) {
-		return false
-	}
-
-	for i, v := range a {
-		if v != b[i] {
-			return false
-		}
-	}
-
-	return true
-}
-
-// EqualByteSlice returns true if the two slices have identical contents
-func EqualByteSlice(a, b []byte) bool {
-	if len(a) != len(b) {
-		return false
-	}
-
-	for i, v := range a {
-		if v != b[i] {
-			return false
-		}
-	}
-
-	return true
-}
-
-// Reverse reverses the order of the elements in a slice
-func Reverse(digits []int) []int {
-	rev := make([]int, 0)
-
-	for i := len(digits) - 1; i >= 0; i-- {
-		rev = append(rev, digits[i])
-	}
-
-	return rev
-}
-
-// IntToDigits converts an int into a slice of its component digits
-func IntToDigits(n int) []int {
-	digits := make([]int, 0)
+// IntToDigits converts an integer into a slice of its component digits
+func IntToDigits[T common.Integers](n T) []int8 {
+	digits := make([]int8, 0)
 
 	for n > 0 {
 		d := n % 10
-		digits = append(digits, d)
+		digits = append(digits, int8(d))
 		n = n / 10
 	}
 
-	return Reverse(digits)
+	slices.Reverse(digits)
+	return digits
 }
 
 // DigitsToInt converts a slice of digits to an int
-func DigitsToInt(digits []int) int {
+func DigitsToInt(digits []int8) int {
 	number := 0
 
 	for i := 0; i < len(digits); i++ {
-		number += digits[i] * int(math.Pow(10.0, float64(len(digits)-1-i)))
+		number += int(digits[i]) * int(math.Pow(10.0, float64(len(digits)-1-i)))
 	}
 
 	return number
 }
 
 // DigitSum returns the sum of the digits in the number
-func DigitSum(n int) int {
-	sum := 0
+func DigitSum[T common.Integers](n T) T {
+	sum := T(0)
 
 	for n > 0 {
 		sum += n % 10
@@ -412,7 +371,7 @@ func DigitSum(n int) int {
 }
 
 // Harshad returns true if n is divisible by the sum of its digits
-func Harshad(n int) bool {
+func Harshad[T common.Integers](n T) bool {
 	return n%DigitSum(n) == 0
 }
 
@@ -553,7 +512,7 @@ func Hamming(n int) bool {
 	return KSmooth(n, 5)
 }
 
-func minimum(s []int) int {
+func minimum[T common.Integers](s []T) T {
 	m := s[0]
 	for _, i := range s {
 		m = min(m, i)

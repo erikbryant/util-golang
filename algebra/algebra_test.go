@@ -19,6 +19,7 @@ func TestNextSquare(t *testing.T) {
 		{15, 16, 4},
 		{100, 121, 11},
 		{101, 121, 11},
+		{1000 * 1000, 1002001, 1001},
 	}
 
 	for _, testCase := range testCases {
@@ -134,7 +135,7 @@ func TestDivisors(t *testing.T) {
 
 	for _, testCase := range testCases {
 		answer := Divisors(testCase.n)
-		if !EqualIntSlice(answer, testCase.expected) {
+		if !slices.Equal(answer, testCase.expected) {
 			t.Errorf("ERROR: For %d expected %v, got %v", testCase.n, testCase.expected, answer)
 		}
 	}
@@ -164,7 +165,7 @@ func TestFactors(t *testing.T) {
 
 	for _, testCase := range testCases {
 		answer := Factors(testCase.n)
-		if !EqualIntSlice(answer, testCase.expected) {
+		if !slices.Equal(answer, testCase.expected) {
 			t.Errorf("ERROR: For %d expected %v, got %v", testCase.n, testCase.expected, answer)
 		}
 	}
@@ -554,57 +555,15 @@ func TestIsCube(t *testing.T) {
 	}
 }
 
-func TestEqualIntSlice(t *testing.T) {
-	testCases := []struct {
-		a        []int
-		b        []int
-		expected bool
-	}{
-		{[]int{5, 6, 0, 0, 3}, []int{3, 0, 0, 6, 5}, false},
-		{[]int{2}, []int{2}, true},
-		{[]int{2, 3}, []int{3, 2}, false},
-	}
-
-	for _, testCase := range testCases {
-		answer := EqualIntSlice(testCase.a, testCase.b)
-		if answer != testCase.expected {
-			t.Errorf("ERROR: For %v, %v expected %t, got %t", testCase.a, testCase.b, testCase.expected, answer)
-		}
-	}
-}
-
-func TestReverse(t *testing.T) {
-	testCases := []struct {
-		n        []int
-		expected []int
-	}{
-		{[]int{5, 6, 0, 0, 3}, []int{3, 0, 0, 6, 5}},
-		{[]int{2}, []int{2}},
-		{[]int{2, 3}, []int{3, 2}},
-	}
-
-	for _, testCase := range testCases {
-		answer := Reverse(testCase.n)
-		if len(answer) != len(testCase.expected) {
-			t.Errorf("ERROR: For %v expected %v, got %v", testCase.n, testCase.expected, answer)
-		}
-		for i := 0; i < len(testCase.expected); i++ {
-			if answer[i] != testCase.expected[i] {
-				t.Errorf("ERROR: For %v expected %v, got %v", testCase.n, testCase.expected, answer)
-			}
-		}
-	}
-}
-
 func TestIntToDigits(t *testing.T) {
 	testCases := []struct {
 		n        int
-		expected []int
+		expected []int8
 	}{
-		{56003, []int{5, 6, 0, 0, 3}},
-		{2, []int{2}},
-		{23, []int{2, 3}},
-		{1230, []int{1, 2, 3, 0}},
+		{56003, []int8{5, 6, 0, 0, 3}},
+		{2, []int8{2}},
+		{23, []int8{2, 3}},
+		{1230, []int8{1, 2, 3, 0}},
 		// {0, []int{0}},  // Not implemented yet.
 	}
 
@@ -623,14 +582,14 @@ func TestIntToDigits(t *testing.T) {
 
 func TestDigitsToInt(t *testing.T) {
 	testCases := []struct {
-		n        []int
+		n        []int8
 		expected int
 	}{
-		{[]int{5, 6, 0, 0, 3}, 56003},
-		{[]int{2}, 2},
-		{[]int{2, 3}, 23},
-		{[]int{1, 2, 3, 0}, 1230},
-		{[]int{0}, 0},
+		{[]int8{5, 6, 0, 0, 3}, 56003},
+		{[]int8{2}, 2},
+		{[]int8{2, 3}, 23},
+		{[]int8{1, 2, 3, 0}, 1230},
+		{[]int8{0}, 0},
 	}
 
 	for _, testCase := range testCases {
