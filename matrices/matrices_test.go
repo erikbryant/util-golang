@@ -13,7 +13,7 @@ func TestNew(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		m := New(testCase.r, testCase.c)
+		m := New[int](testCase.r, testCase.c)
 		answerR := m.Rows()
 		answerC := m.Cols()
 		if answerR != testCase.r || answerC != testCase.c {

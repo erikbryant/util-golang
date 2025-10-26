@@ -3,38 +3,41 @@ package matrices
 import (
 	"fmt"
 	"log"
+	"strconv"
+
+	"github.com/erikbryant/util-golang/common"
 )
 
-type Matrix [][]float64
+type Matrix[T common.Numbers] [][]T
 
 // New returns a new, empty matrix of the given dimensions
-func New(rows, cols int) Matrix {
+func New[T common.Numbers](rows, cols int) Matrix[T] {
 	if rows <= 0 || cols <= 0 {
 		return nil
 	}
 
-	A := make([][]float64, rows)
+	A := make(Matrix[T], rows)
 
 	for row := 0; row < rows; row++ {
-		A[row] = make([]float64, cols)
+		A[row] = make([]T, cols)
 	}
 
 	return A
 }
 
-func (A Matrix) Rows() int {
+func (A Matrix[T]) Rows() int {
 	return len(A)
 }
 
-func (A Matrix) Cols() int {
+func (A Matrix[T]) Cols() int {
 	return len(A[0])
 }
 
-func (A Matrix) Copy() Matrix {
+func (A Matrix[T]) Copy() Matrix[T] {
 	rowsA := len(A)
 	colsA := len(A[0])
 
-	B := New(rowsA, colsA)
+	B := New[T](rowsA, colsA)
 
 	for i := 0; i < rowsA; i++ {
 		for j := 0; j < colsA; j++ {
@@ -45,12 +48,24 @@ func (A Matrix) Copy() Matrix {
 	return B
 }
 
-// Print prints the matrix to the screen, f() formats row/col numbers to strings
-func (A Matrix) Print(title string, f func(int) string) {
+func (A Matrix[T]) Get(row, col int) T {
+	return A[row][col]
+}
+
+// Print prints the matrix to the screen, f() [optional] formats row/col numbers to strings
+func (A Matrix[T]) Print(title string, f func(int) string) {
 	rowsA := len(A)
 	colsA := len(A[0])
 
-	fmt.Printf("\n    %s\n", title)
+	if f == nil {
+		f = func(i int) string {
+			return strconv.Itoa(i)
+		}
+	}
+
+	if title != "" {
+		fmt.Printf("\n    %s\n", title)
+	}
 
 	fmt.Printf("    ")
 	for col := 0; col < colsA; col++ {
@@ -64,7 +79,7 @@ func (A Matrix) Print(title string, f func(int) string) {
 			if A[row][col] == 0 {
 				fmt.Printf("%6s ", " ·  ")
 			} else {
-				fmt.Printf("%6.2f ", A[row][col]*100)
+				fmt.Printf("%6v ", A[row][col]*100)
 			}
 		}
 		fmt.Println()
@@ -72,7 +87,7 @@ func (A Matrix) Print(title string, f func(int) string) {
 }
 
 // SetRow sets all cells in that row to value
-func (A Matrix) SetRow(row int, value float64) {
+func (A Matrix[T]) SetRow(row int, value T) {
 	colsA := len(A[0])
 	for col := 0; col < colsA; col++ {
 		A[row][col] = value
@@ -80,7 +95,7 @@ func (A Matrix) SetRow(row int, value float64) {
 }
 
 // Set sets all cells to value
-func (A Matrix) Set(value float64) {
+func (A Matrix[T]) Set(value T) {
 	rowsA := len(A)
 	colsA := len(A[0])
 
@@ -92,7 +107,7 @@ func (A Matrix) Set(value float64) {
 }
 
 // Mul multiplies AxB, putting the result in C
-func (A Matrix) Mul(B, C Matrix) Matrix {
+func (A Matrix[T]) Mul(B, C Matrix[T]) Matrix[T] {
 	rowsA := len(A)
 	colsA := len(A[0])
 	rowsB := len(B)
