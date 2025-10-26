@@ -54,8 +54,13 @@ func init() {
 	End = len(Primes) - 1
 }
 
-// Iter returns an iterator over Primes
-func Iter(start, end int) func(func(int, int) bool) {
+// Iter returns an iterator over all Primes
+func Iter() func(func(int, int) bool) {
+	return Iterr(0, -1)
+}
+
+// Iterr returns an iterator over a range of Primes
+func Iterr(start, end int) func(func(int, int) bool) {
 	return func(yield func(int, int) bool) {
 		if end < 0 {
 			end = len(Primes)

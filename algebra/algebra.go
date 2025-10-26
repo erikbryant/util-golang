@@ -419,7 +419,7 @@ func Totients(upper int) []int {
 	// Sieve of Eratosthenes
 
 	// Fast mode
-	for _, prime := range primes.Iter(0, -1) {
+	for _, prime := range primes.Iter() {
 		if prime > upper {
 			break
 		}
@@ -442,7 +442,7 @@ func Totients(upper int) []int {
 
 // SquareFree returns true if no square of a prime divides n
 func SquareFree(n int) bool {
-	for _, prime := range primes.Iter(0, -1) {
+	for _, prime := range primes.Iter() {
 		if prime > int(math.Sqrt(float64(n))) {
 			break
 		}
@@ -495,7 +495,7 @@ func KSmooth(n, k int) bool {
 		return false
 	}
 
-	for _, prime := range primes.Iter(0, -1) {
+	for _, prime := range primes.Iter() {
 		if prime > k {
 			break
 		}
