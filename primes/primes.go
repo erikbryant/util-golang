@@ -2,9 +2,9 @@ package primes
 
 // https://primes.utm.edu/howmany.html
 //
-// pi(x) = approx # of primes <= x
+// π(x) = approx # of primes <= x
 //
-//                          x                pi(x)
+//                          x                 π(x)
 // 1                       10                    4
 // 2                      100                   25
 // 3                    1,000                  168
@@ -34,8 +34,8 @@ import (
 var (
 	// Primes is a list of the first n prime numbers
 	Primes []int
-	// PrimesEnd is the index of the final value in the Primes slice
-	PrimesEnd int
+	// End is the index of the final value in the Primes slice
+	End int
 )
 
 const (
@@ -49,19 +49,21 @@ func init() {
 	//Save(primes)
 	fileName := system.MyPath(gobName)
 	Primes = Load(fileName)
-	PrimesEnd = len(Primes) - 1
+	End = len(Primes) - 1
 }
 
-// Pi is the prime counting function, returning the number of primes below n
+func boundsCheck(n int) {
+	if n > Primes[End] {
+		err := fmt.Errorf("exceeded max prime; did you call Init() n = %d", n)
+		panic(err)
+	}
+}
+
+// Pi is the prime counting function, returning the number of primes <= n
 // https://en.wikipedia.org/wiki/Prime-counting_function
 func Pi(n int) int {
-	if n < Primes[0] {
+	if n < 2 {
 		return 0
-	}
-
-	if n > Primes[PrimesEnd] {
-		err := fmt.Errorf("pi(%d) exceeded max prime; did you call Init()", n)
-		panic(err)
 	}
 
 	i := Index(n)
@@ -80,12 +82,8 @@ func SlowPrime(n int) bool {
 
 	root := int(math.Sqrt(float64(n)))
 
-	if root > Primes[PrimesEnd] {
-		err := fmt.Errorf("SlowPrime(%d) exceeded max prime; did you call Init()", n)
-		panic(err)
-	}
-
 	// Check each potential divisor to see if number divides evenly (i.e., is not prime).
+	boundsCheck(root)
 	for i := 0; Primes[i] <= root; i++ {
 		if n%Primes[i] == 0 {
 			return false
@@ -95,21 +93,21 @@ func SlowPrime(n int) bool {
 	return true
 }
 
-// Prime returns true if number is prime
-func Prime(number int) bool {
-	if number > Primes[PrimesEnd] {
-		return SlowPrime(number)
+// Prime returns true if n is prime
+func Prime(n int) bool {
+	if n > Primes[End] {
+		return SlowPrime(n)
 	}
-	return Index(number) >= 0
+	return Index(n) >= 0
 }
 
-// Index returns the index in Primes of n, or -1 if not found
+// Index returns the index in Primes of n, or negative of the next highest index if not found
 func Index(n int) int {
 	if n <= 1 {
 		return -1
 	}
 
-	upper := PrimesEnd
+	upper := End
 	lower := 0
 
 	for upper > lower {
@@ -214,8 +212,8 @@ func Save(primes []int) {
 }
 
 // Load returns the contents of the gob file as an int slice
-func Load(fName string) []int {
-	file, err := os.Open(fName)
+func Load(name string) []int {
+	file, err := os.Open(name)
 	if err != nil {
 		fmt.Printf("error opening file: %v", err)
 		panic(err)
