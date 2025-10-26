@@ -3,6 +3,7 @@ package util
 import (
 	"strings"
 
+	"github.com/erikbryant/util-golang/common"
 	"github.com/erikbryant/util-golang/figurate"
 )
 
@@ -65,8 +66,8 @@ func IsPalindromeString(p string) bool {
 	return true
 }
 
-// IsPalindromeInt returns true if the digits of p are a palindrome
-func IsPalindromeInt(p []int) bool {
+// IsPalindromeInt returns true if the values in p are a palindrome
+func IsPalindromeInt[T comparable](p []T) bool {
 	head := 0
 	tail := len(p) - 1
 
@@ -123,19 +124,19 @@ func Cryptoquip(w1, w2 string) (map[byte]byte, bool) {
 }
 
 // IsDigitPermutation returns whether the two numbers are digit permutations of each other
-func IsDigitPermutation(a, b int) bool {
+func IsDigitPermutation[T common.Integers](a, b T) bool {
 	// Take the absolute value
-	a = max(a, -1*a)
-	b = max(b, -1*b)
+	a = max(a, -a)
+	b = max(b, -b)
 
 	digits := map[int]int{}
 
 	for a > 0 && b > 0 {
-		r := a % 10
+		r := int(a % 10)
 		digits[r]++
 		a /= 10
 
-		r = b % 10
+		r = int(b % 10)
 		digits[r]--
 		b /= 10
 	}
@@ -155,23 +156,23 @@ func IsDigitPermutation(a, b int) bool {
 }
 
 // Partitions returns all integer partitions of n
-func Partitions(n int) [][]int {
+func Partitions[T common.Integers](n T) [][]T {
 	// Translated from Jerome's Python code
 	// https://jeromekelleher.net/generating-integer-partitions.html
 
 	if n <= 0 {
-		return [][]int{}
+		return [][]T{}
 	}
 
 	if n == 1 {
-		return [][]int{
+		return [][]T{
 			{1},
 		}
 	}
 
-	partitions := [][]int{}
+	partitions := [][]T{}
 
-	a := make([]int, n)
+	a := make([]T, n)
 	k := 1
 	a[1] = n
 	for k != 0 {
@@ -184,7 +185,7 @@ func Partitions(n int) [][]int {
 			k += 1
 		}
 		a[k] = x + y
-		c := append([]int{}, a[0:k+1]...) // Make a copy of a
+		c := append([]T{}, a[0:k+1]...) // Make a copy of a
 		partitions = append(partitions, c)
 	}
 
@@ -192,7 +193,7 @@ func Partitions(n int) [][]int {
 }
 
 // pIndex returns p[k] or zero if k < 0 (safe indexing)
-func pIndex(p []int, n int) int {
+func pIndex[T common.Numbers](p []T, n int) T {
 	if n < 0 {
 		return 0
 	}
