@@ -1,4 +1,4 @@
-package factorial
+package factorials
 
 import (
 	"log"
