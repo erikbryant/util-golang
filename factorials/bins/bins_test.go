@@ -21,56 +21,6 @@ func quiet() func() {
 	}
 }
 
-func TestMultiply(t *testing.T) {
-	testCases := []struct {
-		x            int
-		f            int
-		twos         int
-		expected     int
-		expectedTwos int
-	}{
-		// Remember that we ignore numbers w trailing zeroes
-		{1, 1, 0, 1, 0},
-		{1, 2, 0, 2, 0},
-		{2, 1, 0, 1, 1},
-		{2, 1, MaxFives, 2, MaxFives},
-	}
-
-	for _, testCase := range testCases {
-		answer, answerTwos := multiply(testCase.x, testCase.f, testCase.twos)
-		if answer != testCase.expected {
-			t.Errorf("ERROR: For %d*%d %d expected %d, %d got %d, %d", testCase.x, testCase.f, testCase.twos, testCase.expected, testCase.expectedTwos, answer, answerTwos)
-		}
-		if answerTwos != testCase.expectedTwos {
-			t.Errorf("ERROR: For %d*%d %d expected %d, %d got %d, %d", testCase.x, testCase.f, testCase.twos, testCase.expected, testCase.expectedTwos, answer, answerTwos)
-		}
-	}
-}
-
-func TestFix(t *testing.T) {
-	testCases := []struct {
-		f        int
-		twos     int
-		expected int
-	}{
-		// Remember that we ignore numbers w trailing zeroes
-		{0, 0, 0},
-		{1, 0, 1},
-		{99, 0, 99},
-		{0, 1, 0},
-		{1, 1, 2},
-		{99, 1, 198},
-		{3, 3, 24},
-	}
-
-	for _, testCase := range testCases {
-		answer := fix(testCase.f, testCase.twos)
-		if answer != testCase.expected {
-			t.Errorf("ERROR: For %d %d expected %d got %d", testCase.f, testCase.twos, testCase.expected, answer)
-		}
-	}
-}
-
 func TestFactorial(t *testing.T) {
 	testCases := []struct {
 		c        int

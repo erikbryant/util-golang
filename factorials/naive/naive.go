@@ -15,8 +15,8 @@ var (
 	MaxFives = 16
 )
 
-// multiply returns f and k-j where f=[(x * f) % Mod]/(2^k * 5^j)
-func multiply(x, f, twos int) (int, int) {
+// Multiply returns f and k-j where f=[(x * f) % Mod]/(2^k * 5^j)
+func Multiply(x, f, twos int) (int, int) {
 	for twos < MaxFives && x%2 == 0 {
 		twos++
 		x /= 2
@@ -34,8 +34,8 @@ func multiply(x, f, twos int) (int, int) {
 	return f, twos
 }
 
-// fix returns (f*2^twos)%Mod (i.e., it puts back the excess 2's that multiply removed)
-func fix(f, twos int) int {
+// Fix returns (f*2^twos)%Mod (i.e., it puts back the excess 2's that multiply removed)
+func Fix(f, twos int) int {
 	if twos < 0 || twos > 32 {
 		log.Fatal("Twos outside of expected 0-32 range! ", twos)
 	}
@@ -48,9 +48,9 @@ func Factorial(n int) int {
 	twos := 0
 
 	for i := 2; i <= n; i++ {
-		f, twos = multiply(i, f, twos)
+		f, twos = Multiply(i, f, twos)
 	}
-	f = fix(f, twos)
+	f = Fix(f, twos)
 
 	return f
 }

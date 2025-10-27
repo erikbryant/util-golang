@@ -4,11 +4,10 @@ import (
 	"log"
 	"math"
 
-	"github.com/erikbryant/util-golang/factorial/naive"
 	"github.com/erikbryant/util-golang/factorials/bins"
 	"github.com/erikbryant/util-golang/factorials/dnc"
 	"github.com/erikbryant/util-golang/factorials/moessner"
-	"github.com/erikbryant/util-golang/factorials/native"
+	"github.com/erikbryant/util-golang/factorials/naive"
 	"github.com/erikbryant/util-golang/factorials/swing"
 )
 

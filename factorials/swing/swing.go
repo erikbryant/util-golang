@@ -31,7 +31,7 @@ func multiply(f, p, fives int) (int, int) {
 
 // find returns the index of m in the list of primes or the index of the next higher prime if m is not prime
 func find(m int) int {
-	if m > primesPkg.Primes[len(primesPkg.Primes)-1] {
+	if m > int(primesPkg.Primes[len(primesPkg.Primes)-1]) {
 		log.Fatal("find: max prime exceeded: ", m, primesPkg.Primes[len(primesPkg.Primes)-1])
 	}
 
@@ -61,19 +61,19 @@ func swing(m int) (int, int) {
 	primes := primesPkg.Primes
 	s, d, e, g := indices(m)
 
-	for _, v := range primes[e:g] {
+	for _, v := range primesPkg.Iterr(e, g) {
 		f, fives = multiply(f, v, fives)
 	}
 
 	for i := s; i < d; i++ {
-		p := primes[i]
+		p := int(primes[i])
 		if (m/p)&0x01 == 1 {
 			f, fives = multiply(f, p, fives)
 		}
 	}
 
 	for i := 1; i < s; i++ {
-		prime := primes[i]
+		prime := int(primes[i])
 		p, q := 1, m
 		for {
 			q /= prime

@@ -7,9 +7,9 @@ package bins
 
 import (
 	"fmt"
-	"log"
 	"math"
 
+	"github.com/erikbryant/util-golang/factorials/naive"
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
 )
@@ -17,44 +17,16 @@ import (
 var (
 	// Mod is the global digit mask. Don't change this. Unless you hate yourself.
 	Mod = 10000000
-
-	// MaxFives is a value greater than k where k is the largest 5^k factor we expect to encounter
-	MaxFives = 16
 )
-
-func multiply(x, f, twos int) (int, int) {
-	for twos < MaxFives && x%2 == 0 {
-		twos++
-		x /= 2
-	}
-
-	for x%5 == 0 {
-		twos--
-		x /= 5
-	}
-
-	x %= Mod
-	f *= x
-	f %= Mod
-
-	return f, twos
-}
-
-func fix(f, twos int) int {
-	if twos < 0 || twos > 32 {
-		log.Fatal("Twos outside of expected 0-32 range! ", twos)
-	}
-	return (f << twos) % Mod
-}
 
 func factorial(n int) int {
 	f := 1
 	twos := 0
 
 	for i := 2; i <= n; i++ {
-		f, twos = multiply(i, f, twos)
+		f, twos = naive.Multiply(i, f, twos)
 	}
-	f = fix(f, twos)
+	f = naive.Fix(f, twos)
 
 	return f
 }
@@ -77,9 +49,9 @@ func factorialNoTens(start, n int) int {
 		if i%10 == 0 {
 			continue
 		}
-		f, twos = multiply(i, f, twos)
+		f, twos = naive.Multiply(i, f, twos)
 	}
-	f = fix(f, twos)
+	f = naive.Fix(f, twos)
 
 	noTensCache[startEnd] = f
 
@@ -91,9 +63,9 @@ func power(base, exp int) int {
 	twos := 0
 
 	for i := 1; i <= exp; i++ {
-		f, twos = multiply(base, f, twos)
+		f, twos = naive.Multiply(base, f, twos)
 	}
-	f = fix(f, twos)
+	f = naive.Fix(f, twos)
 
 	return f
 }

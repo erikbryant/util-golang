@@ -37,7 +37,7 @@ func TestMultiply(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		answer, answerTwos := multiply(testCase.x, testCase.f, testCase.twos)
+		answer, answerTwos := Multiply(testCase.x, testCase.f, testCase.twos)
 		if answer != testCase.expected {
 			t.Errorf("ERROR: For %d*%d %d expected %d, %d got %d, %d", testCase.x, testCase.f, testCase.twos, testCase.expected, testCase.expectedTwos, answer, answerTwos)
 		}
@@ -64,7 +64,7 @@ func TestFix(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		answer := fix(testCase.f, testCase.twos)
+		answer := Fix(testCase.f, testCase.twos)
 		if answer != testCase.expected {
 			t.Errorf("ERROR: For %d %d expected %d got %d", testCase.f, testCase.twos, testCase.expected, answer)
 		}
