@@ -22,36 +22,48 @@ type Context struct {
 
 // IterWheel returns an iterator over all Primes
 func IterWheel() func(func(int, int) bool) {
-	return IterrWheel(0, -1)
+	return IterrWheel(0, LenWheel()-1)
 }
 
 // IterrWheel returns an iterator over a range of Primes
 func IterrWheel(start, end int) func(func(int, int) bool) {
 	return func(yield func(int, int) bool) {
-		if end < 0 {
-			end = len(Primes)
-		}
+		// Initialize the starting point
+		ctx := context(start)
 
-		// Initialize the sequence
-		ctx := context()
-		var prime int
-
-		// Fastforward to the first prime to yield
-		for k := 0; k <= start; k++ {
-			if ctx.atEnd() {
-				return
+		if end >= start {
+			// Yield the primes in forward order
+			for i := start; i < end; i++ {
+				prime := ctx.next()
+				if ctx.atEnd() || !yield(i-start, prime) {
+					return
+				}
 			}
-			prime = ctx.next()
-		}
-
-		// Yield the primes
-		for i := start; i < end; i++ {
-			if ctx.atEnd() || !yield(i-start, prime) {
-				return
+		} else {
+			// Yield the primes in reverse order
+			for i := start; i > end; i-- {
+				prime := ctx.prev()
+				if ctx.atEnd() || !yield(start-i, prime) {
+					return
+				}
 			}
-			prime = ctx.next()
 		}
 	}
+}
+
+func context(start int) Context {
+	// Context indicates the next prime to return
+	ctx := Context{
+		iByte: 0,
+		iBit:  0,
+		index: 0,
+	}
+
+	for ctx.index < start && !ctx.atEnd() {
+		ctx.next()
+	}
+
+	return ctx
 }
 
 func (ctx *Context) atStart() bool {
@@ -81,15 +93,6 @@ func (ctx *Context) inc() {
 	if ctx.iBit >= 8 {
 		ctx.iBit = 0
 		ctx.iByte++
-	}
-}
-
-func context() Context {
-	// Context indicates the next prime to return
-	return Context{
-		iByte: 0,
-		iBit:  0,
-		index: 0,
 	}
 }
 

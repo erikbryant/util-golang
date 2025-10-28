@@ -1,6 +1,7 @@
 package primes
 
 import (
+	"fmt"
 	"slices"
 	"testing"
 )
@@ -246,6 +247,15 @@ func TestIterrWheel(t *testing.T) {
 		primes[i] = prime
 	}
 	if !slices.Equal(primes, []int{3, 5, 7, 11, 0}) {
+		t.Error("Iterr failed to regenerate simple test!", primes)
+	}
+
+	primes = make([]int, 5)
+	for i, prime := range IterrWheel(7, 2) {
+		fmt.Println(i, prime)
+		primes[i] = prime
+	}
+	if !slices.Equal(primes, []int{19, 17, 13, 11, 7}) {
 		t.Error("Iterr failed to regenerate simple test!", primes)
 	}
 }
