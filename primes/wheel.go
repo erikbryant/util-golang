@@ -42,6 +42,10 @@ var (
 	piStep  = 100 // A smaller step makes IndexWheel faster, but piCache larger
 )
 
+func LenWheel() int {
+	return primeCountWheel
+}
+
 func int2offset(p int) (int, uint8, bool) {
 	iByte := p / 30
 	r := p % 30
