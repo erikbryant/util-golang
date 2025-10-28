@@ -42,14 +42,6 @@ var (
 	piStep  = 100 // A smaller step makes IndexWheel faster, but piCache larger
 )
 
-type Context struct {
-	iByte  int
-	iBit   uint8
-	valid  bool
-	primes []int
-	pIndex int
-}
-
 func int2offset(p int) (int, uint8, bool) {
 	iByte := p / 30
 	r := p % 30
@@ -118,40 +110,6 @@ func Bake() {
 	p.Printf("primes/byte     = %16f\n", float64(len(Primes))/float64(totalSizePrimes))
 }
 
-func inc(ctx *Context) {
-	ctx.iBit++
-	if ctx.iBit >= 8 {
-		ctx.iBit = 0
-		ctx.iByte++
-		if ctx.iByte >= len(wheel) {
-			ctx.valid = false
-		}
-	}
-}
-
-func context() Context {
-	// Context indicates the next prime to return
-	return Context{0, 0, true, []int{2, 3, 5}, 0}
-}
-
-func next(ctx *Context) int {
-	if ctx.pIndex < len(ctx.primes) {
-		p := ctx.primes[ctx.pIndex]
-		ctx.pIndex++
-		return p
-	}
-
-	for ctx.valid {
-		if bitIsSet(ctx.iByte, ctx.iBit) {
-			p := offset2int(ctx.iByte, ctx.iBit)
-			inc(ctx)
-			return p
-		}
-		inc(ctx)
-	}
-	return 0
-}
-
 func IndexWheel(p int) int {
 	if p <= 5 {
 		return []int{-1, -1, 0, 1, -1, 2}[p]
@@ -165,23 +123,8 @@ func IndexWheel(p int) int {
 	iByte, iBit, ok := int2offset(p)
 	if !ok || !bitIsSet(iByte, iBit) {
 		// p is not a prime; find the next higher prime
+		p, iByte, iBit = nextHigherPrime(p, iByte)
 		adjusted = true
-		ctx := Context{
-			iByte: iByte,
-			iBit:  0,
-			valid: true,
-		}
-		for ctx.valid {
-			if bitIsSet(ctx.iByte, ctx.iBit) {
-				nextP := offset2int(ctx.iByte, ctx.iBit)
-				if nextP > p {
-					p = nextP
-					break
-				}
-			}
-			inc(&ctx)
-		}
-		iByte, iBit, _ = int2offset(p)
 	}
 
 	// Count 2, 3, and 5
@@ -216,44 +159,6 @@ func PiWheel(n int) int {
 		i = -i
 	}
 	return i + 1
-}
-
-// IterWheel returns an iterator over all Primes
-func IterWheel() func(func(int, int) bool) {
-	return IterrWheel(0, -1)
-}
-
-// IterrWheel returns an iterator over a range of Primes
-func IterrWheel(start, end int) func(func(int, int) bool) {
-	return func(yield func(int, int) bool) {
-		if end < 0 {
-			end = len(Primes)
-		}
-
-		// Initialize the sequence
-		ctx := context()
-		var prime int
-
-		// Fastforward to the first prime to yield
-		for k := 0; k <= start; k++ {
-			prime = next(&ctx)
-			if !valid(ctx) {
-				return
-			}
-		}
-
-		// Yield the primes
-		for i := start; i < end; i++ {
-			if !valid(ctx) || !yield(i-start, prime) {
-				return
-			}
-			prime = next(&ctx)
-		}
-	}
-}
-
-func valid(ctx Context) bool {
-	return ctx.valid
 }
 
 // SlowPrimeWheel returns whether a number is prime or not, using a brute force search
