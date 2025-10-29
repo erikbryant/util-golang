@@ -140,6 +140,11 @@ func Prime(p int) bool {
 	if p <= 5 {
 		return p == 2 || p == 3 || p == 5
 	}
+
+	if p > PrimeMax() {
+		return SlowPrime(p)
+	}
+
 	iByte, iBit, ok := int2offset(p)
 	return ok && bitIsSet(iByte, iBit)
 }
