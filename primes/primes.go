@@ -35,6 +35,7 @@ import (
 var (
 	// Primes is a list of the first n prime numbers
 	Primes []int32
+
 	// End is the index of the final value in the Primes slice
 	End int
 )
@@ -42,7 +43,9 @@ var (
 const (
 	// maxPrime is the highest value up to which we will search for primes
 	maxPrime = 100*1000*1000 + 1000
-	gobName  = "primes.gob"
+
+	// gobName is the name of the gob file the primes are stored in
+	gobName = "primes.gob"
 )
 
 // init loads the primes into memory

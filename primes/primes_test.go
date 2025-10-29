@@ -144,8 +144,8 @@ func TestMakePrimes(t *testing.T) {
 		t.Error("MakePrimes failed to regenerate simple test!", primes)
 	}
 
-	//primes = MakePrimes(uint(Primes[End]))
-	//if !slices.Equal(primes, Primes) {
-	//	t.Error("MakePrimes failed to regenerate Primes!")
-	//}
+	primes = MakePrimes(uint(Primes[End]))
+	if !slices.Equal(primes, Primes) {
+		t.Error("MakePrimes failed to regenerate Primes!")
+	}
 }

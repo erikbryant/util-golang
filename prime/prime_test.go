@@ -1,17 +1,10 @@
-package primes
+package prime
 
 import (
 	"fmt"
 	"slices"
 	"testing"
 )
-
-func init() {
-	for _, prime := range Iter() {
-		StoreWheel(prime)
-	}
-	Bake()
-}
 
 func TestIndexWheel(t *testing.T) {
 	testCases := []struct {
@@ -40,7 +33,7 @@ func TestIndexWheel(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		answer := IndexWheel(testCase.n)
+		answer := Index(testCase.n)
 		if answer != testCase.expected {
 			t.Errorf("ERROR: For %d expected %d, got %d", testCase.n, testCase.expected, answer)
 		}
@@ -76,7 +69,7 @@ func TestPiWheel(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		answer := PiWheel(testCase.n)
+		answer := Pi(testCase.n)
 		if answer != testCase.expected {
 			t.Errorf("ERROR: For %d expected %d, got %d", testCase.n, testCase.expected, answer)
 		}
@@ -132,7 +125,7 @@ func TestSlowPrimeWheel(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		answer := SlowPrimeWheel(testCase.n)
+		answer := SlowPrime(testCase.n)
 		if answer != testCase.expected {
 			t.Errorf("ERROR: For %d expected %t, got %t", testCase.n, testCase.expected, answer)
 		}
@@ -157,7 +150,7 @@ func TestPrimeWheel(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		answer := PrimeWheel(testCase.n)
+		answer := Prime(testCase.n)
 		if answer != testCase.expected {
 			t.Errorf("ERROR: For %d expected %t, got %t", testCase.n, testCase.expected, answer)
 		}

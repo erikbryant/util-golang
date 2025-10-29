@@ -1,4 +1,4 @@
-package primes
+package prime
 
 // Edge-based indexing
 //
@@ -22,7 +22,7 @@ type Context struct {
 
 // IterWheel returns an iterator over all Primes
 func IterWheel() func(func(int, int) bool) {
-	return IterrWheel(0, LenWheel()-1)
+	return IterrWheel(0, Len()-1)
 }
 
 // IterrWheel returns an iterator over a range of Primes
