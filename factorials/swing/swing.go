@@ -6,7 +6,6 @@ package swing
 // http://www.luschny.de/math/factorial/SwingIntro.pdf
 
 import (
-	"fmt"
 	"math"
 
 	"github.com/erikbryant/util-golang/factorials/dnc"
@@ -60,7 +59,6 @@ func swing(m int) (int, int) {
 	}
 
 	for _, prime := range primey.Iterr(s, d) {
-		fmt.Println(s, d, prime)
 		if (m/prime)&0x01 == 1 {
 			f, fives = multiply(f, prime, fives)
 		}

@@ -1,9 +1,9 @@
 package adjLists
 
 import (
-	"fmt"
-	"github.com/erikbryant/util-golang/graphs/vertexes"
 	"testing"
+
+	"github.com/erikbryant/util-golang/graphs/vertexes"
 )
 
 func TestAddEdge(t *testing.T) {
@@ -158,9 +158,6 @@ func TestMinimalVertexCover(t *testing.T) {
 	mvc = a.MinimalVertexCover()
 	if len(mvc) != 1 {
 		t.Errorf("ERROR: For 'one vertex, two whiskers' expected len=1, got len=%d", len(mvc))
-		for _, node := range mvc {
-			fmt.Println(node.Name())
-		}
 	}
 }
 
