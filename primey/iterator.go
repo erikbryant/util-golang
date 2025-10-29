@@ -89,7 +89,7 @@ func (ctx *context) prev() int {
 
 // next moves ctx to the next prime and returns that prime
 func (ctx *context) next() int {
-	if ctx.index < 3 && !ctx.atEnd() {
+	if ctx.index < 3 {
 		p := []int{2, 3, 5}[ctx.index]
 		ctx.index++
 		return p
