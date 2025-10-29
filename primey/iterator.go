@@ -1,4 +1,4 @@
-package prime
+package primey
 
 // Edge-based indexing
 //

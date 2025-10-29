@@ -1,4 +1,4 @@
-package prime
+package primey
 
 // https://primes.utm.edu/howmany.html
 //
