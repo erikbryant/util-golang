@@ -56,15 +56,12 @@ func init() {
 
 // Iter returns an iterator over all Primes
 func Iter() func(func(int, int) bool) {
-	return Iterr(0, -1)
+	return Iterr(0, len(Primes)-1)
 }
 
 // Iterr returns an iterator over a range of Primes
 func Iterr(start, end int) func(func(int, int) bool) {
 	return func(yield func(int, int) bool) {
-		if end < 0 {
-			end = len(Primes)
-		}
 		for i, prime := range Primes[start:end] {
 			if !yield(i, int(prime)) {
 				return
