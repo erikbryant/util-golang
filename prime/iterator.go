@@ -10,50 +10,17 @@ package prime
 //
 // Detailed description: https://softwareengineering.stackexchange.com/a/290580
 
-var (
-	littlePrimes = []int{2, 3, 5}
-)
-
-type Context struct {
+// context stores the position of the iterator in the list of primes
+type context struct {
 	iByte int
 	iBit  int8
 	index int
 }
 
-// IterWheel returns an iterator over all Primes
-func IterWheel() func(func(int, int) bool) {
-	return IterrWheel(0, Len()-1)
-}
-
-// IterrWheel returns an iterator over a range of Primes
-func IterrWheel(start, end int) func(func(int, int) bool) {
-	return func(yield func(int, int) bool) {
-		// Initialize the starting point
-		ctx := context(start)
-
-		if end >= start {
-			// Yield the primes in forward order
-			for i := start; i < end; i++ {
-				prime := ctx.next()
-				if ctx.atEnd() || !yield(i-start, prime) {
-					return
-				}
-			}
-		} else {
-			// Yield the primes in reverse order
-			for i := start; i > end; i-- {
-				prime := ctx.prev()
-				if ctx.atEnd() || !yield(start-i, prime) {
-					return
-				}
-			}
-		}
-	}
-}
-
-func context(start int) Context {
-	// Context indicates the next prime to return
-	ctx := Context{
+// newContext returns a new context, starting at the given position
+func newContext(start int) context {
+	// context indicates the next prime to return
+	ctx := context{
 		iByte: 0,
 		iBit:  0,
 		index: 0,
@@ -66,15 +33,18 @@ func context(start int) Context {
 	return ctx
 }
 
-func (ctx *Context) atStart() bool {
+// atStart returns true if ctx points to the start of the primes
+func (ctx *context) atStart() bool {
 	return ctx.iByte == 0 && ctx.iBit == 0
 }
 
-func (ctx *Context) atEnd() bool {
+// atEnd returns true if ctx points to the end of the primes
+func (ctx *context) atEnd() bool {
 	return ctx.iByte == len(wheel)-1 && ctx.iBit == 7
 }
 
-func (ctx *Context) dec() {
+// dec decrements ctx by one
+func (ctx *context) dec() {
 	if ctx.atStart() {
 		return
 	}
@@ -85,7 +55,8 @@ func (ctx *Context) dec() {
 	ctx.iBit--
 }
 
-func (ctx *Context) inc() {
+// inc increments ctx by one
+func (ctx *context) inc() {
 	if ctx.atEnd() {
 		return
 	}
@@ -96,7 +67,8 @@ func (ctx *Context) inc() {
 	}
 }
 
-func (ctx *Context) prev() int {
+// prev moves ctx to the previous prime and returns that prime
+func (ctx *context) prev() int {
 	if ctx.index < 3 && !ctx.atStart() {
 		ctx.index--
 		return []int{2, 3, 5}[ctx.index]
@@ -115,7 +87,8 @@ func (ctx *Context) prev() int {
 	return 0
 }
 
-func (ctx *Context) next() int {
+// next moves ctx to the next prime and returns that prime
+func (ctx *context) next() int {
 	if ctx.index < 3 && !ctx.atEnd() {
 		p := []int{2, 3, 5}[ctx.index]
 		ctx.index++
@@ -135,10 +108,11 @@ func (ctx *Context) next() int {
 	return 0
 }
 
+// nextHigherPrime returns the next higher prime
 func nextHigherPrime(p, iByte int) (int, int, uint8) {
-	// We can't call Index, because Index called us! Find it by hand.
+	// We can't call Index, because Index calls us! Find it by hand.
 
-	ctx := Context{
+	ctx := context{
 		iByte: iByte,
 		iBit:  0,
 	}

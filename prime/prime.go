@@ -32,6 +32,37 @@ func Len() int {
 	return primeCount
 }
 
+// Iter returns an iterator over all Primes
+func Iter() func(func(int, int) bool) {
+	return Iterr(0, Len()-1)
+}
+
+// Iterr returns an iterator over a range of Primes
+func Iterr(start, end int) func(func(int, int) bool) {
+	return func(yield func(int, int) bool) {
+		// Initialize the starting point
+		ctx := newContext(start)
+
+		if end >= start {
+			// Yield the primes in forward order
+			for i := start; i < end; i++ {
+				prime := ctx.next()
+				if ctx.atEnd() || !yield(i-start, prime) {
+					return
+				}
+			}
+		} else {
+			// Yield the primes in reverse order
+			for i := start; i > end; i-- {
+				prime := ctx.prev()
+				if ctx.atEnd() || !yield(start-i, prime) {
+					return
+				}
+			}
+		}
+	}
+}
+
 // Index returns the index of the given number in the sorted list of primes
 func Index(p int) int {
 	if p <= 5 {
@@ -103,7 +134,7 @@ func SlowPrime(n int) bool {
 	root := int(math.Sqrt(float64(n)))
 
 	// Check each potential divisor to see if number divides evenly (i.e., is not prime).
-	for _, prime := range IterWheel() {
+	for _, prime := range Iter() {
 		if prime > root {
 			return true
 		}

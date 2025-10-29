@@ -78,7 +78,7 @@ func TestPiWheel(t *testing.T) {
 
 func TestIterWheel(t *testing.T) {
 	primes := []int{}
-	for i, prime := range IterWheel() {
+	for i, prime := range Iter() {
 		if i > 4 {
 			break
 		}
@@ -91,7 +91,7 @@ func TestIterWheel(t *testing.T) {
 
 func TestIterrWheel(t *testing.T) {
 	primes := make([]int, 5)
-	for i, prime := range IterrWheel(1, 5) {
+	for i, prime := range Iterr(1, 5) {
 		primes[i] = prime
 	}
 	if !slices.Equal(primes, []int{3, 5, 7, 11, 0}) {
@@ -99,7 +99,7 @@ func TestIterrWheel(t *testing.T) {
 	}
 
 	primes = make([]int, 5)
-	for i, prime := range IterrWheel(7, 2) {
+	for i, prime := range Iterr(7, 2) {
 		fmt.Println(i, prime)
 		primes[i] = prime
 	}
