@@ -28,51 +28,57 @@ import (
 	"math/bits"
 )
 
+func initPrimes() {
+	if primeCount == 0 {
+		load()
+	}
+}
+
+// PrimeMax returns the largest prime in the list of primes
+func PrimeMax() int {
+	initPrimes()
+	return primeMax
+}
+
 // Len returns the length of the list of primes
 func Len() int {
+	initPrimes()
 	return primeCount
 }
 
 // Iter returns an iterator over all Primes
 func Iter() func(func(int, int) bool) {
+	initPrimes()
 	return Iterr(0, Len()-1)
 }
 
 // Iterr returns an iterator over a range of Primes
 func Iterr(start, end int) func(func(int, int) bool) {
-	if Len() == 0 {
-		load()
-	}
+	initPrimes()
 
 	return func(yield func(int, int) bool) {
 		// Initialize the starting point
 		ctx := newContext(start)
 
-		if end >= start {
-			// Yield the primes in forward order
-			for i := start; i < end; i++ {
-				prime := ctx.next()
-				if ctx.atEnd() || !yield(i-start, prime) {
-					return
-				}
-			}
-		} else {
-			// Yield the primes in reverse order
-			for i := start; i > end; i-- {
-				prime := ctx.prev()
-				if ctx.atEnd() || !yield(start-i, prime) {
-					return
-				}
+		// Yield the primes
+		for i := start; i < end; i++ {
+			prime := ctx.next()
+			if ctx.atEnd() || !yield(i-start, prime) {
+				return
 			}
 		}
 	}
 }
 
+// Nth returns the nth prime
+func Nth(n int) int {
+	ctx := newContext(n)
+	return ctx.next()
+}
+
 // Index returns the index of the given number in the sorted list of primes
 func Index(p int) int {
-	if Len() == 0 {
-		load()
-	}
+	initPrimes()
 
 	if p <= 5 {
 		return []int{-1, -1, 0, 1, -1, 2}[p]
@@ -115,6 +121,8 @@ func Index(p int) int {
 
 // Pi returns the number of primes below (and including) n
 func Pi(n int) int {
+	initPrimes()
+
 	if n < 2 {
 		return 0
 	}
@@ -127,9 +135,7 @@ func Pi(n int) int {
 
 // Prime returns true if p is a prime
 func Prime(p int) bool {
-	if Len() == 0 {
-		load()
-	}
+	initPrimes()
 
 	if p <= 5 {
 		return p == 2 || p == 3 || p == 5
@@ -140,6 +146,8 @@ func Prime(p int) bool {
 
 // SlowPrime returns whether a number is prime or not, using a brute force search
 func SlowPrime(n int) bool {
+	initPrimes()
+
 	if n <= 1 {
 		return false
 	}

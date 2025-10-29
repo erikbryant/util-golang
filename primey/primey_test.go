@@ -1,12 +1,11 @@
 package primey
 
 import (
-	"fmt"
 	"slices"
 	"testing"
 )
 
-func TestIndexWheel(t *testing.T) {
+func TestIndex(t *testing.T) {
 	testCases := []struct {
 		n        int
 		expected int
@@ -40,7 +39,7 @@ func TestIndexWheel(t *testing.T) {
 	}
 }
 
-func TestPiWheel(t *testing.T) {
+func TestPi(t *testing.T) {
 	testCases := []struct {
 		n        int
 		expected int
@@ -76,7 +75,7 @@ func TestPiWheel(t *testing.T) {
 	}
 }
 
-func TestIterWheel(t *testing.T) {
+func TestIter(t *testing.T) {
 	primes := []int{}
 	for i, prime := range Iter() {
 		if i > 4 {
@@ -89,7 +88,7 @@ func TestIterWheel(t *testing.T) {
 	}
 }
 
-func TestIterrWheel(t *testing.T) {
+func TestIterr(t *testing.T) {
 	primes := make([]int, 5)
 	for i, prime := range Iterr(1, 5) {
 		primes[i] = prime
@@ -97,18 +96,9 @@ func TestIterrWheel(t *testing.T) {
 	if !slices.Equal(primes, []int{3, 5, 7, 11, 0}) {
 		t.Error("Iterr failed to regenerate simple test!", primes)
 	}
-
-	primes = make([]int, 5)
-	for i, prime := range Iterr(7, 2) {
-		fmt.Println(i, prime)
-		primes[i] = prime
-	}
-	if !slices.Equal(primes, []int{19, 17, 13, 11, 7}) {
-		t.Error("Iterr failed to regenerate simple test!", primes)
-	}
 }
 
-func TestSlowPrimeWheel(t *testing.T) {
+func TestSlowPrime(t *testing.T) {
 	testCases := []struct {
 		n        int
 		expected bool
@@ -132,7 +122,7 @@ func TestSlowPrimeWheel(t *testing.T) {
 	}
 }
 
-func TestPrimeWheel(t *testing.T) {
+func TestPrime(t *testing.T) {
 	testCases := []struct {
 		n        int
 		expected bool

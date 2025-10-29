@@ -7,7 +7,7 @@ import (
 	"sort"
 
 	"github.com/erikbryant/util-golang/common"
-	"github.com/erikbryant/util-golang/primes"
+	"github.com/erikbryant/util-golang/primey"
 )
 
 // NextSquare returns the next highest square and its square root
@@ -113,18 +113,20 @@ func Divisors[T common.Integers](n T) []T {
 
 // Factors returns a sorted list of the unique prime factors of n
 func Factors(n int) []int {
-	if primes.Prime(n) {
+	if primey.Prime(n) {
 		return []int{n}
 	}
 
 	f := []int{}
 
-	for i := 0; int(primes.Primes[i]) <= n; i++ {
-		if n%int(primes.Primes[i]) == 0 {
-			f = append(f, int(primes.Primes[i]))
-			n /= int(primes.Primes[i])
-			for n%int(primes.Primes[i]) == 0 {
-				n /= int(primes.Primes[i])
+	for _, p := range primey.Iter() {
+		if p > n {
+			break
+		}
+		if n%p == 0 {
+			f = append(f, p)
+			for n%p == 0 {
+				n /= p
 			}
 		}
 	}
@@ -146,8 +148,11 @@ func FactorsCounted(n int) map[int]int {
 	}
 
 	root := int(math.Sqrt(float64(n)))
-	for i := 1; int(primes.Primes[i]) <= root; i++ {
-		p := int(primes.Primes[i])
+
+	for _, p := range primey.Iter() {
+		if p > root {
+			break
+		}
 		for n%p == 0 {
 			factors[p]++
 			n = n / p
@@ -394,7 +399,7 @@ func Totient(n int) int {
 	// Prime factors of 12 = {2,3}, φ(12) = 12 * (1-1/2) * (1-1/3) = 12 * 1/2 * 2/3 = 4
 	// Prime factors of 15 = {3,5}, φ(15) = 15 * (1-1/3) * (1-1/5) = 15 * 2/3 * 4/5 = 8
 
-	if primes.Prime(n) {
+	if primey.Prime(n) {
 		return n - 1
 	}
 
@@ -419,7 +424,7 @@ func Totients(upper int) []int {
 	// Sieve of Eratosthenes
 
 	// Fast mode
-	for _, prime := range primes.Iter() {
+	for _, prime := range primey.Iter() {
 		if prime > upper {
 			break
 		}
@@ -429,7 +434,7 @@ func Totients(upper int) []int {
 	}
 
 	// If we ran out of pre-computed primes, switch to slow mode
-	for x := int(primes.Primes[len(primes.Primes)-1]) + 1; x <= upper; x++ {
+	for x := primey.PrimeMax() + 1; x <= upper; x++ {
 		if totients[x] == x {
 			for y := x; y <= upper; y += x {
 				totients[y] -= totients[y] / x
@@ -442,7 +447,7 @@ func Totients(upper int) []int {
 
 // SquareFree returns true if no square of a prime divides n
 func SquareFree(n int) bool {
-	for _, prime := range primes.Iter() {
+	for _, prime := range primey.Iter() {
 		if prime > int(math.Sqrt(float64(n))) {
 			break
 		}
@@ -490,12 +495,12 @@ func PascalTriangle(max int) [][]int {
 
 // KSmooth returns true if n is a k-smooth number
 func KSmooth(n, k int) bool {
-	if n < 1 || k < 2 || !primes.Prime(k) {
+	if n < 1 || k < 2 || !primey.Prime(k) {
 		// Invalid input
 		return false
 	}
 
-	for _, prime := range primes.Iter() {
+	for _, prime := range primey.Iter() {
 		if prime > k {
 			break
 		}
@@ -527,8 +532,11 @@ func KSmooths(n, k int) []int {
 	nexts := []int{}
 	indices := []int{}
 
-	for i := 0; int(primes.Primes[i]) <= k; i++ {
-		nexts = append(nexts, int(primes.Primes[i]))
+	for _, p := range primey.Iter() {
+		if p > k {
+			break
+		}
+		nexts = append(nexts, p)
 		indices = append(indices, 0)
 	}
 
@@ -541,7 +549,7 @@ func KSmooths(n, k int) []int {
 		for i := 0; i < len(nexts); i++ {
 			if h[m] == nexts[i] {
 				indices[i]++
-				nexts[i] = int(primes.Primes[i]) * h[indices[i]]
+				nexts[i] = primey.Nth(i) * h[indices[i]]
 			}
 		}
 	}

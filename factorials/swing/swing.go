@@ -6,11 +6,11 @@ package swing
 // http://www.luschny.de/math/factorial/SwingIntro.pdf
 
 import (
-	"log"
+	"fmt"
 	"math"
 
 	"github.com/erikbryant/util-golang/factorials/dnc"
-	primesPkg "github.com/erikbryant/util-golang/primes"
+	"github.com/erikbryant/util-golang/primey"
 )
 
 var (
@@ -31,15 +31,10 @@ func multiply(f, p, fives int) (int, int) {
 
 // find returns the index of m in the list of primes or the index of the next higher prime if m is not prime
 func find(m int) int {
-	if m > int(primesPkg.Primes[len(primesPkg.Primes)-1]) {
-		log.Fatal("find: max prime exceeded: ", m, primesPkg.Primes[len(primesPkg.Primes)-1])
-	}
-
-	i := primesPkg.Index(m)
+	i := primey.Index(m)
 	if i < 0 {
 		return -i + 1
 	}
-
 	return i
 }
 
@@ -58,22 +53,20 @@ func swing(m int) (int, int) {
 	f := 1
 	fives := 0
 
-	primes := primesPkg.Primes
 	s, d, e, g := indices(m)
 
-	for _, v := range primesPkg.Iterr(e, g) {
-		f, fives = multiply(f, v, fives)
+	for _, prime := range primey.Iterr(e, g) {
+		f, fives = multiply(f, prime, fives)
 	}
 
-	for i := s; i < d; i++ {
-		p := int(primes[i])
-		if (m/p)&0x01 == 1 {
-			f, fives = multiply(f, p, fives)
+	for _, prime := range primey.Iterr(s, d) {
+		fmt.Println(s, d, prime)
+		if (m/prime)&0x01 == 1 {
+			f, fives = multiply(f, prime, fives)
 		}
 	}
 
-	for i := 1; i < s; i++ {
-		prime := int(primes[i])
+	for _, prime := range primey.Iterr(1, s) {
 		p, q := 1, m
 		for {
 			q /= prime
