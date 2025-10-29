@@ -40,6 +40,10 @@ func Iter() func(func(int, int) bool) {
 
 // Iterr returns an iterator over a range of Primes
 func Iterr(start, end int) func(func(int, int) bool) {
+	if Len() == 0 {
+		load()
+	}
+
 	return func(yield func(int, int) bool) {
 		// Initialize the starting point
 		ctx := newContext(start)
@@ -66,6 +70,10 @@ func Iterr(start, end int) func(func(int, int) bool) {
 
 // Index returns the index of the given number in the sorted list of primes
 func Index(p int) int {
+	if Len() == 0 {
+		load()
+	}
+
 	if p <= 5 {
 		return []int{-1, -1, 0, 1, -1, 2}[p]
 	}
@@ -119,6 +127,10 @@ func Pi(n int) int {
 
 // Prime returns true if p is a prime
 func Prime(p int) bool {
+	if Len() == 0 {
+		load()
+	}
+
 	if p <= 5 {
 		return p == 2 || p == 3 || p == 5
 	}
@@ -147,8 +159,8 @@ func SlowPrime(n int) bool {
 	return true
 }
 
-// MakePrimes returns all primes <= maxPrime
-func MakePrimes(maxPrime uint) []int32 {
+// MakePrimes finds and returns all primes <= limit
+func MakePrimes(limit uint) []int32 {
 	// Sieve of Eratosthenes
 	// Original Python Code by David Eppstein, UC Irvine, 28 Feb 2002
 	// http://code.activestate.com/recipes/117119/
@@ -160,9 +172,9 @@ func MakePrimes(maxPrime uint) []int32 {
 	// indefinitely, but only as long as required by the current
 	// number being tested.
 
-	if maxPrime > 4294967296 {
+	if limit > 4294967296 {
 		// We calculate q*q below; verify q*q will not overflow uint
-		log.Fatal("maxPrime > sqrt(2^64 - 1)! ", maxPrime)
+		log.Fatal("limit > sqrt(2^64 - 1)! ", limit)
 	}
 
 	primes := []int32{}
@@ -172,7 +184,7 @@ func MakePrimes(maxPrime uint) []int32 {
 	for q := uint(2); ; q++ {
 		_, ok := D[q]
 		if !ok {
-			if q > maxPrime {
+			if q > limit {
 				break
 			}
 			// q is a new prime.

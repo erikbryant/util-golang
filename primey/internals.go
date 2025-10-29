@@ -11,6 +11,14 @@ package primey
 // Thus, primes from 1 to 30 can be stored in a single byte (ignoring 2, 3, 5),
 // then primes from 31 to 60 in a single byte, then from 61 to 90, and so on.
 // Handle 2, 3, and 5 separately.
+//
+// To create a new wheel gob file:
+//
+//   for _, prime := range MakePrimes(maxPrime) {
+//     store(uint32(prime))
+//   }
+//   bake()
+//   save()
 
 import (
 	"encoding/gob"
@@ -64,17 +72,6 @@ const (
 	// piStep is the size of the blocks in the prime counts cache
 	piStep = 100 // A smaller step makes Index faster, but piCache larger
 )
-
-// init loads (or saves) the wheel
-func init() {
-	//primes := primesPkg.MakePrimes(maxPrime)
-	//for _, prime := range primes {
-	//	store(uint32(prime))
-	//}
-	//bake()
-	//save()
-	load()
-}
 
 // int2offset returns the bit/byte in the wheel that the int corresponds to
 func int2offset(p int) (int, uint8, bool) {
