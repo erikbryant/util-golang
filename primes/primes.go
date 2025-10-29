@@ -28,8 +28,6 @@ import (
 	"log"
 	"math"
 	"os"
-
-	"github.com/erikbryant/util-golang/system"
 )
 
 var (
@@ -48,14 +46,14 @@ const (
 	gobName = "primes.gob"
 )
 
-// init loads the primes into memory
-func init() {
-	//primes := MakePrimes(maxPrime)
-	//Save(primes)
-	fileName := system.MyPath(gobName)
-	Primes = Load(fileName)
-	End = len(Primes) - 1
-}
+//// init loads the primes into memory
+//func init() {
+//	//primes := MakePrimes(maxPrime)
+//	//Save(primes)
+//	fileName := system.MyPath(gobName)
+//	Primes = Load(fileName)
+//	End = len(Primes) - 1
+//}
 
 // Iter returns an iterator over all Primes
 func Iter() func(func(int, int) bool) {
