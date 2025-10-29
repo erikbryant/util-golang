@@ -71,7 +71,7 @@ func (ctx *context) inc() {
 func (ctx *context) prev() int {
 	if ctx.index < 3 && !ctx.atStart() {
 		ctx.index--
-		return ctx.index + 2 + ctx.index>>1 // 0: 2, 1: 3, 2: 5 (opaque, but fast)
+		return []int{2, 3, 5}[ctx.index]
 	}
 
 	for !ctx.atStart() {
@@ -90,7 +90,7 @@ func (ctx *context) prev() int {
 // next moves ctx to the next prime and returns that prime
 func (ctx *context) next() int {
 	if ctx.index < 3 {
-		p := ctx.index + 2 + ctx.index>>1 // 0: 2, 1: 3, 2: 5 (opaque, but fast)
+		p := []int{2, 3, 5}[ctx.index]
 		ctx.index++
 		return p
 	}
