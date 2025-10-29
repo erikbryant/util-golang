@@ -18,6 +18,7 @@ import (
 	"math/bits"
 	"os"
 
+	"github.com/erikbryant/util-golang/system"
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
 )
@@ -100,7 +101,7 @@ func bitIsSet(iByte int, iBit uint8) bool {
 
 // save writes the wheel and its derived values to the gob file
 func save() {
-	file, err := os.Create(gobName)
+	file, err := os.Create(system.MyPath(gobName))
 	if err != nil {
 		fmt.Printf("error creating file: %v", err)
 		panic(err)
@@ -117,7 +118,7 @@ func save() {
 
 // load reads the contents of the gob file into wheel and its derived values
 func load() {
-	file, err := os.Open(gobName)
+	file, err := os.Open(system.MyPath(gobName))
 	if err != nil {
 		fmt.Printf("error opening file: %v", err)
 		panic(err)
