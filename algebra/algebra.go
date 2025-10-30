@@ -406,8 +406,7 @@ func Totient(n int) int {
 	count := n
 
 	for _, f := range Factors(n) {
-		count /= f
-		count *= f - 1
+		count -= count / f
 	}
 
 	return count
