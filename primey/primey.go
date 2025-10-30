@@ -23,6 +23,7 @@ package primey
 // 16  10,000,000,000,000,000  279,238,341,033,925
 
 import (
+	"fmt"
 	"log"
 	"math"
 )
@@ -55,6 +56,11 @@ func Iter() func(func(int, int) bool) {
 func Iterr(start, end int) func(func(int, int) bool) {
 	initPrimes()
 
+	if end >= PrimeMax() {
+		err := fmt.Errorf("index out of range %d > %d ", end, PrimeMax())
+		panic(err)
+	}
+
 	return func(yield func(int, int) bool) {
 		// Initialize the starting point
 		ctx := newContext(start)
@@ -62,7 +68,7 @@ func Iterr(start, end int) func(func(int, int) bool) {
 		// Yield the primes
 		for i := start; i < end; i++ {
 			prime := ctx.next()
-			if prime == 0 || !yield(i-start, prime) { // We should check 'ctx.atEnd()', but 'prime == 0' is faster
+			if !yield(i-start, prime) {
 				return
 			}
 		}
@@ -71,6 +77,7 @@ func Iterr(start, end int) func(func(int, int) bool) {
 
 // Nth returns the nth prime
 func Nth(n int) int {
+	initPrimes()
 	ctx := newContext(n)
 	return ctx.next()
 }
