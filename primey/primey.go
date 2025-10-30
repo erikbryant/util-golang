@@ -52,12 +52,17 @@ func Iter() func(func(int, int) bool) {
 	return Iterr(0, Len()-1)
 }
 
-// Iterr returns an iterator over a range of Primes
+// Iterr returns an iterator over a range of index values
 func Iterr(start, end int) func(func(int, int) bool) {
 	initPrimes()
 
-	if end >= PrimeMax() {
-		err := fmt.Errorf("index out of range %d > %d ", end, PrimeMax())
+	if start < 0 || start >= Len() {
+		err := fmt.Errorf("start index out of range 0 >= %d > %d ", start, Len())
+		panic(err)
+	}
+
+	if end < 0 || end >= Len() {
+		err := fmt.Errorf("end index out of range 0 >= %d > %d ", end, Len())
 		panic(err)
 	}
 
@@ -75,6 +80,23 @@ func Iterr(start, end int) func(func(int, int) bool) {
 	}
 }
 
+// Iterp returns an iterator over a range of prime numbers
+func Iterp(start, end int) func(func(int, int) bool) {
+	initPrimes()
+
+	if start < 2 || start > PrimeMax() {
+		err := fmt.Errorf("start index out of range 2 >= %d >= %d ", start, PrimeMax())
+		panic(err)
+	}
+
+	if end < 2 || end > PrimeMax() {
+		err := fmt.Errorf("end index out of range 2 >= %d >= %d ", end, PrimeMax())
+		panic(err)
+	}
+
+	return Iterr(Index(start), Index(end))
+}
+
 // Nth returns the nth prime
 func Nth(n int) int {
 	initPrimes()
@@ -82,48 +104,36 @@ func Nth(n int) int {
 	return ctx.next()
 }
 
-// Index returns the index of the given number in the sorted list of primes
+// Index returns the index of the prime, or if p is not prime then the index below the next highest prime
 func Index(p int) int {
 	initPrimes()
 
 	if p <= 5 {
-		return []int{-1, -1, 0, 1, -1, 2}[p]
+		return []int{0, 0, 0, 1, 1, 2}[p]
 	}
 
 	iByte, iBit, ok, r := int2offset(p)
-	adjusted := false
+	adjust := 0
 	if !ok || !bitIsSet(iByte, iBit) {
 		// p is not a prime; find the next higher iBit
-		adjusted = true
 		for i, remainder := range bit2remainder {
 			iBit = uint8(i)
 			if remainder > r {
 				break
 			}
 		}
+		adjust = 1
 	}
 
-	primesBelowP := primesBelow(iByte, iBit)
-
-	if adjusted {
-		return -(primesBelowP - 1)
-	}
-
-	return primesBelowP
+	return primesBelow(iByte, iBit) - adjust
 }
 
 // Pi returns the number of primes below (and including) n
 func Pi(n int) int {
-	initPrimes()
-
 	if n < 2 {
 		return 0
 	}
-	i := Index(n)
-	if i < 0 {
-		i = -i
-	}
-	return i + 1
+	return Index(n) + 1
 }
 
 // Prime returns true if p is a prime

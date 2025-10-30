@@ -31,10 +31,10 @@ func multiply(f, p, fives int) (int, int) {
 // find returns the index of m in the list of primes or the index of the next higher prime if m is not prime
 func find(m int) int {
 	i := primey.Index(m)
-	if i < 0 {
-		return -i + 1
+	if primey.Prime(m) {
+		return i
 	}
-	return i
+	return i + 1
 }
 
 // indices returns the index values for the 4 key variables
