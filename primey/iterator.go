@@ -57,13 +57,10 @@ func (ctx *context) dec() {
 
 // inc increments ctx by one
 func (ctx *context) inc() {
-	if ctx.atEnd() {
-		return
-	}
 	ctx.iBit++
 	if ctx.iBit >= 8 {
-		ctx.iBit = 0
 		ctx.iByte++
+		ctx.iBit = 0
 	}
 }
 
