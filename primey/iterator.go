@@ -104,26 +104,3 @@ func (ctx *context) next() int {
 
 	return 0
 }
-
-// nextHigherPrime returns the next higher prime
-func nextHigherPrime(p, iByte int) (int, int, uint8) {
-	// We can't call Index, because Index calls us! Find it by hand.
-
-	ctx := context{
-		iByte: iByte,
-		iBit:  0,
-	}
-
-	for !ctx.atEnd() {
-		if bitIsSet(ctx.iByte, uint8(ctx.iBit)) {
-			nextP := offset2int(ctx.iByte, uint8(ctx.iBit))
-			if nextP > p {
-				return p, ctx.iByte, uint8(ctx.iBit)
-			}
-		}
-		ctx.inc()
-	}
-
-	// We ran off the end of the list
-	return -1, -1, 0
-}

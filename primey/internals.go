@@ -74,11 +74,14 @@ const (
 )
 
 // int2offset returns the bit/byte in the wheel that the int corresponds to
-func int2offset(p int) (int, uint8, bool) {
+func int2offset(p int) (int, uint8, bool, int) {
 	iByte := p / 30
 	r := p % 30
+	if r == 1 {
+		return iByte, 0, true, 1
+	}
 	iBit := remainder2bit[r]
-	return iByte, iBit, iBit > 0 || r == 1
+	return iByte, iBit, iBit > 0, r
 }
 
 // offset2int returns the number corresponding to bit/byte
@@ -94,6 +97,30 @@ func setBit(iByte int, iBit uint8) {
 // bitIsSet returns true if the given bit is set in the given byte of the wheel
 func bitIsSet(iByte int, iBit uint8) bool {
 	return wheel[iByte]&(1<<iBit) != 0
+}
+
+// primesBelow returns the number of primes below the input. Input must be prime and must be > 5.
+func primesBelow(iByte int, iBit uint8) int {
+	// Count 2, 3, and 5
+	primesBelowP := 3
+
+	// Each byte in the wheel represents 0-8 primes
+	// Count bits on the way up to p
+
+	// Count the primes in bytes below p
+	primesBelowP += int(piCache[iByte/piStep])
+	for b := iByte - iByte%piStep; b < iByte; b++ {
+		primesBelowP += bits.OnesCount8(wheel[b])
+	}
+
+	// Count the primes in bits below p
+	for m := uint8(0); m < iBit; m++ {
+		if bitIsSet(iByte, m) {
+			primesBelowP++
+		}
+	}
+
+	return primesBelowP
 }
 
 // save writes the wheel and its derived values to the gob file
@@ -154,7 +181,7 @@ func store(p uint32) {
 	if p <= 5 {
 		return
 	}
-	iByte, iBit, ok := int2offset(int(p))
+	iByte, iBit, ok, _ := int2offset(int(p))
 	if !ok {
 		fmt.Printf("%d is not prime! Not storing.\n", p)
 		return

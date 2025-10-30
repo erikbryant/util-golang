@@ -25,7 +25,6 @@ package primey
 import (
 	"log"
 	"math"
-	"math/bits"
 )
 
 func initPrimes() {
@@ -63,7 +62,7 @@ func Iterr(start, end int) func(func(int, int) bool) {
 		// Yield the primes
 		for i := start; i < end; i++ {
 			prime := ctx.next()
-			if ctx.atEnd() || !yield(i-start, prime) {
+			if prime == 0 || !yield(i-start, prime) { // We should check 'ctx.atEnd()', but 'prime == 0' is faster
 				return
 			}
 		}
@@ -84,33 +83,20 @@ func Index(p int) int {
 		return []int{-1, -1, 0, 1, -1, 2}[p]
 	}
 
+	iByte, iBit, ok, r := int2offset(p)
 	adjusted := false
-
-	// Each byte in the wheel represents 0-7 primes
-	// Count bits on the way up to p
-
-	iByte, iBit, ok := int2offset(p)
 	if !ok || !bitIsSet(iByte, iBit) {
-		// p is not a prime; find the next higher prime
-		p, iByte, iBit = nextHigherPrime(p, iByte)
+		// p is not a prime; find the next higher iBit
 		adjusted = true
-	}
-
-	// Count 2, 3, and 5
-	primesBelowP := 3
-
-	// Count the primes in bytes below p
-	primesBelowP += int(piCache[iByte/piStep])
-	for b := iByte - iByte%piStep; b < iByte; b++ {
-		primesBelowP += bits.OnesCount8(wheel[b])
-	}
-
-	// Count the primes in bits below p
-	for m := uint8(0); m < iBit; m++ {
-		if bitIsSet(iByte, m) {
-			primesBelowP++
+		for i, remainder := range bit2remainder {
+			iBit = uint8(i)
+			if remainder > r {
+				break
+			}
 		}
 	}
+
+	primesBelowP := primesBelow(iByte, iBit)
 
 	if adjusted {
 		return -(primesBelowP - 1)
@@ -145,7 +131,7 @@ func Prime(p int) bool {
 		return SlowPrime(p)
 	}
 
-	iByte, iBit, ok := int2offset(p)
+	iByte, iBit, ok, _ := int2offset(p)
 	return ok && bitIsSet(iByte, iBit)
 }
 
