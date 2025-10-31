@@ -54,6 +54,10 @@ func Iter() func(func(int, int) bool) {
 
 // Iterr returns an iterator over a range of index values
 func Iterr(start, end int) func(func(int, int) bool) {
+	if end <= start {
+		return func(yield func(int, int) bool) {}
+	}
+
 	initPrimes()
 
 	if start < 0 || start >= Len() {
@@ -78,23 +82,6 @@ func Iterr(start, end int) func(func(int, int) bool) {
 			}
 		}
 	}
-}
-
-// Iterp returns an iterator over a range of prime numbers
-func Iterp(start, end int) func(func(int, int) bool) {
-	initPrimes()
-
-	if start < 2 || start > PrimeMax() {
-		err := fmt.Errorf("start index out of range 2 >= %d >= %d ", start, PrimeMax())
-		panic(err)
-	}
-
-	if end < 2 || end > PrimeMax() {
-		err := fmt.Errorf("end index out of range 2 >= %d >= %d ", end, PrimeMax())
-		panic(err)
-	}
-
-	return Iterr(Index(start), Index(end))
 }
 
 // Nth returns the nth prime
