@@ -4,27 +4,26 @@ package primey
 //
 // π(x) = approx # of primes <= x
 //
-//                          x                 π(x)
-// 1                       10                    4
-// 2                      100                   25
-// 3                    1,000                  168
-// 4                   10,000                1,229
-// 5                  100,000                9,592
-// 6                1,000,000               78,498
-// 7               10,000,000              664,579
-// 8              100,000,000            5,761,455
-// 9            1,000,000,000           50,847,534
-// 10          10,000,000,000          455,052,511
-// 11         100,000,000,000        4,118,054,813
-// 12       1,000,000,000,000       37,607,912,018
-// 13      10,000,000,000,000      346,065,536,839
-// 14     100,000,000,000,000    3,204,941,750,802
-// 15   1,000,000,000,000,000   29,844,570,422,669
-// 16  10,000,000,000,000,000  279,238,341,033,925
+//        x                  π(x)
+//       10                     4
+//      100                    25
+//    1,000                   168
+//   10,000                 1,229
+//  100,000                 9,592
+//     10^6                78,498
+//     10^7               664,579
+//     10^8             5,761,455
+//     10^9            50,847,534
+//    10^10           455,052,511
+//    10^11         4,118,054,813
+//    10^12        37,607,912,018
+//    10^13       346,065,536,839
+//    10^14     3,204,941,750,802
+//    10^15    29,844,570,422,669
+//    10^16   279,238,341,033,925
 
 import (
 	"fmt"
-	"log"
 	"math"
 )
 
@@ -38,7 +37,7 @@ func Len() int {
 	return primeCount
 }
 
-// Iter returns an iterator over all Primes
+// Iter returns an iterator over all primes
 func Iter() func(func(int, int) bool) {
 	return Iterr(0, Len()-1)
 }
@@ -73,7 +72,7 @@ func Iterr(start, end int) func(func(int, int) bool) {
 	}
 }
 
-// Nth returns the nth prime
+// Nth returns the value of the nth prime
 func Nth(n int) int {
 	ctx := newContext(n)
 	return ctx.next()
@@ -98,10 +97,10 @@ func Index(p int) int {
 		adjust = 1
 	}
 
-	return primesBelow(iByte, iBit) - adjust
+	return offset2index(iByte, iBit) - adjust
 }
 
-// Pi returns the number of primes below (and including) n
+// Pi returns the number of primes up to and including n
 func Pi(n int) int {
 	if n < 2 {
 		return 0
@@ -116,15 +115,15 @@ func Prime(p int) bool {
 	}
 
 	if p > PrimeMax() {
-		return SlowPrime(p)
+		return PrimeSlow(p)
 	}
 
 	iByte, iBit, ok, _ := int2offset(p)
 	return ok && bitIsSet(iByte, iBit)
 }
 
-// SlowPrime returns whether a number is prime or not, using a brute force search
-func SlowPrime(n int) bool {
+// PrimeSlow returns whether a number is prime or not, used for primes > PrimeMax()
+func PrimeSlow(n int) bool {
 	if n <= 1 {
 		return false
 	}
@@ -142,57 +141,4 @@ func SlowPrime(n int) bool {
 	}
 
 	return true
-}
-
-// MakePrimes finds and returns all primes <= limit
-func MakePrimes(limit uint) []int32 {
-	// Sieve of Eratosthenes
-	// Original Python Code by David Eppstein, UC Irvine, 28 Feb 2002
-	// http://code.activestate.com/recipes/117119/
-	// Found on:
-	// https://stackoverflow.com/questions/567222/simple-prime-number-generator-in-python
-
-	// Maps composites to primes witnessing their compositeness.
-	// This is memory efficient, as the sieve is not "run forward"
-	// indefinitely, but only as long as required by the current
-	// number being tested.
-
-	if limit > 4294967296 {
-		// We calculate q*q below; verify q*q will not overflow uint
-		log.Fatal("limit > sqrt(2^64 - 1)! ", limit)
-	}
-
-	primes := []int32{}
-	D := map[uint][]uint{}
-
-	// The running integer that's checked for primeness
-	for q := uint(2); ; q++ {
-		_, ok := D[q]
-		if !ok {
-			if q > limit {
-				break
-			}
-			// q is a new prime.
-			// Yield it and mark its first multiple that isn't
-			// already marked in previous iterations
-			primes = append(primes, int32(q))
-			D[q*q] = []uint{q}
-		} else {
-			// q is composite. D[q] is the list of primes that
-			// divide it. Since we've reached q, we no longer
-			// need it in the map, but we'll mark the next
-			// multiples of its witnesses to prepare for larger
-			// numbers
-			for _, p := range D[q] {
-				_, ok := D[p+q]
-				if !ok {
-					D[p+q] = []uint{}
-				}
-				D[p+q] = append(D[p+q], p)
-			}
-			delete(D, q)
-		}
-	}
-
-	return primes
 }

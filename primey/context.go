@@ -1,7 +1,5 @@
 package primey
 
-import "fmt"
-
 // Edge-based indexing
 //
 //     item   0   1   2   3   4   5
@@ -14,54 +12,49 @@ import "fmt"
 
 // context stores the position of the iterator in the list of primes
 type context struct {
-	iByteBit int // byte and bit offsets together; bit overflow/underflow automatically increments/decrements byte
+	iByteBit int // byte and bit offsets concatenated; bit's overflow/underflow automatically increments/decrements byte
 	index    int
 	end      int
 }
 
-// newContext returns a new context, starting at the given position
+// newContext returns a new context, set to the given index
 func newContext(start int) context {
 	// context indicates the next prime to return
 	ctx := context{
 		iByteBit: 0,
-		index:    0,
-		end:      (len(wheel)-1)<<3 + 7,
+		index:    start,
+		end:      (len(wheel)-1)<<3 + 0x07,
 	}
 
-	if start > PrimeMax() {
-		err := fmt.Errorf("index out of range %d > %d", start, PrimeMax())
-		panic(err)
-	}
-
-	for ctx.index < start && !ctx.atEnd() {
-		ctx.next()
-	}
+	iByte, iBit := index2offset(start)
+	ctx.iByteBit = iByte<<3 + int(iBit)
 
 	return ctx
 }
 
 // atStart returns true if ctx points to the start of the primes
 func (ctx *context) atStart() bool {
-	return ctx.iByteBit == 0
+	return ctx.index == 0
 }
 
 // atEnd returns true if ctx points to the end of the primes
 func (ctx *context) atEnd() bool {
-	return ctx.iByteBit == ctx.end
+	return ctx.index == Len()
 }
 
-// dec decrements ctx by one
+// dec decrements ctx by one, trusting the caller to stay in bounds
 func (ctx *context) dec() {
 	ctx.iByteBit--
 }
 
-// inc increments ctx by one
+// inc increments ctx by one, trusting the caller to stay in bounds
 func (ctx *context) inc() {
 	ctx.iByteBit++
 }
 
-// prev moves ctx to the previous prime and returns that prime
+// prev moves ctx to the previous prime and returns that prime, trusting the caller to stay in bounds
 func (ctx *context) prev() int {
+	// FIXME: This function has not been tested!
 	if ctx.index < len(primeCache)-1 && !ctx.atStart() {
 		ctx.index--
 		return primeCache[ctx.index]
@@ -69,7 +62,7 @@ func (ctx *context) prev() int {
 
 	for !ctx.atStart() {
 		iByte := ctx.iByteBit >> 3
-		iBit := uint8(ctx.iByteBit & 7)
+		iBit := uint8(ctx.iByteBit & 0x07)
 		if bitIsSet(iByte, iBit) {
 			p := offset2int(iByte, iBit)
 			ctx.dec()
@@ -92,15 +85,12 @@ func (ctx *context) next() int {
 
 	if ctx.index == len(primeCache) {
 		// Leaving primeCache and entering wheel; initialize the wheel index
-		p := primeCache[len(primeCache)-1]
-		iByte, iBit, _, _ := int2offset(p)
-		ctx.iByteBit = iByte<<3 + int(iBit)
-		ctx.inc()
+		ctx.iByteBit = wheelStartByteBit
 	}
 
 	for {
 		iByte := ctx.iByteBit >> 3
-		iBit := uint8(ctx.iByteBit & 7)
+		iBit := uint8(ctx.iByteBit & 0x07)
 		if bitIsSet(iByte, iBit) {
 			p := offset2int(iByte, iBit)
 			ctx.inc()

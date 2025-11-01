@@ -14,21 +14,14 @@ package primey
 //
 // To create a new wheel gob file:
 //
-//   for _, prime := range MakePrimes(maxPrime) {
+//   for _, prime := range FindPrimes(maxPrime) {
 //     store(uint32(prime))
 //   }
 //   bake()
 //   save()
 
 import (
-	"encoding/gob"
-	"fmt"
 	"math/bits"
-	"os"
-
-	"github.com/erikbryant/util-golang/system"
-	"golang.org/x/text/language"
-	"golang.org/x/text/message"
 )
 
 var (
@@ -47,12 +40,15 @@ var (
 		29: 7,
 	}
 
-	// Loaded from the gob file ...
+	// ---------- The prime cache ----------
+
+	primeCache        = []int{2, 3, 5}
+	wheelStartByteBit = wheelStart()
+
+	// ---------- Loaded from the gob file ----------
 
 	// wheel is the compressed storage for primes
-	wheel = make([]uint8, maxPrime/30)
-
-	primeCache = []int{2, 3, 5}
+	wheel = []uint8{}
 
 	// piCache is the cache of pre-computed counts
 	piCache = []uint32{}
@@ -65,9 +61,6 @@ var (
 )
 
 const (
-	// maxPrime is the highest value up to which we will search for primes
-	maxPrime = 100*1000*1000 + 1000
-
 	// gobName is the name of the gob file the primes are stored in
 	gobName = "wheel.gob"
 
@@ -77,6 +70,14 @@ const (
 
 func init() {
 	load()
+}
+
+// wheelStart returns the position one after the end of primeCache
+func wheelStart() int {
+	p := primeCache[len(primeCache)-1]
+	iByte, iBit, _, _ := int2offset(p)
+	iByteBit := iByte<<3 + int(iBit)
+	return iByteBit + 1
 }
 
 // int2offset returns the bit/byte in the wheel that the int corresponds to
@@ -105,8 +106,49 @@ func bitIsSet(iByte int, iBit uint8) bool {
 	return wheel[iByte]&(1<<iBit) != 0
 }
 
-// primesBelow returns the number of primes below the input. Input must be prime and must be > 5.
-func primesBelow(iByte int, iBit uint8) int {
+func index2offset(index int) (int, uint8) {
+	if index <= 2 {
+		// Wheel does not store {2, 3, 5}
+		return 0, 0
+	}
+	index -= 3
+
+	iByte := 0
+	iBit := uint8(0)
+
+	// Jump forward to the step that index is in
+	for s := 0; ; s++ {
+		if int(piCache[s+1]) > index {
+			iByte = s * piStep
+			index -= int(piCache[s])
+			break
+		}
+	}
+
+	// Walk forward to the byte that index is in
+	for {
+		oc := bits.OnesCount8(wheel[iByte])
+		if oc > index {
+			break
+		}
+		iByte += 1
+		index -= oc
+	}
+
+	// Crawl forward to the bit that index represents
+	for b := uint8(0); index >= 0 && b <= 7; b++ {
+		if !bitIsSet(iByte, b) {
+			continue
+		}
+		iBit = b
+		index -= 1
+	}
+
+	return iByte, iBit
+}
+
+// offset2index returns the index of this prime (i.e., the number of primes below the input). Input must be prime and must be > 5.
+func offset2index(iByte int, iBit uint8) int {
 	// Count 2, 3, and 5
 	primesBelowP := 3
 
@@ -127,100 +169,4 @@ func primesBelow(iByte int, iBit uint8) int {
 	}
 
 	return primesBelowP
-}
-
-// save writes the wheel and its derived values to the gob file
-func save() {
-	file, err := os.Create(system.MyPath(gobName))
-	if err != nil {
-		fmt.Printf("error creating file: %v", err)
-		panic(err)
-	}
-	defer file.Close()
-
-	encoder := gob.NewEncoder(file)
-
-	_ = encoder.Encode(wheel)
-	_ = encoder.Encode(piCache)
-	_ = encoder.Encode(primeCount)
-	_ = encoder.Encode(primeMax)
-}
-
-// load reads the contents of the gob file into wheel and its derived values
-func load() {
-	file, err := os.Open(system.MyPath(gobName))
-	if err != nil {
-		fmt.Printf("error opening file: %v", err)
-		panic(err)
-	}
-	defer file.Close()
-
-	decoder := gob.NewDecoder(file)
-
-	err = decoder.Decode(&wheel)
-	if err != nil {
-		fmt.Printf("error reading primes gob: %v", err)
-		panic(err)
-	}
-
-	err = decoder.Decode(&piCache)
-	if err != nil {
-		fmt.Printf("error reading primes gob: %v", err)
-		panic(err)
-	}
-
-	err = decoder.Decode(&primeCount)
-	if err != nil {
-		fmt.Printf("error reading primes gob: %v", err)
-		panic(err)
-	}
-
-	err = decoder.Decode(&primeMax)
-	if err != nil {
-		fmt.Printf("error reading primes gob: %v", err)
-		panic(err)
-	}
-}
-
-// store writes the prime to wheel (be sure to call bake() when done storing)
-func store(p uint32) {
-	if p <= 5 {
-		return
-	}
-	iByte, iBit, ok, _ := int2offset(int(p))
-	if !ok {
-		fmt.Printf("%d is not prime! Not storing.\n", p)
-		return
-	}
-
-	if bitIsSet(iByte, iBit) {
-		fmt.Printf("%d is already stored! Not storing.\n", p)
-		return
-	}
-
-	primeMax = max(primeMax, int(p))
-	primeCount++
-	setBit(iByte, iBit)
-}
-
-// bake computes the derived values for a new wheel
-func bake() {
-	piCache = make([]uint32, primeCount/piStep)
-
-	primeCount := uint32(0)
-	for i := 0; i < len(wheel); i++ {
-		primeCount += uint32(bits.OnesCount8(wheel[i]))
-		k := i/piStep + 1
-		piCache[k] = primeCount
-	}
-
-	p := message.NewPrinter(language.English)
-	p.Printf("Wheel statistics\n")
-	p.Printf("primeCount      = %16d\n", primeCount)
-	p.Printf("primeMax        = %16d\n", primeMax)
-	p.Printf("Wheel size      = %16d bytes\n", len(wheel))
-	p.Printf("sizeof(piCache) = %16d bytes\n", len(piCache)*4)
-	totalSizeWheel := len(wheel) + len(piCache)*4
-	p.Printf("total size      = %16d bytes\n", totalSizeWheel)
-	p.Printf("primes/byte     = %16f\n", float64(primeCount)/float64(totalSizeWheel))
 }
