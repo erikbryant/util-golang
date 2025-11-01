@@ -52,6 +52,8 @@ var (
 	// wheel is the compressed storage for primes
 	wheel = make([]uint8, maxPrime/30)
 
+	primeCache = []int{2, 3, 5}
+
 	// piCache is the cache of pre-computed counts
 	piCache = []uint32{}
 
@@ -72,6 +74,10 @@ const (
 	// piStep is the size of the blocks in the prime counts cache
 	piStep = 100 // A smaller step makes Index faster, but piCache larger
 )
+
+func init() {
+	load()
+}
 
 // int2offset returns the bit/byte in the wheel that the int corresponds to
 func int2offset(p int) (int, uint8, bool, int) {

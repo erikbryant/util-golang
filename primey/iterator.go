@@ -62,9 +62,9 @@ func (ctx *context) inc() {
 
 // prev moves ctx to the previous prime and returns that prime
 func (ctx *context) prev() int {
-	if ctx.index < 3 && !ctx.atStart() {
+	if ctx.index < len(primeCache)-1 && !ctx.atStart() {
 		ctx.index--
-		return []int{2, 3, 5}[ctx.index]
+		return primeCache[ctx.index]
 	}
 
 	for !ctx.atStart() {
@@ -82,12 +82,20 @@ func (ctx *context) prev() int {
 	return 0
 }
 
-// next returns the next prime and increments cts, trusting the caller to stay in bounds
+// next returns the next prime and advances ctx, trusting the caller to stay in bounds
 func (ctx *context) next() int {
-	if ctx.index < 3 {
-		p := []int{2, 3, 5}[ctx.index]
+	if ctx.index < len(primeCache) {
+		p := primeCache[ctx.index]
 		ctx.index++
 		return p
+	}
+
+	if ctx.index == len(primeCache) {
+		// Leaving primeCache and entering wheel; initialize the wheel index
+		p := primeCache[len(primeCache)-1]
+		iByte, iBit, _, _ := int2offset(p)
+		ctx.iByteBit = iByte<<3 + int(iBit)
+		ctx.inc()
 	}
 
 	for {

@@ -28,27 +28,18 @@ import (
 	"math"
 )
 
-func initPrimes() {
-	if primeCount == 0 {
-		load()
-	}
-}
-
 // PrimeMax returns the largest prime in the list of primes
 func PrimeMax() int {
-	initPrimes()
 	return primeMax
 }
 
 // Len returns the length of the list of primes
 func Len() int {
-	initPrimes()
 	return primeCount
 }
 
 // Iter returns an iterator over all Primes
 func Iter() func(func(int, int) bool) {
-	initPrimes()
 	return Iterr(0, Len()-1)
 }
 
@@ -57,8 +48,6 @@ func Iterr(start, end int) func(func(int, int) bool) {
 	if end <= start {
 		return func(yield func(int, int) bool) {}
 	}
-
-	initPrimes()
 
 	if start < 0 || start >= Len() {
 		err := fmt.Errorf("start index out of range 0 >= %d > %d ", start, Len())
@@ -86,15 +75,12 @@ func Iterr(start, end int) func(func(int, int) bool) {
 
 // Nth returns the nth prime
 func Nth(n int) int {
-	initPrimes()
 	ctx := newContext(n)
 	return ctx.next()
 }
 
 // Index returns the index of the prime, or if p is not prime then the index below the next highest prime
 func Index(p int) int {
-	initPrimes()
-
 	if p <= 5 {
 		return []int{0, 0, 0, 1, 1, 2}[p]
 	}
@@ -125,8 +111,6 @@ func Pi(n int) int {
 
 // Prime returns true if p is a prime
 func Prime(p int) bool {
-	initPrimes()
-
 	if p <= 5 {
 		return p == 2 || p == 3 || p == 5
 	}
@@ -141,8 +125,6 @@ func Prime(p int) bool {
 
 // SlowPrime returns whether a number is prime or not, using a brute force search
 func SlowPrime(n int) bool {
-	initPrimes()
-
 	if n <= 1 {
 		return false
 	}
