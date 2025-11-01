@@ -59,10 +59,10 @@ func Iterr(start, end int) func(func(int, int) bool) {
 		panic(err)
 	}
 
-	return func(yield func(int, int) bool) {
-		// Initialize the starting point
-		ctx := newContext(start)
+	// Initialize the starting point
+	ctx := newContext(start)
 
+	return func(yield func(int, int) bool) {
 		// Yield the primes
 		for i := start; i < end; i++ {
 			prime := ctx.next()
