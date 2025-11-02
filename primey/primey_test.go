@@ -187,7 +187,7 @@ func TestPrimeSlow(t *testing.T) {
 	}
 }
 
-func TestResize(t *testing.T) {
+func TestCacheResize(t *testing.T) {
 	testCases := []struct {
 		n         int
 		expected1 []uint32

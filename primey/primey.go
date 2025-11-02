@@ -170,6 +170,7 @@ func PrimeSlow(n int) bool {
 	return true
 }
 
+// CacheResize sets the length of primeCache to l and fills it with primes
 func CacheResize(l int) {
 	l = max(l, 3)
 	l = min(l, Len())
