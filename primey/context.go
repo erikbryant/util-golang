@@ -18,7 +18,7 @@ type context struct {
 
 // newContext returns a new context, set to the given index
 func newContext(start int) context {
-	// context indicates the next prime to return
+	// ctx indicates the next prime to return
 	ctx := context{
 		iByteBit: 0,
 		index:    start,
@@ -75,20 +75,6 @@ func (ctx *context) prev() int {
 
 // next returns the next prime and advances ctx, trusting the caller to stay in bounds
 func (ctx *context) next() int {
-	// TODO: the commented-out code is for a context that spans both the
-	// TODO: primeCache and wheel. We are not using that. Will we ever?
-
-	//if ctx.index < len(primeCache) {
-	//	p := primeCache[ctx.index]
-	//	ctx.index++
-	//	return p
-	//}
-
-	//if ctx.index == len(primeCache) {
-	//	// Leaving primeCache and entering wheel; initialize the wheel index
-	//	ctx.iByteBit = wheelStartByteBit
-	//}
-
 	for {
 		iByte := ctx.iByteBit >> 3
 		iBit := uint8(ctx.iByteBit & 0x07)
