@@ -186,3 +186,33 @@ func TestPrimeSlow(t *testing.T) {
 		}
 	}
 }
+
+func TestResize(t *testing.T) {
+	testCases := []struct {
+		n         int
+		expected1 []uint32
+		expected2 int
+	}{
+		{0, []uint32{2, 3, 5}, 7},
+		{1, []uint32{2, 3, 5}, 7},
+		{2, []uint32{2, 3, 5}, 7},
+		{3, []uint32{2, 3, 5}, 7},
+		{4, []uint32{2, 3, 5, 7}, 11},
+		{5, []uint32{2, 3, 5, 7, 11}, 13},
+		{3, []uint32{2, 3, 5}, 7},
+	}
+
+	for _, testCase := range testCases {
+		CacheResize(testCase.n)
+		if !slices.Equal(primeCache, testCase.expected1) {
+			t.Errorf("ERROR: For %d expected %v, got %v", testCase.n, testCase.expected1, primeCache)
+		}
+
+		// Verify that the next prime (which will come from wheel) is the proper one in the sequence
+		// That is, that primeCache and wheel are properly aligned
+		answer := Nth(max(testCase.n, 3))
+		if answer != testCase.expected2 {
+			t.Errorf("ERROR: For %d expected %d, got %d", testCase.n, testCase.expected2, answer)
+		}
+	}
+}

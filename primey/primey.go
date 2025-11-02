@@ -45,6 +45,7 @@ func Iter() func(func(int, int) bool) {
 // Iterr returns an iterator over a range of index values
 func Iterr(start, end int) func(func(int, int) bool) {
 	if end <= start {
+		// Nothing to do
 		return func(yield func(int, int) bool) {}
 	}
 
@@ -58,22 +59,48 @@ func Iterr(start, end int) func(func(int, int) bool) {
 		panic(err)
 	}
 
-	// Initialize the starting point
-	ctx := newContext(start)
+	// Yield primes only from the primeCache
+	if end <= len(primeCache) {
+		return func(yield func(int, int) bool) {
+			for i := start; i < end; i++ {
+				if !yield(i-start, int(primeCache[i])) {
+					return
+				}
+			}
+		}
+	}
 
 	return func(yield func(int, int) bool) {
-		// Yield the primes
-		for i := start; i < end; i++ {
+		i := start
+
+		// Yield primes from the primeCache
+		for ; i < len(primeCache); i++ {
+			if !yield(i-start, int(primeCache[i])) {
+				return
+			}
+		}
+
+		ctx := newContext(i)
+
+		// Yield primes from the wheel
+		for ; i < end; i++ {
 			prime := ctx.next()
 			if !yield(i-start, prime) {
 				return
 			}
 		}
+
+		// TODO: Yield primes from beyond what is precomputed
+		// TODO: Is this the right place? Is this useful?
+		// TODO: Call PrimeSlow()? Load FindPrimes() state from disk?
 	}
 }
 
 // Nth returns the value of the nth prime
 func Nth(n int) int {
+	if n < len(primeCache) {
+		return int(primeCache[n])
+	}
 	ctx := newContext(n)
 	return ctx.next()
 }
@@ -141,4 +168,26 @@ func PrimeSlow(n int) bool {
 	}
 
 	return true
+}
+
+func CacheResize(l int) {
+	l = max(l, 3)
+	l = min(l, Len())
+
+	if l == len(primeCache) {
+		return
+	}
+
+	newCache := make([]uint32, l)
+
+	// Copy only copies up to the length of the shorter
+	copy(newCache, primeCache)
+
+	// Fill in the rest of newCache (if needed)
+	start := min(len(newCache), len(primeCache))
+	for i, p := range Iterr(start, l) {
+		newCache[i+start] = uint32(p)
+	}
+
+	primeCache = newCache
 }

@@ -42,8 +42,7 @@ var (
 
 	// ---------- The prime cache ----------
 
-	primeCache        = []int{2, 3, 5}
-	wheelStartByteBit = wheelStart()
+	primeCache = []uint32{2, 3, 5}
 
 	// ---------- Loaded from the gob file ----------
 
@@ -75,7 +74,7 @@ func init() {
 // wheelStart returns the position one after the end of primeCache
 func wheelStart() int {
 	p := primeCache[len(primeCache)-1]
-	iByte, iBit, _, _ := int2offset(p)
+	iByte, iBit, _, _ := int2offset(int(p))
 	iByteBit := iByte<<3 + int(iBit)
 	return iByteBit + 1
 }

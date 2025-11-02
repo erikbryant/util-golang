@@ -23,7 +23,6 @@ func newContext(start int) context {
 	ctx := context{
 		iByteBit: 0,
 		index:    start,
-		end:      (len(wheel)-1)<<3 + 0x07,
 	}
 
 	iByte, iBit := index2offset(start)
@@ -57,7 +56,7 @@ func (ctx *context) prev() int {
 	// FIXME: This function has not been tested!
 	if ctx.index < len(primeCache)-1 && !ctx.atStart() {
 		ctx.index--
-		return primeCache[ctx.index]
+		return int(primeCache[ctx.index])
 	}
 
 	for !ctx.atStart() {
@@ -77,16 +76,19 @@ func (ctx *context) prev() int {
 
 // next returns the next prime and advances ctx, trusting the caller to stay in bounds
 func (ctx *context) next() int {
-	if ctx.index < len(primeCache) {
-		p := primeCache[ctx.index]
-		ctx.index++
-		return p
-	}
+	// TODO: the commented-out code is for a context that spans both the
+	// TODO: primeCache and wheel. We are not using that. Will we ever?
 
-	if ctx.index == len(primeCache) {
-		// Leaving primeCache and entering wheel; initialize the wheel index
-		ctx.iByteBit = wheelStartByteBit
-	}
+	//if ctx.index < len(primeCache) {
+	//	p := primeCache[ctx.index]
+	//	ctx.index++
+	//	return p
+	//}
+
+	//if ctx.index == len(primeCache) {
+	//	// Leaving primeCache and entering wheel; initialize the wheel index
+	//	ctx.iByteBit = wheelStartByteBit
+	//}
 
 	for {
 		iByte := ctx.iByteBit >> 3
