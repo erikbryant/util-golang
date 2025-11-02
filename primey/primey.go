@@ -62,8 +62,8 @@ func Iterr(start, end int) func(func(int, int) bool) {
 	// Yield primes only from the primeCache
 	if end <= len(primeCache) {
 		return func(yield func(int, int) bool) {
-			for i := start; i < end; i++ {
-				if !yield(i-start, int(primeCache[i])) {
+			for i, prime := range primeCache[start:end] {
+				if !yield(i, int(prime)) {
 					return
 				}
 			}
