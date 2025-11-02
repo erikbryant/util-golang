@@ -12,20 +12,19 @@ package primey
 
 // context stores the position of the iterator in the list of primes
 type context struct {
-	iByteBit int // byte and bit offsets concatenated; bit's overflow/underflow automatically increments/decrements byte
-	index    int
+	index int
+	iByte int
+	iBit  uint8
 }
 
 // newContext returns a new context, set to the given index
 func newContext(start int) context {
 	// ctx indicates the next prime to return
 	ctx := context{
-		iByteBit: 0,
-		index:    start,
+		index: start,
 	}
 
-	iByte, iBit := index2offset(start)
-	ctx.iByteBit = iByte<<3 + int(iBit)
+	ctx.iByte, ctx.iBit = index2offset(start)
 
 	return ctx
 }
@@ -40,46 +39,20 @@ func (ctx *context) atEnd() bool {
 	return ctx.index == Len()
 }
 
-// dec decrements ctx by one, trusting the caller to stay in bounds
-func (ctx *context) dec() {
-	ctx.iByteBit--
-}
-
 // inc increments ctx by one, trusting the caller to stay in bounds
 func (ctx *context) inc() {
-	ctx.iByteBit++
-}
-
-// prev moves ctx to the previous prime and returns that prime, trusting the caller to stay in bounds
-func (ctx *context) prev() int {
-	// FIXME: This function has not been tested!
-	if ctx.index < len(primeCache)-1 && !ctx.atStart() {
-		ctx.index--
-		return int(primeCache[ctx.index])
+	ctx.iBit++
+	if ctx.iBit > 7 {
+		ctx.iByte++
+		ctx.iBit = 0
 	}
-
-	for !ctx.atStart() {
-		iByte := ctx.iByteBit >> 3
-		iBit := uint8(ctx.iByteBit & 0x07)
-		if bitIsSet(iByte, iBit) {
-			p := offset2int(iByte, iBit)
-			ctx.dec()
-			ctx.index--
-			return p
-		}
-		ctx.dec()
-	}
-
-	return 0
 }
 
 // next returns the next prime and advances ctx, trusting the caller to stay in bounds
 func (ctx *context) next() int {
 	for {
-		iByte := ctx.iByteBit >> 3
-		iBit := uint8(ctx.iByteBit & 0x07)
-		if bitIsSet(iByte, iBit) {
-			p := offset2int(iByte, iBit)
+		if bitIsSet(ctx.iByte, ctx.iBit) {
+			p := offset2int(ctx.iByte, ctx.iBit)
 			ctx.inc()
 			ctx.index++
 			return p

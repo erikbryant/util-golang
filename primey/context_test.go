@@ -7,20 +7,29 @@ func TestNewContext(t *testing.T) {
 		c         int
 		expected1 int
 		expected2 int
+		expected3 uint8
 	}{
-		{0, 0, 0},
-		{1, 1, 0},
-		{2, 2, 0},
-		{3, 3, 1},
-		{4, 4, 2},
+		{0, 0, 0, 0},
+		{1, 1, 0, 0},
+		{2, 2, 0, 0},
+		{3, 3, 0, 1},
+		{4, 4, 0, 2},
+		{5, 5, 0, 3},
+		{6, 6, 0, 4},
+		{7, 7, 0, 5},
+		{8, 8, 0, 6},
+		{9, 9, 0, 7},
+		{10, 10, 1, 0},
+		{11, 11, 1, 1},
 	}
 
 	for _, testCase := range testCases {
 		ctx := newContext(testCase.c)
 		answer1 := ctx.index
-		answer2 := ctx.iByteBit
-		if answer1 != testCase.expected1 || answer2 != testCase.expected2 {
-			t.Errorf("ERROR: For %d expected %d, %d, got %d, %d", testCase.c, testCase.expected1, testCase.expected2, answer1, answer2)
+		answer2 := ctx.iByte
+		answer3 := ctx.iBit
+		if answer1 != testCase.expected1 || answer2 != testCase.expected2 || answer3 != testCase.expected3 {
+			t.Errorf("ERROR: For %d expected %d, %d, %d got %d, %d, %d", testCase.c, testCase.expected1, testCase.expected2, testCase.expected3, answer1, answer2, answer3)
 		}
 	}
 }
