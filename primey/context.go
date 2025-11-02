@@ -14,7 +14,6 @@ package primey
 type context struct {
 	iByteBit int // byte and bit offsets concatenated; bit's overflow/underflow automatically increments/decrements byte
 	index    int
-	end      int
 }
 
 // newContext returns a new context, set to the given index
