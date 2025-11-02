@@ -4,22 +4,6 @@ import (
 	"testing"
 )
 
-func TestWheelStart(t *testing.T) {
-	testCases := []struct {
-		n        int
-		expected int
-	}{
-		{1, 1},
-	}
-
-	for _, testCase := range testCases {
-		answer := wheelStart()
-		if answer != testCase.expected {
-			t.Errorf("ERROR: For %d expected %d, got %d", testCase.n, testCase.expected, answer)
-		}
-	}
-}
-
 func TestInt2Offset(t *testing.T) {
 	testCases := []struct {
 		n         int

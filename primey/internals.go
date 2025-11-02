@@ -71,14 +71,6 @@ func init() {
 	load()
 }
 
-// wheelStart returns the position one after the end of primeCache
-func wheelStart() int {
-	p := primeCache[len(primeCache)-1]
-	iByte, iBit, _, _ := int2offset(int(p))
-	iByteBit := iByte<<3 + int(iBit)
-	return iByteBit + 1
-}
-
 // int2offset returns the bit/byte in the wheel that the int corresponds to
 func int2offset(p int) (int, uint8, bool, int) {
 	iByte := p / 30
