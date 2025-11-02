@@ -6,25 +6,44 @@ import (
 )
 
 func TestIter(t *testing.T) {
-	primes := []int{}
+	primes := make([]int, 7)
 	for i, prime := range Iter() {
 		if i > 4 {
 			break
 		}
-		primes = append(primes, prime)
+		primes[i] = prime
 	}
-	if !slices.Equal(primes, []int{2, 3, 5, 7, 11}) {
+	if !slices.Equal(primes, []int{2, 3, 5, 7, 11, 0, 0}) {
 		t.Error("Iter failed to regenerate simple test!", primes)
 	}
 }
 
 func TestIterr(t *testing.T) {
-	primes := make([]int, 5)
-	for i, prime := range Iterr(1, 5) {
-		primes[i] = prime
+	testCases := []struct {
+		start    int
+		end      int
+		expected []int
+	}{
+		// Just within the primeCache range
+		{1, 2, []int{3, 0, 0, 0, 0}},
+
+		// Just within the wheel range
+		{5, 8, []int{13, 17, 19, 0, 0}},
+
+		// Spanning the primeCache across into the wheel
+		{2, 7, []int{5, 7, 11, 13, 17}},
 	}
-	if !slices.Equal(primes, []int{3, 5, 7, 11, 0}) {
-		t.Error("Iterr failed to regenerate simple test!", primes)
+
+	CacheResize(3)
+
+	for _, testCase := range testCases {
+		answer := make([]int, 5)
+		for i, prime := range Iterr(testCase.start, testCase.end) {
+			answer[i] = prime
+		}
+		if !slices.Equal(answer, testCase.expected) {
+			t.Errorf("ERROR: For %d:%d expected %v, got %v", testCase.start, testCase.end, testCase.expected, answer)
+		}
 	}
 }
 

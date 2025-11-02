@@ -70,16 +70,29 @@ func Iterr(start, end int) func(func(int, int) bool) {
 		}
 	}
 
-	return func(yield func(int, int) bool) {
-		i := start
+	// Yield primes only from the wheel
+	if start >= len(primeCache) {
+		return func(yield func(int, int) bool) {
+			ctx := newContext(start)
+			for i := start; i < end; i++ {
+				prime := ctx.next()
+				if !yield(i-start, prime) {
+					return
+				}
+			}
+		}
+	}
 
+	// Yield primes from a range spanning both the primeCache and the wheel
+	return func(yield func(int, int) bool) {
 		// Yield primes from the primeCache
-		for ; i < len(primeCache); i++ {
-			if !yield(i-start, int(primeCache[i])) {
+		for i, prime := range primeCache[start:] {
+			if !yield(i, int(prime)) {
 				return
 			}
 		}
 
+		i := len(primeCache)
 		ctx := newContext(i)
 
 		// Yield primes from the wheel
@@ -89,10 +102,6 @@ func Iterr(start, end int) func(func(int, int) bool) {
 				return
 			}
 		}
-
-		// TODO: Yield primes from beyond what is precomputed
-		// TODO: Is this the right place? Is this useful?
-		// TODO: Call PrimeSlow()? Load FindPrimes() state from disk?
 	}
 }
 
