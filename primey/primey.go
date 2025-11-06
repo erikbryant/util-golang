@@ -164,6 +164,15 @@ func PrimeSlow(n int) bool {
 		return false
 	}
 
+	// All primes (except 2, 3, 5) are congruent to {1, 7, 11, 13, 17, 19, 23, 29} mod 30
+	if n == 2 || n == 3 || n == 5 {
+		return true
+	}
+	r := n % 30
+	if r != 1 && r != 7 && r != 11 && r != 13 && r != 17 && r != 19 && r != 23 && r != 29 {
+		return false
+	}
+
 	root := int(math.Sqrt(float64(n)))
 
 	// Check each potential divisor to see if number divides evenly (i.e., is not prime).

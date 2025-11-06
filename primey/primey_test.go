@@ -196,6 +196,7 @@ func TestPrimeSlow(t *testing.T) {
 		{101, true},
 		{PrimeMax() + 1, false},
 		{100001029, true},
+		{100001030, false},
 	}
 
 	for _, testCase := range testCases {
