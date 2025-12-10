@@ -1,4 +1,4 @@
-github.com/emicklei/dot v1.9.2 h1:E/Wjz+BAH+JDhybEpISbo+QyDMNSiu/wqmIW9y922P8=
-github.com/emicklei/dot v1.9.2/go.mod h1:DeV7GvQtIw4h2u73RKBkkFdvVAz0D9fzeJrgPW6gy/s=
-golang.org/x/text v0.31.0 h1:aC8ghyu4JhP8VojJ2lEHBnochRno1sgL6nEi9WGFGMM=
-golang.org/x/text v0.31.0/go.mod h1:tKRAlv61yKIjGGHX/4tP1LTbc13YSec1pxVEWXzfoeM=
+github.com/emicklei/dot v1.10.0 h1:z17n0ce/FBMz3QbShSzVGhiW447Qhu7fljzvp3Gs6ig=
+github.com/emicklei/dot v1.10.0/go.mod h1:DeV7GvQtIw4h2u73RKBkkFdvVAz0D9fzeJrgPW6gy/s=
+golang.org/x/text v0.32.0 h1:ZD01bjUt1FQ9WJ0ClOL5vxgxOI/sVCNgX1YtKwcY0mU=
+golang.org/x/text v0.32.0/go.mod h1:o/rUWzghvpD5TXrTIBuJU77MTaN0ljMWE47kxGJQ7jY=
