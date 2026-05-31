@@ -1,6 +1,6 @@
 module github.com/erikbryant/util-golang
 
-go 1.25.5
+go 1.26.3
 
 require github.com/emicklei/dot v1.11.0
 
